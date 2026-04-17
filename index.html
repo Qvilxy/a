@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Rose Mini App</title>
+  <title>Peony Mini App</title>
   <style>
     /* === БАЗОВЫЕ СТИЛИ === */
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -12,7 +12,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #050505; /* Глубокий черный фон */
+      background-color: #050002;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
@@ -27,126 +27,133 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: radial-gradient(circle at center, #2a0a0a 0%, #000000 80%);
-      transition: opacity 0.5s ease-out, visibility 0.5s;
+      background: radial-gradient(circle at center, #3d0c1a 0%, #000000 90%);
+      transition: opacity 0.6s ease-out, visibility 0.6s;
       pointer-events: none; 
       user-select: none;
     }
 
-    .rose-container {
+    .flower-container {
       position: relative;
-      width: 200px;
-      height: 320px;
+      width: 220px;
+      height: 360px; /* Увеличил высоту контейнера */
       display: flex;
       justify-content: center;
       align-items: flex-end;
-      /* Легкое покачивание всей розы после появления */
-      animation: sway 4s ease-in-out infinite 3s;
+      animation: sway 6s ease-in-out infinite 3.2s;
     }
 
     /* === СТЕБЕЛЬ И ЛИСТЬЯ === */
     .stem {
-      width: 6px;
+      width: 7px;
       height: 0;
-      background: linear-gradient(90deg, #1e3c1b, #3a6b35, #1e3c1b);
+      background: linear-gradient(90deg, #1a2e1a, #386638, #1a2e1a);
       position: absolute;
       bottom: 0;
       border-radius: 4px;
-      /* Ускорено: рост за 1.2 сек */
+      /* Высота роста 240px */
       animation: growStem 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+      box-shadow: 2px 0 8px rgba(0,0,0,0.6);
+      z-index: 1;
     }
 
     .leaf {
       position: absolute;
       width: 50px;
       height: 30px;
-      background: linear-gradient(135deg, #2d5a27, #5da156);
-      border-radius: 2px 30px 2px 30px;
+      background: linear-gradient(135deg, #2d4a25, #6b9c6b);
+      border-radius: 2px 20px 2px 20px; 
       opacity: 0;
-      box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2), 2px 2px 5px rgba(0,0,0,0.3);
+      box-shadow: inset 1px 1px 3px rgba(255,255,255,0.15), 2px 4px 6px rgba(0,0,0,0.4);
+      z-index: 1;
     }
 
     .leaf.left {
-      bottom: 120px;
+      bottom: 130px;
       left: 50%;
       transform-origin: right center;
       transform: translateX(-100%) rotate(-10deg) scale(0);
-      /* Появляются на 0.8 сек */
       animation: growLeafLeft 1s ease-out 0.8s forwards;
     }
 
     .leaf.right {
-      bottom: 160px;
+      bottom: 170px;
       left: 50%;
       transform-origin: left center;
       transform: rotate(10deg) scale(0);
-      border-radius: 30px 2px 30px 2px;
-      /* Появляются на 1.0 сек */
+      border-radius: 20px 2px 20px 2px;
       animation: growLeafRight 1s ease-out 1s forwards;
     }
 
-    /* === ГОЛОВКА ЦВЕТКА (SVG) === */
+    /* === ГОЛОВКА ПИОНА (SVG) === */
     .flower-head {
       position: absolute;
-      top: 0; /* Позиционируется относительно верха стебля (который вырастет) */
-      /* Смещаем вверх, так как stem растет снизу. 
-         Высота стебля 220px. Центр цветка должен быть наверху стебля. */
-      bottom: 220px; 
-      width: 140px;
-      height: 140px;
+      /* 
+         ВАЖНО: Bottom равен максимальной высоте стебля (240px).
+         Минус половина высоты цветка (90px), чтобы центр цветка был на конце стебля.
+         240px (стебель) - 90px (половина цветка) = 150px.
+         Но так как flower-head имеет высоту 180px, нам нужно позиционировать его низ.
+         
+         Проще: Ставим bottom: 240px. Это поставит НИЖНЮЮ границу SVG ровно на верхушку стебля.
+         Но цветок должен "расти" ИЗ стебля, поэтому немного опустим его (translateY), 
+         чтобы основание бутона перекрывало конец стебля.
+      */
+      bottom: 240px; 
+      width: 180px;
+      height: 180px;
+      
+      /* Центрируем по горизонтали */
+      left: 50%;
+      transform: translateX(-50%) scale(0); 
+      
       opacity: 0;
-      transform: scale(0) rotate(-90deg); /* Начинаем свернутым */
       
-      /* Анимация цветения: начинается на 1.2сек (когда стебель вырос) и длится до 3сек */
-      animation: bloomRealistic 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) 1.2s forwards;
+      /* Анимация */
+      animation: bloomPeonyDetailed 2s cubic-bezier(0.22, 1, 0.36, 1) 1.2s forwards;
       
-      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6));
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+      z-index: 2;
     }
-
-    /* Градиенты для лепестков внутри SVG */
-    .gradient-dark { stop-color: #800000; }
-    .gradient-mid { stop-color: #cc0000; }
-    .gradient-light { stop-color: #ff3333; }
-    .gradient-highlight { stop-color: #ff6666; }
 
     /* === KEYFRAMES === */
 
     @keyframes growStem {
       0% { height: 0; }
-      100% { height: 220px; }
+      100% { height: 240px; } /* Синхронизировано с bottom цветка */
     }
 
     @keyframes growLeafLeft {
       0% { transform: translateX(-100%) rotate(-10deg) scale(0); opacity: 0; }
-      100% { transform: translateX(-100%) rotate(-45deg) scale(1); opacity: 1; }
+      100% { transform: translateX(-100%) rotate(-50deg) scale(1); opacity: 1; }
     }
 
     @keyframes growLeafRight {
       0% { transform: rotate(10deg) scale(0); opacity: 0; }
-      100% { transform: rotate(45deg) scale(1); opacity: 1; }
+      100% { transform: rotate(50deg) scale(1); opacity: 1; }
     }
 
-    @keyframes bloomRealistic {
+    @keyframes bloomPeonyDetailed {
       0% { 
         opacity: 0; 
-        transform: scale(0) rotate(-45deg); 
+        /* Начинаем чуть ниже, чтобы казалось, что он вылезает из стебля */
+        transform: translateX(-50%) scale(0) translateY(20px); 
       }
-      40% {
+      50% {
         opacity: 1;
+        transform: translateX(-50%) scale(1.05) translateY(0);
       }
       100% { 
         opacity: 1; 
-        transform: scale(1) rotate(0deg); 
+        /* Финальная позиция: центрирован по X, на месте по Y */
+        transform: translateX(-50%) scale(1) translateY(0); 
       }
     }
 
     @keyframes sway {
       0%, 100% { transform: rotate(0deg); }
-      50% { transform: rotate(2deg); }
+      50% { transform: rotate(1.5deg); }
     }
 
-    /* Класс скрытия */
     .hidden {
       opacity: 0;
       visibility: hidden;
@@ -167,63 +174,101 @@
       opacity: 1;
     }
 
-    h1 { text-align: center; margin-top: 50px; color: #ff4d4d; }
-    p { text-align: center; margin-top: 20px; line-height: 1.5; color: #aaa; }
+    h1 { text-align: center; margin-top: 50px; color: #ffb6c1; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    p { text-align: center; margin-top: 20px; line-height: 1.5; color: #ccc; }
 
   </style>
 </head>
 <body>
 
   <div id="splash-screen">
-    <div class="rose-container">
+    <div class="flower-container">
       <div class="stem"></div>
       <div class="leaf left"></div>
       <div class="leaf right"></div>
       
-      <!-- Реалистичная SVG Роза -->
+      <!-- Детализированный SVG Пион -->
       <div class="flower-head">
         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <radialGradient id="gradCenter" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" style="stop-color:#ff4d4d;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#990000;stop-opacity:1" />
+            <radialGradient id="peonyDeep" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" style="stop-color:#ffc0cb;stop-opacity:1" />
+              <stop offset="60%" style="stop-color:#ff69b4;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#c71585;stop-opacity:1" />
             </radialGradient>
-            <linearGradient id="gradPetalOuter" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#ff1a1a;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#660000;stop-opacity:1" />
+            
+            <linearGradient id="peonyLight" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" style="stop-color:#ff1493;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#fff0f5;stop-opacity:1" />
             </linearGradient>
-            <filter id="shadow">
-               <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
+
+            <filter id="innerShadow">
+              <feOffset dx="0" dy="2"/>
+              <feGaussianBlur stdDeviation="2" result="offset-blur"/>
+              <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+              <feFlood flood-color="black" flood-opacity="0.3" result="color"/>
+              <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+              <feComposite operator="over" in="shadow" in2="SourceGraphic"/> 
             </filter>
           </defs>
 
-          <!-- Внешние лепестки (чашелистики) -->
-          <path d="M100 180 C 60 180 40 140 50 100 C 60 60 90 40 100 40 C 110 40 140 60 150 100 C 160 140 140 180 100 180 Z" 
-                fill="url(#gradPetalOuter)" stroke="#4a0000" stroke-width="1" />
+          <!-- СЛОЙ 1: Внешние чашелистики -->
+          <g transform="translate(100,100)">
+             <path d="M0,85 C-40,80 -70,40 -60,0 C-50,-30 0,-40 0,-40 C 0,-40 50,-30 60,0 C 70,40 40,80 0,85 Z" 
+                   fill="#db7093" stroke="#8b0040" stroke-width="1" transform="rotate(0)" />
+             <path d="M0,80 C-35,75 -60,40 -50,5 C-40,-25 0,-35 0,-35 C 0,-35 40,-25 50,5 C 60,40 35,75 0,80 Z" 
+                   fill="#c71585" opacity="0.8" transform="rotate(45)" />
+             <path d="M0,80 C-35,75 -60,40 -50,5 C-40,-25 0,-35 0,-35 C 0,-35 40,-25 50,5 C 60,40 35,75 0,80 Z" 
+                   fill="#c71585" opacity="0.8" transform="rotate(-45)" />
+          </g>
 
-          <!-- Средний слой лепестков -->
-          <path d="M100 170 C 70 170 60 130 70 100 C 80 70 95 60 100 60 C 105 60 120 70 130 100 C 140 130 130 170 100 170 Z" 
-                fill="#cc0000" stroke="#800000" stroke-width="1" filter="url(#shadow)" />
-          
-          <!-- Внутренний бутон (спираль) -->
-          <path d="M100 160 C 80 160 75 130 85 110 C 95 90 100 85 100 85 C 100 85 105 90 115 110 C 125 130 120 160 100 160 Z" 
-                fill="#e60000" stroke="#990000" stroke-width="1" />
+          <!-- СЛОЙ 2: Основные лепестки -->
+          <g transform="translate(100,100)" filter="url(#innerShadow)">
+             <path d="M-50,20 Q-70,-30 -20,-50 Q0,-60 20,-50 Q70,-30 50,20 Q30,60 0,70 Q-30,60 -50,20" 
+                   fill="url(#peonyDeep)" stroke="#8b0040" stroke-width="0.5" />
+             <path d="M-50,20 Q-70,-30 -20,-50 Q0,-60 20,-50 Q70,-30 50,20 Q30,60 0,70 Q-30,60 -50,20" 
+                   fill="url(#peonyDeep)" stroke="#8b0040" stroke-width="0.5" transform="rotate(70)" />
+             <path d="M-50,20 Q-70,-30 -20,-50 Q0,-60 20,-50 Q70,-30 50,20 Q30,60 0,70 Q-30,60 -50,20" 
+                   fill="url(#peonyDeep)" stroke="#8b0040" stroke-width="0.5" transform="rotate(-70)" />
+             <path d="M-50,20 Q-70,-30 -20,-50 Q0,-60 20,-50 Q70,-30 50,20 Q30,60 0,70 Q-30,60 -50,20" 
+                   fill="url(#peonyDeep)" stroke="#8b0040" stroke-width="0.5" transform="rotate(180)" />
+          </g>
 
-          <!-- Центр (сердцевина) -->
-          <path d="M100 150 C 90 150 88 135 95 125 C 98 120 100 118 100 118 C 100 118 102 120 105 125 C 112 135 110 150 100 150 Z" 
-                fill="url(#gradCenter)" />
-                
-          <!-- Блики для объема -->
-          <ellipse cx="80" cy="110" rx="5" ry="10" fill="#ff6666" opacity="0.3" transform="rotate(-20 80 110)" />
-          <ellipse cx="120" cy="110" rx="5" ry="10" fill="#ff6666" opacity="0.3" transform="rotate(20 120 110)" />
+          <!-- СЛОЙ 3: Внутренние лепестки -->
+          <g transform="translate(100,100)">
+             <path d="M-30,10 Q-40,-20 -10,-30 Q0,-35 10,-30 Q40,-20 30,10 Q20,30 0,35 Q-20,30 -30,10" 
+                   fill="url(#peonyLight)" stroke="#db7093" stroke-width="0.5" transform="rotate(15)" opacity="0.95"/>
+             <path d="M-30,10 Q-40,-20 -10,-30 Q0,-35 10,-30 Q40,-20 30,10 Q20,30 0,35 Q-20,30 -30,10" 
+                   fill="url(#peonyLight)" stroke="#db7093" stroke-width="0.5" transform="rotate(-15)" opacity="0.95"/>
+             <path d="M-30,10 Q-40,-20 -10,-30 Q0,-35 10,-30 Q40,-20 30,10 Q20,30 0,35 Q-20,30 -30,10" 
+                   fill="url(#peonyLight)" stroke="#db7093" stroke-width="0.5" transform="rotate(90)" opacity="0.95"/>
+             <path d="M-30,10 Q-40,-20 -10,-30 Q0,-35 10,-30 Q40,-20 30,10 Q20,30 0,35 Q-20,30 -30,10" 
+                   fill="url(#peonyLight)" stroke="#db7093" stroke-width="0.5" transform="rotate(-90)" opacity="0.95"/>
+          </g>
+
+          <!-- СЛОЙ 4: Центр -->
+          <g transform="translate(100,100)">
+             <circle r="25" fill="#ffb6c1" />
+             <path d="M-15,-5 Q0,-15 15,-5 Q10,10 0,15 Q-10,10 -15,-5" fill="#ff69b4" stroke="#c71585" transform="rotate(0)"/>
+             <path d="M-15,-5 Q0,-15 15,-5 Q10,10 0,15 Q-10,10 -15,-5" fill="#ff69b4" stroke="#c71585" transform="rotate(60)"/>
+             <path d="M-15,-5 Q0,-15 15,-5 Q10,10 0,15 Q-10,10 -15,-5" fill="#ff69b4" stroke="#c71585" transform="rotate(120)"/>
+             <g fill="#ffd700" opacity="0.8">
+                <circle cx="-5" cy="-5" r="1.5" />
+                <circle cx="5" cy="-5" r="1.5" />
+                <circle cx="0" cy="5" r="1.5" />
+                <circle cx="-8" cy="2" r="1.2" />
+                <circle cx="8" cy="2" r="1.2" />
+                <circle cx="0" cy="-8" r="1.2" />
+             </g>
+          </g>
         </svg>
       </div>
     </div>
   </div>
 
   <div id="app-content">
-    <h1>🌹 Rose Market</h1>
-    <p>Добро пожаловать в магазин цветов.</p>
+    <h1>🌸 Peony Boutique</h1>
+    <p>Загрузка завершена.</p>
   </div>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -236,7 +281,6 @@
       const splashScreen = document.getElementById('splash-screen');
       const appContent = document.getElementById('app-content');
 
-      // Таймер установлен на 3000 мс (3 секунды)
       setTimeout(() => {
         splashScreen.classList.add('hidden');
         appContent.style.display = 'block';
