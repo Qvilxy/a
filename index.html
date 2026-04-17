@@ -1,134 +1,253 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Loading Screen</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Rose Mini App</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
+    /* === БАЗОВЫЕ СТИЛИ === */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body, html {
+      width: 100%;
+      height: 100%;
       overflow: hidden;
-      font-family: Arial, sans-serif;
+      background-color: #050505; /* Глубокий черный фон */
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    #loading-screen {
+    /* === ЭКРАН ЗАГРУЗКИ === */
+    #splash-screen {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(to bottom, #87CEEB, #E0F7FA); /* голубое небо */
       z-index: 9999;
       display: flex;
       justify-content: center;
       align-items: center;
+      background: radial-gradient(circle at center, #2a0a0a 0%, #000000 80%);
+      transition: opacity 0.5s ease-out, visibility 0.5s;
+      pointer-events: none; 
+      user-select: none;
     }
 
-    .sky {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-    }
-
-    .cloud {
-      position: absolute;
-      opacity: 0.8;
-      animation: floatCloud 8s infinite ease-in-out alternate;
-    }
-
-    .cloud1 { top: 10%; left: 10%; width: 150px; }
-    .cloud2 { top: 30%; right: 15%; width: 120px; animation-delay: 1s; }
-    .cloud3 { bottom: 20%; left: 20%; width: 180px; animation-delay: 2s; }
-
-    .bear {
+    .rose-container {
       position: relative;
       width: 200px;
-      z-index: 10;
-      animation: wavePaw 0.3s infinite alternate;
+      height: 320px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      /* Легкое покачивание всей розы после появления */
+      animation: sway 4s ease-in-out infinite 3s;
     }
 
-    .heart {
+    /* === СТЕБЕЛЬ И ЛИСТЬЯ === */
+    .stem {
+      width: 6px;
+      height: 0;
+      background: linear-gradient(90deg, #1e3c1b, #3a6b35, #1e3c1b);
       position: absolute;
-      width: 60px;
-      animation: floatHeart 2s infinite ease-in-out alternate;
+      bottom: 0;
+      border-radius: 4px;
+      /* Ускорено: рост за 1.2 сек */
+      animation: growStem 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.5);
     }
 
-    .heart1 { top: 15%; left: 20%; animation-delay: 0s; }
-    .heart2 { top: 25%; right: 25%; animation-delay: 0.3s; }
-    .heart3 { bottom: 30%; left: 15%; animation-delay: 0.6s; }
-    .heart4 { bottom: 20%; right: 20%; animation-delay: 0.9s; }
-    .heart5 { top: 40%; left: 10%; animation-delay: 1.2s; }
-    .heart6 { top: 50%; right: 10%; animation-delay: 1.5s; }
-
-    @keyframes floatCloud {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(20px); }
+    .leaf {
+      position: absolute;
+      width: 50px;
+      height: 30px;
+      background: linear-gradient(135deg, #2d5a27, #5da156);
+      border-radius: 2px 30px 2px 30px;
+      opacity: 0;
+      box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2), 2px 2px 5px rgba(0,0,0,0.3);
     }
 
-    @keyframes wavePaw {
-      0% { transform: rotate(-15deg); }
-      100% { transform: rotate(15deg); }
+    .leaf.left {
+      bottom: 120px;
+      left: 50%;
+      transform-origin: right center;
+      transform: translateX(-100%) rotate(-10deg) scale(0);
+      /* Появляются на 0.8 сек */
+      animation: growLeafLeft 1s ease-out 0.8s forwards;
     }
 
-    @keyframes floatHeart {
-      0% { transform: translateY(0) translateX(0); }
-      50% { transform: translateY(-15px) translateX(5px); }
-      100% { transform: translateY(0) translateX(0); }
+    .leaf.right {
+      bottom: 160px;
+      left: 50%;
+      transform-origin: left center;
+      transform: rotate(10deg) scale(0);
+      border-radius: 30px 2px 30px 2px;
+      /* Появляются на 1.0 сек */
+      animation: growLeafRight 1s ease-out 1s forwards;
     }
 
-    #app-interface {
+    /* === ГОЛОВКА ЦВЕТКА (SVG) === */
+    .flower-head {
+      position: absolute;
+      top: 0; /* Позиционируется относительно верха стебля (который вырастет) */
+      /* Смещаем вверх, так как stem растет снизу. 
+         Высота стебля 220px. Центр цветка должен быть наверху стебля. */
+      bottom: 220px; 
+      width: 140px;
+      height: 140px;
+      opacity: 0;
+      transform: scale(0) rotate(-90deg); /* Начинаем свернутым */
+      
+      /* Анимация цветения: начинается на 1.2сек (когда стебель вырос) и длится до 3сек */
+      animation: bloomRealistic 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) 1.2s forwards;
+      
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6));
+    }
+
+    /* Градиенты для лепестков внутри SVG */
+    .gradient-dark { stop-color: #800000; }
+    .gradient-mid { stop-color: #cc0000; }
+    .gradient-light { stop-color: #ff3333; }
+    .gradient-highlight { stop-color: #ff6666; }
+
+    /* === KEYFRAMES === */
+
+    @keyframes growStem {
+      0% { height: 0; }
+      100% { height: 220px; }
+    }
+
+    @keyframes growLeafLeft {
+      0% { transform: translateX(-100%) rotate(-10deg) scale(0); opacity: 0; }
+      100% { transform: translateX(-100%) rotate(-45deg) scale(1); opacity: 1; }
+    }
+
+    @keyframes growLeafRight {
+      0% { transform: rotate(10deg) scale(0); opacity: 0; }
+      100% { transform: rotate(45deg) scale(1); opacity: 1; }
+    }
+
+    @keyframes bloomRealistic {
+      0% { 
+        opacity: 0; 
+        transform: scale(0) rotate(-45deg); 
+      }
+      40% {
+        opacity: 1;
+      }
+      100% { 
+        opacity: 1; 
+        transform: scale(1) rotate(0deg); 
+      }
+    }
+
+    @keyframes sway {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(2deg); }
+    }
+
+    /* Класс скрытия */
+    .hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* === КОНТЕНТ ПРИЛОЖЕНИЯ === */
+    #app-content {
       display: none;
-      padding: 2rem;
-      text-align: center;
-      background: white;
       min-height: 100vh;
+      padding: 20px;
+      color: var(--tg-theme-text-color, #fff);
+      background-color: var(--tg-theme-bg-color, #1c1c1e);
+      opacity: 0;
+      transition: opacity 0.8s ease-in;
     }
+    
+    #app-content.visible {
+      opacity: 1;
+    }
+
+    h1 { text-align: center; margin-top: 50px; color: #ff4d4d; }
+    p { text-align: center; margin-top: 20px; line-height: 1.5; color: #aaa; }
+
   </style>
 </head>
 <body>
 
-  <!-- ЗАГРУЗОЧНЫЙ ЭКРАН -->
-  <div id="loading-screen">
-    <div class="sky"></div>
+  <div id="splash-screen">
+    <div class="rose-container">
+      <div class="stem"></div>
+      <div class="leaf left"></div>
+      <div class="leaf right"></div>
+      
+      <!-- Реалистичная SVG Роза -->
+      <div class="flower-head">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="gradCenter" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" style="stop-color:#ff4d4d;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#990000;stop-opacity:1" />
+            </radialGradient>
+            <linearGradient id="gradPetalOuter" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#ff1a1a;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#660000;stop-opacity:1" />
+            </linearGradient>
+            <filter id="shadow">
+               <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
+            </filter>
+          </defs>
 
-    <!-- Облака -->
-    <img src="assets/cloud.png" class="cloud cloud1" alt="Облако">
-    <img src="assets/cloud.png" class="cloud cloud2" alt="Облако">
-    <img src="assets/cloud.png" class="cloud cloud3" alt="Облако">
+          <!-- Внешние лепестки (чашелистики) -->
+          <path d="M100 180 C 60 180 40 140 50 100 C 60 60 90 40 100 40 C 110 40 140 60 150 100 C 160 140 140 180 100 180 Z" 
+                fill="url(#gradPetalOuter)" stroke="#4a0000" stroke-width="1" />
 
-    <!-- Медведь -->
-    <img src="assets/bear.png" class="bear" alt="Медведь">
+          <!-- Средний слой лепестков -->
+          <path d="M100 170 C 70 170 60 130 70 100 C 80 70 95 60 100 60 C 105 60 120 70 130 100 C 140 130 130 170 100 170 Z" 
+                fill="#cc0000" stroke="#800000" stroke-width="1" filter="url(#shadow)" />
+          
+          <!-- Внутренний бутон (спираль) -->
+          <path d="M100 160 C 80 160 75 130 85 110 C 95 90 100 85 100 85 C 100 85 105 90 115 110 C 125 130 120 160 100 160 Z" 
+                fill="#e60000" stroke="#990000" stroke-width="1" />
 
-    <!-- Сердца -->
-    <img src="assets/heart.png" class="heart heart1" alt="Сердце">
-    <img src="assets/heart.png" class="heart heart2" alt="Сердце">
-    <img src="assets/heart.png" class="heart heart3" alt="Сердце">
-    <img src="assets/heart.png" class="heart heart4" alt="Сердце">
-    <img src="assets/heart.png" class="heart heart5" alt="Сердце">
-    <img src="assets/heart.png" class="heart heart6" alt="Сердце">
+          <!-- Центр (сердцевина) -->
+          <path d="M100 150 C 90 150 88 135 95 125 C 98 120 100 118 100 118 C 100 118 102 120 105 125 C 112 135 110 150 100 150 Z" 
+                fill="url(#gradCenter)" />
+                
+          <!-- Блики для объема -->
+          <ellipse cx="80" cy="110" rx="5" ry="10" fill="#ff6666" opacity="0.3" transform="rotate(-20 80 110)" />
+          <ellipse cx="120" cy="110" rx="5" ry="10" fill="#ff6666" opacity="0.3" transform="rotate(20 120 110)" />
+        </svg>
+      </div>
+    </div>
   </div>
 
-  <!-- ОСНОВНОЙ ИНТЕРФЕЙС ПРИЛОЖЕНИЯ -->
-  <div id="app-interface">
-    <h1>Добро пожаловать!</h1>
-    <p>Интерфейс приложения запущен.</p>
-    <button onclick="alert('Работает!')">Нажми меня</button>
+  <div id="app-content">
+    <h1>🌹 Rose Market</h1>
+    <p>Добро пожаловать в магазин цветов.</p>
   </div>
 
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    // Ждём 3 секунды → резко переключаемся на интерфейс
-    setTimeout(() => {
-      document.getElementById('loading-screen').style.display = 'none';
-      document.getElementById('app-interface').style.display = 'block';
-    }, 3000);
-  </script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tg = window.Telegram.WebApp;
+      tg.ready();
+      tg.expand();
 
+      const splashScreen = document.getElementById('splash-screen');
+      const appContent = document.getElementById('app-content');
+
+      // Таймер установлен на 3000 мс (3 секунды)
+      setTimeout(() => {
+        splashScreen.classList.add('hidden');
+        appContent.style.display = 'block';
+        
+        setTimeout(() => {
+          appContent.classList.add('visible');
+          document.body.style.overflow = 'auto';
+        }, 50);
+
+      }, 3000); 
+    });
+  </script>
 </body>
 </html>
