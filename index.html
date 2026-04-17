@@ -14,7 +14,7 @@
       --nav-bg: rgba(255, 255, 255, 0.85);
       --shadow: 0 4px 12px rgba(0,0,0,0.1);
       --border-radius: 16px;
-      --icon-fill: #333; /* Цвет иконок */
+      --icon-fill: #333;
     }
 
     body.dark-mode {
@@ -24,7 +24,7 @@
       --green-placeholder: #2d4a25;
       --nav-bg: rgba(44, 44, 46, 0.85);
       --shadow: 0 4px 12px rgba(0,0,0,0.3);
-      --icon-fill: #fff; /* Цвет иконок в темной теме */
+      --icon-fill: #fff;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -86,11 +86,23 @@
     }
 
     .header {
-      display: flex; justify-content: space-between; align-items: center;
-      position: sticky; top: 0; background: var(--bg-color); z-index: 10;
+      display: flex; 
+      justify-content: center; /* Центрируем содержимое */
+      align-items: center;
+      position: sticky; 
+      top: 0; 
+      background: var(--bg-color); 
+      z-index: 10;
       padding-bottom: 10px;
+      padding-top: 10px;
     }
-    .logo { font-weight: 700; font-size: 18px; letter-spacing: 1px; }
+    
+    /* Стили для логотипа-картинки в шапке */
+    .header-logo-img {
+      height: 40px; /* Высота логотипа */
+      width: auto;
+      object-fit: contain;
+    }
 
     .screen { display: none; animation: fadeIn 0.3s; }
     .screen.active { display: block; }
@@ -240,7 +252,7 @@
 
   <!-- ЗАГРУЗОЧНЫЙ ЭКРАН -->
   <div id="splash-screen">
-    <!-- ЗАМЕНИТЕ ballonrose.png НА ВАШЕ ФОТО, ЕСЛИ НУЖНО ДРУГОЕ ИМЯ -->
+    <!-- Используем то же фото, что и для заставки -->
     <img src="ballonrose.png" alt="Loading..." class="splash-img">
   </div>
 
@@ -251,18 +263,19 @@
       
       <!-- ВКЛАДКА 1: ГЛАВНАЯ -->
       <div id="tab-home" class="screen active">
-        <div class="header"><div class="logo">FLOWER SHOP</div></div>
+        <div class="header">
+          <!-- ЛОГОТИП ПО ЦЕНТРУ -->
+          <img src="ballonrose.png" alt="Logo" class="header-logo-img">
+        </div>
         
         <div class="search-row">
           <div class="search-bar">
-            <!-- SVG Search -->
             <svg class="svg-icon" style="margin-right:8px; width:20px; height:20px;" viewBox="0 0 24 24">
               <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
             </svg>
             <input type="text" id="search-input" placeholder="Поиск цветов...">
           </div>
           <div class="cart-btn" onclick="alert('Корзина пока в разработке')">
-            <!-- SVG Cart -->
             <svg class="svg-icon" viewBox="0 0 24 24">
               <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
             </svg>
@@ -275,7 +288,10 @@
 
       <!-- ВКЛАДКА 2: ПРОФИЛЬ -->
       <div id="tab-profile" class="screen">
-        <div class="header"><div class="logo">ПРОФИЛЬ</div></div>
+        <div class="header">
+           <!-- ЛОГОТИП ПО ЦЕНТРУ -->
+           <img src="ballonrose.png" alt="Logo" class="header-logo-img">
+        </div>
 
         <div class="profile-header">
           <img src="https://via.placeholder.com/60" alt="Avatar" class="avatar" id="user-avatar">
@@ -284,7 +300,6 @@
             <span id="user-username">@username</span>
           </div>
           <div class="theme-toggle" id="theme-btn">
-            <!-- SVG Moon -->
             <svg class="svg-icon" viewBox="0 0 24 24">
               <path d="M9 2c-1.05 0-2.05.16-3 .46 1.69 1.23 2.79 3.24 2.79 5.54 0 3.87-3.13 7-7 7-1.06 0-2.06-.23-2.96-.63C.23 16.04 3.69 19 8 19c4.97 0 9-4.03 9-9 0-4.31-2.96-7.96-7.56-8.54C9.05 2.06 9.03 2 9 2z"/>
             </svg>
@@ -295,12 +310,10 @@
           <div class="section-title">Важные даты</div>
           <div class="calendar-header">
             <button id="prev-month" style="background:none; border:none; cursor:pointer;">
-               <!-- SVG Chevron Left -->
                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
             </button>
             <span id="current-month-year">Март 2026</span>
             <button id="next-month" style="background:none; border:none; cursor:pointer;">
-              <!-- SVG Chevron Right -->
               <svg class="svg-icon" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
             </button>
           </div>
@@ -323,13 +336,19 @@
 
       <!-- ВКЛАДКА 3: КУРЬЕР -->
       <div id="tab-courier" class="screen">
-        <div class="header"><div class="logo">ЗАДАНИЯ</div></div>
+        <div class="header">
+           <!-- ЛОГОТИП ПО ЦЕНТРУ -->
+           <img src="ballonrose.png" alt="Logo" class="header-logo-img">
+        </div>
         <div id="courier-list"></div>
       </div>
 
       <!-- ВКЛАДКА 4: АДМИН -->
       <div id="tab-admin" class="screen">
-        <div class="header"><div class="logo">АДМИН</div></div>
+        <div class="header">
+           <!-- ЛОГОТИП ПО ЦЕНТРУ -->
+           <img src="ballonrose.png" alt="Logo" class="header-logo-img">
+        </div>
         
         <div class="pill-section">
           <div class="section-title">Сотрудники</div>
@@ -347,25 +366,21 @@
         
         <div class="nav-item active" data-target="tab-home">
           <div class="nav-icon">
-            <!-- SVG Home -->
             <svg class="svg-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
           </div><span>Главная</span>
         </div>
         <div class="nav-item" data-target="tab-profile">
           <div class="nav-icon">
-            <!-- SVG User -->
             <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
           </div><span>Профиль</span>
         </div>
         <div class="nav-item" data-target="tab-courier">
           <div class="nav-icon">
-            <!-- SVG Truck -->
             <svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
           </div><span>Курьер</span>
         </div>
         <div class="nav-item" data-target="tab-admin">
           <div class="nav-icon">
-            <!-- SVG Crown/Admin -->
             <svg class="svg-icon" viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .55-.45 1-1 1H6c-.55 0-1-.45-1-1v-1h14v1z"/></svg>
           </div><span>Админ</span>
         </div>
@@ -424,18 +439,16 @@
         splash.classList.add('hidden');
         app.classList.add('visible');
         
-        // Удаляем сплэш из DOM после анимации, чтобы не мешал кликам
         setTimeout(() => {
           splash.style.display = 'none';
         }, 500);
-      }, 2000); // 2 секунды показа заставки
+      }, 2000);
 
       const user = tg.initDataUnsafe?.user || { first_name: "Иван", username: "ivan_test", photo_url: "" };
       document.getElementById('user-name').innerText = user.first_name;
       document.getElementById('user-username').innerText = "@" + (user.username || "user");
       if(user.photo_url) document.getElementById('user-avatar').src = user.photo_url;
 
-      // Инициализация контента
       initProducts();
       initCalendar();
       initNavigation();
@@ -518,7 +531,6 @@
       indicator.style.width = `${itemRect.width}px`;
     }
 
-    // === ЛОГИКА КОНТЕНТА ===
     const products = [
       { name: "Пион 'Sarah'", price: 5000 }, { name: "Роза 'Red Naomi'", price: 3500 },
       { name: "Тюльпан Микс", price: 2000 }, { name: "Гортензия", price: 4500 },
@@ -565,12 +577,9 @@
       btn.addEventListener('click', () => {
         isDark = !isDark;
         document.body.classList.toggle('dark-mode', isDark);
-        // Меняем иконку темы
         if(isDark) {
-             // Sun icon for dark mode (to switch back to light)
              btn.innerHTML = '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>';
         } else {
-             // Moon icon for light mode
              btn.innerHTML = '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 2c-1.05 0-2.05.16-3 .46 1.69 1.23 2.79 3.24 2.79 5.54 0 3.87-3.13 7-7 7-1.06 0-2.06-.23-2.96-.63C.23 16.04 3.69 19 8 19c4.97 0 9-4.03 9-9 0-4.31-2.96-7.96-7.56-8.54C9.05 2.06 9.03 2 9 2z"/></svg>';
         }
       });
@@ -682,7 +691,6 @@
         div.innerHTML = `
           <div class="emp-info"><span class="emp-name">${emp.name}</span><span class="emp-role">${emp.role}</span></div>
           <div class="emp-menu-btn">
-             <!-- SVG Menu Dots -->
              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
           </div>
         `;
@@ -702,3 +710,4 @@
   </script>
 </body>
 </html>
+
