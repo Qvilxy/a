@@ -1,455 +1,134 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Bear & Hearts Mini App</title>
+  <meta charset="UTF-8">
+  <title>Loading Screen</title>
   <style>
-    /* === БАЗОВЫЕ НАСТРОЙКИ === */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body, html {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    /* === ЭКРАН ЗАГРУЗКИ === */
-    #splash-screen {
+    body {
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    #loading-screen {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
+      background: linear-gradient(to bottom, #87CEEB, #E0F7FA); /* голубое небо */
       z-index: 9999;
       display: flex;
       justify-content: center;
       align-items: center;
-      
-      /* Голубое небо */
-      background: linear-gradient(to bottom, #87CEEB 0%, #E0F7FA 100%);
-      
-      transition: opacity 0.8s ease-out, visibility 0.8s;
-      pointer-events: none; 
-      user-select: none;
     }
 
-    /* Контейнер сцены */
-    .scene-container {
-      position: relative;
+    .sky {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
+      z-index: -1;
     }
 
-    /* === ОБЛАКА === */
     .cloud {
       position: absolute;
-      background: #fff;
-      border-radius: 50px;
-      opacity: 0.9;
-      filter: blur(1px);
-      z-index: 1;
-    }
-    
-    .cloud::after, .cloud::before {
-      content: '';
-      position: absolute;
-      background: #fff;
-      border-radius: 50%;
+      opacity: 0.8;
+      animation: floatCloud 8s infinite ease-in-out alternate;
     }
 
-    /* Разные облака */
-    .c-1 { width: 120px; height: 40px; top: 10%; left: -150px; animation: moveCloud 20s linear infinite; }
-    .c-1::after { width: 50px; height: 50px; top: -25px; left: 20px; }
-    .c-1::before { width: 40px; height: 40px; top: -15px; left: 60px; }
+    .cloud1 { top: 10%; left: 10%; width: 150px; }
+    .cloud2 { top: 30%; right: 15%; width: 120px; animation-delay: 1s; }
+    .cloud3 { bottom: 20%; left: 20%; width: 180px; animation-delay: 2s; }
 
-    .c-2 { width: 100px; height: 35px; top: 25%; left: -120px; animation: moveCloud 25s linear infinite 5s; opacity: 0.7; }
-    .c-2::after { width: 40px; height: 40px; top: -20px; left: 15px; }
-
-    .c-3 { width: 140px; height: 45px; top: 15%; right: -160px; animation: moveCloudReverse 22s linear infinite 2s; }
-    .c-3::after { width: 60px; height: 60px; top: -30px; right: 25px; }
-
-    /* === МЕДВЕДЬ (БЕЖЕВЫЙ, КАК НА ФОТО) === */
-    .bear-wrapper {
+    .bear {
       position: relative;
       width: 200px;
-      height: 200px;
       z-index: 10;
-      /* Медведь появляется сразу, без задержки */
-      animation: bearPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      animation: wavePaw 0.3s infinite alternate;
     }
 
-    /* Тело */
-    .bear-body {
+    .heart {
       position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 140px;
-      height: 130px;
-      background: #E6C288; /* Бежевый цвет тела */
-      border-radius: 70px 70px 60px 60px;
-      box-shadow: inset -10px -10px 20px rgba(0,0,0,0.05), 0 10px 20px rgba(0,0,0,0.1);
-      z-index: 2;
-    }
-    
-    /* Животик (светлее) */
-    .bear-belly {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 70px;
-      background: #F5DEB3; /* Пшеничный цвет */
-      border-radius: 50%;
-      opacity: 0.6;
+      width: 60px;
+      animation: floatHeart 2s infinite ease-in-out alternate;
     }
 
-    /* Голова */
-    .bear-head {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 120px;
-      height: 110px;
-      background: #E6C288;
-      border-radius: 50%;
-      z-index: 3;
-      box-shadow: inset -5px -5px 15px rgba(0,0,0,0.05);
+    .heart1 { top: 15%; left: 20%; animation-delay: 0s; }
+    .heart2 { top: 25%; right: 25%; animation-delay: 0.3s; }
+    .heart3 { bottom: 30%; left: 15%; animation-delay: 0.6s; }
+    .heart4 { bottom: 20%; right: 20%; animation-delay: 0.9s; }
+    .heart5 { top: 40%; left: 10%; animation-delay: 1.2s; }
+    .heart6 { top: 50%; right: 10%; animation-delay: 1.5s; }
+
+    @keyframes floatCloud {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(20px); }
     }
 
-    /* Уши (темнее, как на фото) */
-    .ear {
-      position: absolute;
-      top: 5px;
-      width: 40px;
-      height: 40px;
-      background: #C19A6B; /* Темно-бежевый/коричневый */
-      border-radius: 50%;
-      z-index: 1;
-    }
-    .ear.left { left: 25px; }
-    .ear.right { right: 25px; }
-    
-    .ear-inner {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 25px;
-      height: 25px;
-      background: #E6C288;
-      border-radius: 50%;
+    @keyframes wavePaw {
+      0% { transform: rotate(-15deg); }
+      100% { transform: rotate(15deg); }
     }
 
-    /* Мордочка */
-    .snout {
-      position: absolute;
-      bottom: 25px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 50px;
-      height: 35px;
-      background: #FFF8DC; /* Светло-кремовый */
-      border-radius: 20px;
-      z-index: 4;
-    }
-    
-    .nose {
-      position: absolute;
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 16px;
-      height: 10px;
-      background: #333;
-      border-radius: 10px 10px 15px 15px;
+    @keyframes floatHeart {
+      0% { transform: translateY(0) translateX(0); }
+      50% { transform: translateY(-15px) translateX(5px); }
+      100% { transform: translateY(0) translateX(0); }
     }
 
-    .mouth {
-      position: absolute;
-      bottom: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 24px;
-      height: 12px;
-      border-bottom: 2px solid #333;
-      border-radius: 0 0 20px 20px;
-    }
-
-    /* Глаза */
-    .eye {
-      position: absolute;
-      top: 40px;
-      width: 12px;
-      height: 12px;
-      background: #000;
-      border-radius: 50%;
-      z-index: 4;
-      animation: blink 4s infinite;
-    }
-    .eye.left { left: 35px; }
-    .eye.right { right: 35px; }
-    
-    /* Блик в глазах */
-    .eye::after {
-      content: '';
-      position: absolute;
-      top: 2px;
-      right: 3px;
-      width: 4px;
-      height: 4px;
-      background: #fff;
-      border-radius: 50%;
-    }
-
-    /* Лапы (темные, как на фото) */
-    .paw {
-      position: absolute;
-      bottom: 5px;
-      width: 45px;
-      height: 30px;
-      background: #C19A6B; /* Темно-бежевый */
-      border-radius: 20px;
-      z-index: 3;
-      box-shadow: inset -2px -2px 5px rgba(0,0,0,0.1);
-    }
-    
-    /* Левая лапа (которая справа на экране) - МАШЕТ */
-    .paw.left { 
-      left: 15px; 
-      transform-origin: top center;
-      animation: waveLeftPaw 1.5s ease-in-out infinite 0.5s; 
-    }
-    
-    .paw.right { right: 15px; }
-
-    /* Подушечки на лапах */
-    .paw-pad {
-      position: absolute;
-      bottom: 5px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 25px;
-      height: 15px;
-      background: #8B4513; /* Коричневые подушечки */
-      border-radius: 10px;
-    }
-    
-    .paw-pad::before, .paw-pad::after {
-      content: '';
-      position: absolute;
-      top: -5px;
-      width: 8px;
-      height: 8px;
-      background: #8B4513;
-      border-radius: 50%;
-    }
-    .paw-pad::before { left: 2px; }
-    .paw-pad::after { right: 2px; }
-
-
-    /* === 3D ШАРИКИ-СЕРДЦА === */
-    .heart-balloon {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      z-index: 5;
-      /* Форма сердца через clip-path или SVG, но для 3D эффекта используем SVG внутри */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .heart-svg {
-      width: 100%;
-      height: 100%;
-      filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
-    }
-
-    /* Анимация полета шариков */
-    .h-1 { bottom: -50px; left: 20%; animation: floatUp 6s linear infinite; }
-    .h-2 { bottom: -50px; left: 50%; animation: floatUp 7s linear infinite 1s; transform: scale(0.8); }
-    .h-3 { bottom: -50px; left: 80%; animation: floatUp 5s linear infinite 2s; transform: scale(1.2); }
-    .h-4 { bottom: -50px; left: 35%; animation: floatUp 8s linear infinite 0.5s; transform: scale(0.6); opacity: 0.8; }
-
-    /* === АНИМАЦИИ === */
-
-    @keyframes bearPopIn {
-      0% { opacity: 0; transform: scale(0.5); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-
-    @keyframes waveLeftPaw {
-      0%, 100% { transform: rotate(0deg); }
-      50% { transform: rotate(-20deg); }
-    }
-
-    @keyframes blink {
-      0%, 96%, 100% { transform: scaleY(1); }
-      98% { transform: scaleY(0.1); }
-    }
-
-    @keyframes moveCloud {
-      0% { left: -150px; }
-      100% { left: 100%; }
-    }
-    
-    @keyframes moveCloudReverse {
-      0% { right: -150px; }
-      100% { right: 100%; }
-    }
-
-    @keyframes floatUp {
-      0% { 
-        bottom: -50px; 
-        transform: translateX(0) scale(1); 
-        opacity: 0;
-      }
-      10% {
-        opacity: 1;
-      }
-      90% {
-        opacity: 1;
-      }
-      100% { 
-        bottom: 110%; 
-        transform: translateX(20px) scale(1.1); 
-        opacity: 0;
-      }
-    }
-
-    /* === ОСНОВНОЙ КОНТЕНТ === */
-    #app-content {
+    #app-interface {
       display: none;
+      padding: 2rem;
+      text-align: center;
+      background: white;
       min-height: 100vh;
-      padding: 20px;
-      color: var(--tg-theme-text-color, #333);
-      background-color: var(--tg-theme-bg-color, #fff);
-      opacity: 0;
-      transition: opacity 1s ease-in;
     }
-    
-    #app-content.visible {
-      opacity: 1;
-    }
-
-    h1 { text-align: center; margin-top: 50px; color: #ff4d4d; }
-    p { text-align: center; margin-top: 20px; line-height: 1.5; }
-
   </style>
 </head>
 <body>
 
-  <!-- Экран загрузки -->
-  <div id="splash-screen">
-    <div class="scene-container">
-      
-      <!-- Облака -->
-      <div class="cloud c-1"></div>
-      <div class="cloud c-2"></div>
-      <div class="cloud c-3"></div>
+  <!-- ЗАГРУЗОЧНЫЙ ЭКРАН -->
+  <div id="loading-screen">
+    <div class="sky"></div>
 
-      <!-- Медведь -->
-      <div class="bear-wrapper">
-        <div class="ear left"><div class="ear-inner"></div></div>
-        <div class="ear right"><div class="ear-inner"></div></div>
-        
-        <div class="bear-head">
-          <div class="eye left"></div>
-          <div class="eye right"></div>
-          <div class="snout">
-            <div class="nose"></div>
-            <div class="mouth"></div>
-          </div>
-        </div>
-        
-        <div class="bear-body">
-          <div class="bear-belly"></div>
-        </div>
-        
-        <div class="paw left">
-          <div class="paw-pad"></div>
-        </div>
-        <div class="paw right">
-          <div class="paw-pad"></div>
-        </div>
-      </div>
+    <!-- Облака -->
+    <img src="assets/cloud.png" class="cloud cloud1" alt="Облако">
+    <img src="assets/cloud.png" class="cloud cloud2" alt="Облако">
+    <img src="assets/cloud.png" class="cloud cloud3" alt="Облако">
 
-      <!-- Шарики-сердца (SVG для 3D эффекта) -->
-      <div class="heart-balloon h-1">
-        <svg class="heart-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="grad1" cx="30%" cy="30%" r="70%">
-              <stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#cc0000;stop-opacity:1" />
-            </radialGradient>
-          </defs>
-          <path d="M16 28 C 16 28 2 18 2 8 C 2 4 6 2 10 2 C 13 2 15 4 16 6 C 17 4 19 2 22 2 C 26 2 30 4 30 8 C 30 18 16 28 16 28 Z" fill="url(#grad1)" />
-          <ellipse cx="10" cy="8" rx="3" ry="2" fill="white" opacity="0.4" transform="rotate(-45 10 8)" />
-        </svg>
-      </div>
+    <!-- Медведь -->
+    <img src="assets/bear.png" class="bear" alt="Медведь">
 
-      <div class="heart-balloon h-2">
-        <svg class="heart-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-           <path d="M16 28 C 16 28 2 18 2 8 C 2 4 6 2 10 2 C 13 2 15 4 16 6 C 17 4 19 2 22 2 C 26 2 30 4 30 8 C 30 18 16 28 16 28 Z" fill="#ff0000" />
-           <ellipse cx="10" cy="8" rx="3" ry="2" fill="white" opacity="0.3" transform="rotate(-45 10 8)" />
-        </svg>
-      </div>
-
-      <div class="heart-balloon h-3">
-        <svg class="heart-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-           <path d="M16 28 C 16 28 2 18 2 8 C 2 4 6 2 10 2 C 13 2 15 4 16 6 C 17 4 19 2 22 2 C 26 2 30 4 30 8 C 30 18 16 28 16 28 Z" fill="#d60000" />
-           <ellipse cx="10" cy="8" rx="3" ry="2" fill="white" opacity="0.3" transform="rotate(-45 10 8)" />
-        </svg>
-      </div>
-      
-       <div class="heart-balloon h-4">
-        <svg class="heart-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-           <path d="M16 28 C 16 28 2 18 2 8 C 2 4 6 2 10 2 C 13 2 15 4 16 6 C 17 4 19 2 22 2 C 26 2 30 4 30 8 C 30 18 16 28 16 28 Z" fill="#ff4d4d" />
-           <ellipse cx="10" cy="8" rx="3" ry="2" fill="white" opacity="0.3" transform="rotate(-45 10 8)" />
-        </svg>
-      </div>
-
-    </div>
+    <!-- Сердца -->
+    <img src="assets/heart.png" class="heart heart1" alt="Сердце">
+    <img src="assets/heart.png" class="heart heart2" alt="Сердце">
+    <img src="assets/heart.png" class="heart heart3" alt="Сердце">
+    <img src="assets/heart.png" class="heart heart4" alt="Сердце">
+    <img src="assets/heart.png" class="heart heart5" alt="Сердце">
+    <img src="assets/heart.png" class="heart heart6" alt="Сердце">
   </div>
 
-  <!-- Основной контент -->
-  <div id="app-content">
-    <h1> Привет!</h1>
-    <p>Медвежонок приветствует вас.</p>
-    <p>Загрузка завершена.</p>
+  <!-- ОСНОВНОЙ ИНТЕРФЕЙС ПРИЛОЖЕНИЯ -->
+  <div id="app-interface">
+    <h1>Добро пожаловать!</h1>
+    <p>Интерфейс приложения запущен.</p>
+    <button onclick="alert('Работает!')">Нажми меня</button>
   </div>
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const tg = window.Telegram.WebApp;
-      tg.ready();
-      tg.expand();
-
-      const splashScreen = document.getElementById('splash-screen');
-      const appContent = document.getElementById('app-content');
-
-      // Таймер на 5 секунд
-      setTimeout(() => {
-        splashScreen.classList.add('hidden');
-        appContent.style.display = 'block';
-        
-        setTimeout(() => {
-          appContent.classList.add('visible');
-          document.body.style.overflow = 'auto';
-        }, 50);
-
-      }, 5000);
-    });
+    // Ждём 3 секунды → резко переключаемся на интерфейс
+    setTimeout(() => {
+      document.getElementById('loading-screen').style.display = 'none';
+      document.getElementById('app-interface').style.display = 'block';
+    }, 3000);
   </script>
+
 </body>
 </html>
