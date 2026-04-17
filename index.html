@@ -10,7 +10,8 @@
 
   <!-- Экран загрузки с видео -->
   <div id="splash-screen">
-    <video id="loading-video" autoplay muted playsinline loop>
+    <!-- autoplay: автозапуск, muted: без звука (обязательно для автоплея), playsinline: для iOS -->
+    <video id="loading-video" autoplay muted playsinline>
       <source src="rose-loading.mp4" type="video/mp4">
       Ваш браузер не поддерживает видео.
     </video>
@@ -22,15 +23,12 @@
       <h1>🌹 Добро пожаловать!</h1>
     </header>
     <main>
-      <p>Здесь находится основной интерфейс вашего мини-приложения.</p>
-      <p>Анимация загрузки завершена.</p>
-      <!-- Добавьте сюда свои элементы: кнопки, списки, формы и т.д. -->
+      <p>Анимация завершена. Интерфейс загружен.</p>
+      <!-- Ваш основной контент -->
     </main>
   </div>
 
-  <!-- Подключаем Telegram WebApp API -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- Подключаем наш скрипт -->
   <script src="app.js"></script>
 </body>
 </html>
