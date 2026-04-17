@@ -9,9 +9,9 @@
       --bg-color: #f5f5f7;
       --text-color: #000;
       --card-bg: #fff;
-      --accent-color: #ff69b4; /* Розовый для акцентов */
+      --accent-color: #ff69b4;
       --green-placeholder: #c1f0c1;
-      --nav-bg: rgba(255, 255, 255, 0.8);
+      --nav-bg: rgba(255, 255, 255, 0.85);
       --shadow: 0 4px 12px rgba(0,0,0,0.1);
       --border-radius: 16px;
     }
@@ -21,7 +21,7 @@
       --text-color: #fff;
       --card-bg: #2c2c2e;
       --green-placeholder: #2d4a25;
-      --nav-bg: rgba(44, 44, 46, 0.8);
+      --nav-bg: rgba(44, 44, 46, 0.85);
       --shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
 
@@ -37,7 +37,7 @@
       transition: background-color 0.3s, color 0.3s;
     }
 
-    /* === SPLASH SCREEN (Из предыдущего кода) === */
+    /* === SPLASH SCREEN С ФОТО РОЗЫ === */
     #splash-screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       z-index: 9999; display: flex; justify-content: center; align-items: center;
@@ -45,22 +45,66 @@
       transition: opacity 0.6s ease-out, visibility 0.6s;
       pointer-events: none; 
     }
-    .flower-container { position: relative; width: 240px; height: 380px; display: flex; justify-content: center; align-items: flex-end; animation: sway 6s ease-in-out infinite 3.2s; }
-    .stem { width: 8px; height: 0; background: linear-gradient(90deg, #1a2e1a, #386638, #1a2e1a); position: absolute; bottom: 0; border-radius: 4px; animation: growStem 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; z-index: 1; }
-    .leaf { position: absolute; width: 55px; height: 35px; background: linear-gradient(135deg, #2d4a25, #6b9c6b); border-radius: 2px 20px 2px 20px; opacity: 0; z-index: 1; }
+
+    .flower-container {
+      position: relative;
+      width: 240px;
+      height: 400px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      animation: sway 6s ease-in-out infinite 3.2s;
+    }
+
+    /* Стебель и листья */
+    .stem {
+      width: 8px; height: 0;
+      background: linear-gradient(90deg, #1a2e1a, #386638, #1a2e1a);
+      position: absolute; bottom: 0;
+      border-radius: 4px;
+      animation: growStem 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      z-index: 1; /* Стебель ниже фото */
+    }
+    .leaf {
+      position: absolute; width: 55px; height: 35px;
+      background: linear-gradient(135deg, #2d4a25, #6b9c6b);
+      border-radius: 2px 20px 2px 20px; opacity: 0; z-index: 1;
+    }
     .leaf.left { bottom: 140px; left: 50%; transform-origin: right center; transform: translateX(-100%) rotate(-10deg) scale(0); animation: growLeafLeft 1s ease-out 0.8s forwards; }
     .leaf.right { bottom: 180px; left: 50%; transform-origin: left center; transform: rotate(10deg) scale(0); border-radius: 20px 2px 20px 2px; animation: growLeafRight 1s ease-out 1s forwards; }
-    .flower-head { position: absolute; bottom: 240px; width: 200px; height: 200px; left: 50%; transform: translateX(-50%) scale(0); opacity: 0; animation: bloomPeonyDetailed 2s cubic-bezier(0.22, 1, 0.36, 1) 1.2s forwards; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.6)); z-index: 2; }
+
+    /* Фото розы */
+    .flower-photo {
+      position: absolute; /* Обязательно для позиционирования над стеблем */
+      bottom: 240px; /* На конце стебля */
+      width: 200px; /* Размер фото */
+      height: auto;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
+      opacity: 0;
+      z-index: 10; /* ВЫСОКИЙ Z-INDEX, ЧТОБЫ БЫТЬ ПОВЕРХ ВСЕГО */
+      
+      /* Анимация появления */
+      animation: bloomPhoto 2s cubic-bezier(0.22, 1, 0.36, 1) 1.2s forwards;
+      filter: drop-shadow(0 15px 25px rgba(0,0,0,0.6));
+    }
+
     @keyframes growStem { 0% { height: 0; } 100% { height: 240px; } }
     @keyframes growLeafLeft { 0% { transform: translateX(-100%) rotate(-10deg) scale(0); opacity: 0; } 100% { transform: translateX(-100%) rotate(-50deg) scale(1); opacity: 1; } }
     @keyframes growLeafRight { 0% { transform: rotate(10deg) scale(0); opacity: 0; } 100% { transform: rotate(50deg) scale(1); opacity: 1; } }
-    @keyframes bloomPeonyDetailed { 0% { opacity: 0; transform: translateX(-50%) scale(0) translateY(20px); } 60% { opacity: 1; transform: translateX(-50%) scale(1.05) translateY(0); } 100% { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); } }
+    
+    @keyframes bloomPhoto {
+      0% { opacity: 0; transform: translateX(-50%) scale(0) translateY(20px); }
+      60% { opacity: 1; transform: translateX(-50%) scale(1.05) translateY(0); }
+      100% { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); }
+    }
+    
     @keyframes sway { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(1.5deg); } }
     .hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
     /* === MAIN APP LAYOUT === */
     #app-interface {
-      display: none; /* Скрыто до конца загрузки */
+      display: none;
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -69,114 +113,69 @@
     }
     #app-interface.visible { opacity: 1; }
 
-    /* Верхняя часть (Header + Content) */
     .main-scroll-area {
       flex: 1;
       overflow-y: auto;
-      padding: 10px 16px 100px 16px; /* Отступ снизу для навигации */
+      padding: 100px 16px 120px 16px; /* Отступ сверху 100px */
       position: relative;
     }
 
-    /* Header */
     .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0 20px 0;
-      position: sticky;
-      top: 0;
-      background: var(--bg-color);
-      z-index: 10;
+      display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; background: var(--bg-color); z-index: 10;
+      padding-bottom: 10px;
     }
     .logo { font-weight: 700; font-size: 18px; letter-spacing: 1px; }
 
-    /* Вкладки (Screens) */
     .screen { display: none; animation: fadeIn 0.3s; }
     .screen.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* === КОМПОНЕНТЫ ИНТЕРФЕЙСА === */
-
-    /* Поиск и Корзина (Вкладка 1) */
+    /* === КОМПОНЕНТЫ === */
     .search-row { display: flex; gap: 10px; margin-bottom: 20px; }
     .search-bar {
-      flex: 1;
-      background: var(--card-bg);
-      border-radius: 20px;
-      padding: 10px 15px;
-      display: flex;
-      align-items: center;
-      box-shadow: var(--shadow);
+      flex: 1; background: var(--card-bg); border-radius: 20px; padding: 10px 15px;
+      display: flex; align-items: center; box-shadow: var(--shadow);
     }
-    .search-bar input {
-      border: none; outline: none; background: transparent; width: 100%; color: var(--text-color); font-size: 16px;
-    }
+    .search-bar input { border: none; outline: none; background: transparent; width: 100%; color: var(--text-color); font-size: 16px; }
     .cart-btn {
-      width: 44px; height: 44px;
-      background: var(--card-bg);
-      border-radius: 50%;
-      display: flex; justify-content: center; align-items: center;
-      box-shadow: var(--shadow);
-      position: relative;
-      cursor: pointer;
+      width: 44px; height: 44px; background: var(--card-bg); border-radius: 50%;
+      display: flex; justify-content: center; align-items: center; box-shadow: var(--shadow); position: relative; cursor: pointer;
     }
     .cart-badge {
-      position: absolute; top: -5px; right: -5px;
-      background: red; color: white; font-size: 10px; font-weight: bold;
-      width: 18px; height: 18px; border-radius: 50%;
-      display: flex; justify-content: center; align-items: center;
-      display: none; /* Скрыт если 0 */
+      position: absolute; top: -5px; right: -5px; background: red; color: white;
+      font-size: 10px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%;
+      display: flex; justify-content: center; align-items: center; display: none;
     }
 
-    /* Сетка товаров */
-    .product-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-    }
-    .product-card {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      display: flex; flex-direction: column;
-    }
-    .product-img {
-      width: 100%; aspect-ratio: 1;
-      background-color: var(--green-placeholder);
-      object-fit: cover;
-    }
+    .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .product-card { background: var(--card-bg); border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+    .product-img { width: 100%; aspect-ratio: 1; background-color: var(--green-placeholder); object-fit: cover; }
     .product-info { padding: 10px; }
     .product-title { font-weight: 600; margin-bottom: 5px; font-size: 14px; }
     .product-price { color: var(--accent-color); font-weight: bold; }
     .add-to-cart-btn {
-      margin-top: 8px; width: 100%; padding: 8px;
-      background: var(--text-color); color: var(--bg-color);
-      border: none; border-radius: 8px; font-weight: 600;
+      margin-top: 8px; width: 100%; padding: 8px; background: var(--text-color);
+      color: var(--bg-color); border: none; border-radius: 8px; font-weight: 600;
     }
 
-    /* Профиль (Вкладка 2) */
+    /* Профиль */
     .profile-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
     .avatar { width: 60px; height: 60px; border-radius: 50%; background: #ddd; object-fit: cover; }
     .user-info h2 { font-size: 18px; }
     .user-info span { color: #888; font-size: 14px; }
     .theme-toggle {
-      margin-left: auto; width: 40px; height: 40px;
-      background: var(--card-bg); border-radius: 50%;
-      display: flex; justify-content: center; align-items: center;
+      margin-left: auto; width: 40px; height: 40px; background: var(--card-bg);
+      border-radius: 50%; display: flex; justify-content: center; align-items: center;
       box-shadow: var(--shadow); cursor: pointer;
     }
 
     .pill-section {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      padding: 15px;
-      margin-bottom: 15px;
-      box-shadow: var(--shadow);
+      background: var(--card-bg); border-radius: var(--border-radius); padding: 15px;
+      margin-bottom: 15px; box-shadow: var(--shadow);
     }
     .section-title { font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     
-    /* Календарь */
     .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
     .cal-day { padding: 8px 0; font-size: 14px; border-radius: 50%; cursor: pointer; }
@@ -184,99 +183,59 @@
     .cal-day.event { background: #ff4d4d; color: #fff; }
     .cal-day.empty { pointer-events: none; }
 
-    /* Адреса */
     .address-list { list-style: none; }
     .address-item { padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; }
     .add-address-btn { color: var(--accent-color); font-weight: 600; cursor: pointer; margin-top: 5px; display: block; }
 
-    /* История заказов */
     .history-stats { display: flex; justify-content: space-between; align-items: center; }
     .order-count { font-size: 24px; font-weight: bold; color: var(--accent-color); }
 
-    /* Курьер (Вкладка 3) */
-    .courier-task {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      padding: 15px;
-      margin-bottom: 15px;
-      box-shadow: var(--shadow);
-    }
+    /* Курьер */
+    .courier-task { background: var(--card-bg); border-radius: var(--border-radius); padding: 15px; margin-bottom: 15px; box-shadow: var(--shadow); }
     .task-images { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 10px; padding-bottom: 5px; }
     .task-img { width: 80px; height: 80px; background: var(--green-placeholder); border-radius: 8px; flex-shrink: 0; object-fit: cover; }
     .task-details p { margin-bottom: 4px; font-size: 14px; }
     .task-details strong { font-weight: 600; }
 
-    /* Админ (Вкладка 4) */
-    .employee-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05);
-    }
+    /* Админ */
+    .employee-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
     .emp-info { display: flex; flex-direction: column; }
     .emp-name { font-weight: 600; }
     .emp-role { font-size: 12px; color: #888; }
     .emp-menu-btn { font-size: 20px; padding: 5px; cursor: pointer; }
 
-    /* === НАВИГАЦИЯ (НИЖНЯЯ ПАНЕЛЬ) === */
+    /* === НАВИГАЦИЯ === */
     .nav-wrapper {
-      position: fixed;
-      bottom: 20px;
-      left: 0;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      z-index: 100;
-      pointer-events: none; /* Чтобы клики проходили сквозь пустые места */
+      position: fixed; bottom: 20px; left: 0; width: 100%;
+      display: flex; justify-content: center; z-index: 100; pointer-events: none;
     }
 
     .nav-pill {
-      background: var(--nav-bg);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-radius: 30px;
-      padding: 5px;
-      display: flex;
-      gap: 5px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      pointer-events: auto;
-      position: relative;
-      width: 90%;
-      max-width: 400px;
-      justify-content: space-around;
+      background: var(--nav-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border-radius: 30px; padding: 5px; display: flex; gap: 5px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2); pointer-events: auto;
+      position: relative; width: 90%; max-width: 400px; justify-content: space-around;
     }
 
     .nav-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 0;
-      font-size: 10px;
-      color: #888;
-      z-index: 2;
-      transition: color 0.3s;
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 10px 0; font-size: 10px; color: #888; z-index: 2; transition: color 0.3s;
       cursor: pointer;
+      user-select: none; -webkit-user-select: none;
     }
     .nav-item.active { color: var(--accent-color); font-weight: 600; }
     .nav-icon { font-size: 20px; margin-bottom: 2px; }
 
-    /* Плавающий индикатор (Шайба) */
     .nav-indicator {
-      position: absolute;
-      top: 5px;
-      left: 5px; /* Начальная позиция будет вычислена JS */
-      width: calc(25% - 10px); /* 4 вкладки */
+      position: absolute; top: 5px; left: 5px;
       height: calc(100% - 10px);
-      background: #e0e0e0;
-      border-radius: 25px;
-      z-index: 1;
-      transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.3s;
-      cursor: grab;
-      touch-action: none; /* Важно для драга */
+      background: #e0e0e0; border-radius: 25px; z-index: 1;
+      cursor: grab; touch-action: none;
+      will-change: transform, width, left;
     }
     .nav-indicator:active { cursor: grabbing; background: #d0d0d0; }
     
-    /* Модальные окна */
+    /* Модалки */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.5); z-index: 1000;
@@ -301,35 +260,19 @@
 </head>
 <body>
 
-  <!-- Экран загрузки -->
+  <!-- Экран загрузки с ФОТО -->
   <div id="splash-screen">
     <div class="flower-container">
       <div class="stem"></div>
       <div class="leaf left"></div>
       <div class="leaf right"></div>
-      <div class="flower-head">
-        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
-          <defs>
-            <radialGradient id="peonyDeep" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" style="stop-color:#ffc0cb;stop-opacity:1" />
-              <stop offset="60%" style="stop-color:#ff69b4;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#c71585;stop-opacity:1" />
-            </radialGradient>
-            <linearGradient id="peonyLight" x1="0%" y1="100%" x2="0%" y2="0%">
-              <stop offset="0%" style="stop-color:#ff1493;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#fff0f5;stop-opacity:1" />
-            </linearGradient>
-          </defs>
-          <g transform="translate(100,100)">
-             <path d="M0,85 C-40,80 -70,40 -60,0 C-50,-30 0,-40 0,-40 C 0,-40 50,-30 60,0 C 70,40 40,80 0,85 Z" fill="#db7093" stroke="#8b0040" stroke-width="1" />
-             <path d="M-50,20 Q-70,-30 -20,-50 Q0,-60 20,-50 Q70,-30 50,20 Q30,60 0,70 Q-30,60 -50,20" fill="url(#peonyDeep)" stroke="#8b0040" stroke-width="0.5" transform="rotate(70)" />
-             <path d="M-50,20 Q-70,-30 -20,-50 Q0,-60 20,-50 Q70,-30 50,20 Q30,60 0,70 Q-30,60 -50,20" fill="url(#peonyDeep)" stroke="#8b0040" stroke-width="0.5" transform="rotate(-70)" />
-             <path d="M-30,10 Q-40,-20 -10,-30 Q0,-35 10,-30 Q40,-20 30,10 Q20,30 0,35 Q-20,30 -30,10" fill="url(#peonyLight)" stroke="#db7093" stroke-width="0.5" transform="rotate(15)" opacity="0.95"/>
-             <path d="M-18,-2 Q0,-10 18,-2 Q12,12 0,18 Q-12,12 -18,-2" fill="#ff69b4" stroke="#c71585" stroke-width="1" />
-             <g fill="#ffd700" opacity="0.9"><circle cx="-6" cy="-6" r="2" /><circle cx="6" cy="-6" r="2" /><circle cx="0" cy="6" r="2" /></g>
-          </g>
-        </svg>
-      </div>
+      
+      <!-- 
+        ИСПРАВЛЕНИЕ: 
+        1. Использована прямая ссылка на PNG с прозрачным фоном.
+        2. Если эта ссылка перестанет работать, замените src на любую другую картинку розы на прозрачном фоне.
+      -->
+      <img src="https://png.pngtree.com/png-vector/20230906/ourmid/pngtree-red-rose-flower-png-image_9999670.png" alt="Rose" class="flower-photo">
     </div>
   </div>
 
@@ -340,9 +283,7 @@
       
       <!-- ВКЛАДКА 1: ГЛАВНАЯ -->
       <div id="tab-home" class="screen active">
-        <div class="header">
-          <div class="logo">FLOWER SHOP</div>
-        </div>
+        <div class="header"><div class="logo">FLOWER SHOP</div></div>
         
         <div class="search-row">
           <div class="search-bar">
@@ -355,16 +296,12 @@
           </div>
         </div>
 
-        <div class="product-grid" id="product-grid">
-          <!-- Товары генерируются JS -->
-        </div>
+        <div class="product-grid" id="product-grid"></div>
       </div>
 
       <!-- ВКЛАДКА 2: ПРОФИЛЬ -->
       <div id="tab-profile" class="screen">
-        <div class="header">
-          <div class="logo">ПРОФИЛЬ</div>
-        </div>
+        <div class="header"><div class="logo">ПРОФИЛЬ</div></div>
 
         <div class="profile-header">
           <img src="https://via.placeholder.com/60" alt="Avatar" class="avatar" id="user-avatar">
@@ -372,9 +309,7 @@
             <h2 id="user-name">Загрузка...</h2>
             <span id="user-username">@username</span>
           </div>
-          <div class="theme-toggle" id="theme-btn">
-            🌑 <!-- Луна / Бутон -->
-          </div>
+          <div class="theme-toggle" id="theme-btn">🌑</div>
         </div>
 
         <div class="pill-section">
@@ -384,16 +319,12 @@
             <span id="current-month-year">Март 2026</span>
             <button id="next-month">&gt;</button>
           </div>
-          <div class="calendar-grid" id="calendar-grid">
-            <!-- Дни генерируются JS -->
-          </div>
+          <div class="calendar-grid" id="calendar-grid"></div>
         </div>
 
         <div class="pill-section">
           <div class="section-title">Адреса доставки</div>
-          <ul class="address-list" id="address-list">
-            <!-- Адреса -->
-          </ul>
+          <ul class="address-list" id="address-list"></ul>
           <span class="add-address-btn" onclick="openModal('address-modal')">+ Добавить адрес</span>
         </div>
 
@@ -407,25 +338,17 @@
 
       <!-- ВКЛАДКА 3: КУРЬЕР -->
       <div id="tab-courier" class="screen">
-        <div class="header">
-          <div class="logo">ЗАДАНИЯ</div>
-        </div>
-        <div id="courier-list">
-          <!-- Задания -->
-        </div>
+        <div class="header"><div class="logo">ЗАДАНИЯ</div></div>
+        <div id="courier-list"></div>
       </div>
 
       <!-- ВКЛАДКА 4: АДМИН -->
       <div id="tab-admin" class="screen">
-        <div class="header">
-          <div class="logo">АДМИН</div>
-        </div>
+        <div class="header"><div class="logo">АДМИН</div></div>
         
         <div class="pill-section">
           <div class="section-title">Сотрудники</div>
-          <div id="employee-list">
-            <!-- Сотрудники -->
-          </div>
+          <div id="employee-list"></div>
           <button class="modal-btn" onclick="openModal('add-employee-modal')" style="margin-top:15px">+ Добавить сотрудника</button>
         </div>
       </div>
@@ -438,20 +361,16 @@
         <div class="nav-indicator" id="nav-indicator"></div>
         
         <div class="nav-item active" data-target="tab-home">
-          <div class="nav-icon">🏠</div>
-          <span>Главная</span>
+          <div class="nav-icon">🏠</div><span>Главная</span>
         </div>
         <div class="nav-item" data-target="tab-profile">
-          <div class="nav-icon">👤</div>
-          <span>Профиль</span>
+          <div class="nav-icon">👤</div><span>Профиль</span>
         </div>
         <div class="nav-item" data-target="tab-courier">
-          <div class="nav-icon">🚚</div>
-          <span>Курьер</span>
+          <div class="nav-icon">🚚</div><span>Курьер</span>
         </div>
         <div class="nav-item" data-target="tab-admin">
-          <div class="nav-icon">👑</div>
-          <span>Админ</span>
+          <div class="nav-icon">👑</div><span>Админ</span>
         </div>
       </div>
     </div>
@@ -459,7 +378,6 @@
   </div>
 
   <!-- МОДАЛКИ -->
-  <!-- Добавление события -->
   <div class="modal-overlay" id="event-modal">
     <div class="modal-content">
       <span class="modal-close" onclick="closeModals()">&times;</span>
@@ -470,7 +388,6 @@
     </div>
   </div>
 
-  <!-- Добавление адреса -->
   <div class="modal-overlay" id="address-modal">
     <div class="modal-content">
       <span class="modal-close" onclick="closeModals()">&times;</span>
@@ -480,7 +397,6 @@
     </div>
   </div>
 
-  <!-- Добавление сотрудника -->
   <div class="modal-overlay" id="add-employee-modal">
     <div class="modal-content">
       <span class="modal-close" onclick="closeModals()">&times;</span>
@@ -491,28 +407,23 @@
         <div style="flex:1; height:60px; background:#eee; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:10px;">Паспорт (Лицо)</div>
         <div style="flex:1; height:60px; background:#eee; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:10px;">Прописка</div>
       </div>
-      <select class="modal-input">
-        <option>Курьер</option>
-      </select>
+      <select class="modal-input"><option>Курьер</option></select>
       <button class="modal-btn" onclick="addEmployee()">Оформить</button>
     </div>
   </div>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    // === ИНИЦИАЛИЗАЦИЯ ===
     document.addEventListener('DOMContentLoaded', () => {
       const tg = window.Telegram.WebApp;
       tg.ready();
       tg.expand();
 
-      // Данные пользователя (Mock)
       const user = tg.initDataUnsafe?.user || { first_name: "Иван", username: "ivan_test", photo_url: "" };
       document.getElementById('user-name').innerText = user.first_name;
       document.getElementById('user-username').innerText = "@" + (user.username || "user");
       if(user.photo_url) document.getElementById('user-avatar').src = user.photo_url;
 
-      // Таймер скрытия сплеша (3 сек)
       setTimeout(() => {
         document.getElementById('splash-screen').classList.add('hidden');
         const app = document.getElementById('app-interface');
@@ -529,13 +440,10 @@
       renderCourierTasks();
     });
 
-    // === ЛОГИКА ВКЛАДОК И НАВИГАЦИИ ===
     function switchTab(tabId) {
-      // Смена контента
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
 
-      // Обновление стилей навигации
       document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
         if(item.dataset.target === tabId) item.classList.add('active');
@@ -550,54 +458,43 @@
         item.addEventListener('click', () => switchTab(item.dataset.target));
       });
 
-      // Логика перетаскивания индикатора
       const indicator = document.getElementById('nav-indicator');
       const navPill = document.getElementById('nav-pill');
+      
       let isDragging = false;
       let startX = 0;
       let startLeft = 0;
-      const itemCount = 4;
-      const step = 100 / itemCount; // 25%
 
-      // Touch events
       indicator.addEventListener('touchstart', (e) => {
         isDragging = true;
         startX = e.touches[0].clientX;
         const rect = indicator.getBoundingClientRect();
         const parentRect = navPill.getBoundingClientRect();
         startLeft = rect.left - parentRect.left;
-        indicator.style.transition = 'none'; // Отключаем плавность для драга
+        indicator.style.transition = 'none'; 
       }, {passive: false});
 
       indicator.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
-        e.preventDefault(); // Блокируем скролл страницы
+        e.preventDefault();
         const currentX = e.touches[0].clientX;
         const diff = currentX - startX;
         let newLeft = startLeft + diff;
-        
-        // Ограничения границ
         const maxLeft = navPill.clientWidth - indicator.clientWidth;
         if (newLeft < 0) newLeft = 0;
         if (newLeft > maxLeft) newLeft = maxLeft;
-
-        indicator.style.transform = `translateX(${newLeft - startLeft}px)`; // Используем transform относительно начальной позиции
+        indicator.style.left = `${newLeft}px`;
       }, {passive: false});
 
       indicator.addEventListener('touchend', (e) => {
         if (!isDragging) return;
         isDragging = false;
-        indicator.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
-        indicator.style.transform = 'translateX(0)'; // Сброс transform
-
-        // Вычисляем ближайшую вкладку
+        indicator.style.transition = 'left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
         const rect = indicator.getBoundingClientRect();
         const parentRect = navPill.getBoundingClientRect();
         const currentLeft = rect.left - parentRect.left;
-        const itemWidth = parentRect.clientWidth / itemCount;
+        const itemWidth = parentRect.clientWidth / 4;
         const index = Math.round(currentLeft / itemWidth);
-        
-        // Переключаем на ближайшую
         const targets = ['tab-home', 'tab-profile', 'tab-courier', 'tab-admin'];
         switchTab(targets[index]);
       });
@@ -606,57 +503,27 @@
     function moveIndicatorTo(tabId) {
       const indicator = document.getElementById('nav-indicator');
       const items = Array.from(document.querySelectorAll('.nav-item'));
-      const index = items.findIndex(i => i.dataset.target === tabId);
-      
-      // Простое позиционирование через left в процентах
-      // Ширина индикатора ~25%. Left: 0%, 25%, 50%, 75%
-      // Но нужно учесть padding родителя. Проще использовать transform translateX
-      
-      // Удаляем inline styles от драга
-      indicator.style.transform = 'none';
-      
-      // Вычисляем позицию
+      const targetItem = items.find(i => i.dataset.target === tabId);
+      if (!targetItem) return;
       const navPill = document.getElementById('nav-pill');
-      const itemWidth = navPill.clientWidth / 4;
-      // Учитываем padding 5px слева у nav-pill
-      const offset = 5 + (index * itemWidth);
-      
-      // Так как в CSS используется left: 5px, то нам нужно сдвигать на index * itemWidth
-      // Но itemWidth включает gap? Нет, flex space-around.
-      // Для простоты в этом примере используем жесткое позиционирование через классы или проценты
-      
-      // Упрощенный вариант для демо:
-      const percent = index * 25; 
-      // Нужно динамически считать ширину, так как flex space-around распределяет место нелинейно относительно left
-      // Лучший способ для flex space-around: найти элемент цели и взять его offsetLeft
-      
-      const targetItem = items[index];
       const parentRect = navPill.getBoundingClientRect();
       const itemRect = targetItem.getBoundingClientRect();
-      
       const relativeLeft = itemRect.left - parentRect.left;
-      
       indicator.style.left = `${relativeLeft}px`;
       indicator.style.width = `${itemRect.width}px`;
     }
 
     // === ЛОГИКА КОНТЕНТА ===
-
-    // 1. Товары
     const products = [
-      { name: "Пион 'Sarah'", price: 5000 },
-      { name: "Роза 'Red Naomi'", price: 3500 },
-      { name: "Тюльпан Микс", price: 2000 },
-      { name: "Гортензия", price: 4500 },
-      { name: "Лилия", price: 3000 },
-      { name: "Эустома", price: 2500 },
+      { name: "Пион 'Sarah'", price: 5000 }, { name: "Роза 'Red Naomi'", price: 3500 },
+      { name: "Тюльпан Микс", price: 2000 }, { name: "Гортензия", price: 4500 },
+      { name: "Лилия", price: 3000 }, { name: "Эустома", price: 2500 },
     ];
     let cartCount = 0;
 
     function initProducts() {
       const grid = document.getElementById('product-grid');
       const searchInput = document.getElementById('search-input');
-
       function render(list) {
         grid.innerHTML = '';
         list.forEach(p => {
@@ -673,13 +540,10 @@
           grid.appendChild(card);
         });
       }
-
       render(products);
-
       searchInput.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
-        const filtered = products.filter(p => p.name.toLowerCase().includes(term));
-        render(filtered);
+        render(products.filter(p => p.name.toLowerCase().includes(term)));
       });
     }
 
@@ -688,79 +552,49 @@
       const badge = document.getElementById('cart-badge');
       badge.innerText = cartCount;
       badge.style.display = 'flex';
-      // Анимация тряски корзины можно добавить здесь
     }
 
-    // 2. Тема
     function initTheme() {
       const btn = document.getElementById('theme-btn');
       let isDark = false;
-      
       btn.addEventListener('click', () => {
         isDark = !isDark;
         document.body.classList.toggle('dark-mode', isDark);
-        btn.innerText = isDark ? '🌸' : '🌑'; // Открытый бутон / Луна
+        btn.innerText = isDark ? '🌸' : '🌑';
       });
     }
 
-    // 3. Календарь
-    let currentDate = new Date(); // Апрель 2026 по условию задачи (текущее время)
-    // Но в скриншоте Март 2026. Пусть будет текущая реальная дата.
-    // Установим Март 2026 как в примере, или текущую.
-    // Пусть будет текущая: Апрель 2026.
-    
-    const events = {}; // Хранилище событий { "2026-4-20": "День Рождения" }
-
+    let currentDate = new Date();
+    const events = {};
     function initCalendar() {
       const grid = document.getElementById('calendar-grid');
       const monthLabel = document.getElementById('current-month-year');
-      const prevBtn = document.getElementById('prev-month');
-      const nextBtn = document.getElementById('next-month');
-
       function renderCalendar() {
         grid.innerHTML = '';
         const year = currentDate.getFullYear();
-        const month = currentDate.getMonth(); // 0-11
-        
+        const month = currentDate.getMonth();
         const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         monthLabel.innerText = `${monthNames[month]} ${year}`;
-
-        const firstDay = new Date(year, month, 1).getDay(); // День недели 1-го числа
+        const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-        // Пустые ячейки до начала месяца
+        const today = new Date();
         for (let i = 0; i < firstDay; i++) {
           const div = document.createElement('div');
           div.className = 'cal-day empty';
           grid.appendChild(div);
         }
-
-        const today = new Date();
-
         for (let i = 1; i <= daysInMonth; i++) {
           const div = document.createElement('div');
           div.className = 'cal-day';
           div.innerText = i;
-          
-          // Проверка на сегодня
-          if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-            div.classList.add('today');
-          }
-
-          // Проверка на событие
-          const eventKey = `${year}-${month}-${i}`;
-          if (events[eventKey]) {
-            div.classList.add('event');
-          }
-
+          if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) div.classList.add('today');
+          if (events[`${year}-${month}-${i}`]) div.classList.add('event');
           div.onclick = () => openEventModal(year, month, i);
           grid.appendChild(div);
         }
       }
-
-      prevBtn.onclick = () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); };
-      nextBtn.onclick = () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); };
-
+      document.getElementById('prev-month').onclick = () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); };
+      document.getElementById('next-month').onclick = () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); };
       renderCalendar();
     }
 
@@ -771,20 +605,15 @@
       document.getElementById('event-desc').value = events[selectedDateKey] || '';
       openModal('event-modal');
     }
-
     function saveEvent() {
       const desc = document.getElementById('event-desc').value;
-      if (desc.trim()) {
-        events[selectedDateKey] = desc;
-      } else {
-        delete events[selectedDateKey];
-      }
+      if (desc.trim()) events[selectedDateKey] = desc;
+      else delete events[selectedDateKey];
       closeModals();
-      initCalendar(); // Перерисовка
+      initCalendar();
     }
 
-    // 4. Адреса
-    const addresses = []; // Изначально пусто, "Енисейская" не добавляется
+    const addresses = [];
     function renderAddresses() {
       const list = document.getElementById('address-list');
       list.innerHTML = '';
@@ -799,7 +628,6 @@
         list.appendChild(li);
       });
     }
-
     function addAddress() {
       const val = document.getElementById('new-address').value;
       if(val && addresses.length < 5) {
@@ -807,29 +635,21 @@
         renderAddresses();
         closeModals();
         document.getElementById('new-address').value = '';
-      } else if (addresses.length >= 5) {
-        alert('Максимум 5 адресов');
       }
     }
 
-    // 5. Курьер
     function renderCourierTasks() {
       const list = document.getElementById('courier-list');
-      // Mock данные
       const tasks = [
-        { img: '', addr: 'ул. Ленина 1', date: '18.04.2026 14:00', phone: '+79001234567' },
-        { img: '', addr: 'пр. Мира 15', date: '18.04.2026 16:30', phone: '+79007654321' },
+        { addr: 'ул. Ленина 1', date: '18.04.2026 14:00', phone: '+79001234567' },
+        { addr: 'пр. Мира 15', date: '18.04.2026 16:30', phone: '+79007654321' },
       ];
-      
       list.innerHTML = '';
       tasks.forEach(t => {
         const div = document.createElement('div');
         div.className = 'courier-task';
         div.innerHTML = `
-          <div class="task-images">
-            <div class="task-img"></div>
-            <div class="task-img"></div>
-          </div>
+          <div class="task-images"><div class="task-img"></div><div class="task-img"></div></div>
           <div class="task-details">
             <p><strong>Адрес:</strong> ${t.addr}</p>
             <p><strong>Дата/Время:</strong> ${t.date}</p>
@@ -840,12 +660,7 @@
       });
     }
 
-    // 6. Админ
-    const employees = [
-      { name: "Алексей Петров", role: "Курьер" },
-      { name: "Мария Иванова", role: "Менеджер" }
-    ];
-
+    const employees = [{ name: "Алексей Петров", role: "Курьер" }, { name: "Мария Иванова", role: "Менеджер" }];
     function renderEmployees() {
       const list = document.getElementById('employee-list');
       list.innerHTML = '';
@@ -853,32 +668,21 @@
         const div = document.createElement('div');
         div.className = 'employee-item';
         div.innerHTML = `
-          <div class="emp-info">
-            <span class="emp-name">${emp.name}</span>
-            <span class="emp-role">${emp.role}</span>
-          </div>
+          <div class="emp-info"><span class="emp-name">${emp.name}</span><span class="emp-role">${emp.role}</span></div>
           <div class="emp-menu-btn">☰</div>
         `;
-        // Логика открытия виджета паспорта (упрощено)
-        div.querySelector('.emp-menu-btn').onclick = () => alert(`Паспорт: ${emp.name}\nДолжность: ${emp.role}\n(Фото загружено)`);
+        div.querySelector('.emp-menu-btn').onclick = () => alert(`Паспорт: ${emp.name}\nДолжность: ${emp.role}`);
         list.appendChild(div);
       });
     }
-
     function addEmployee() {
-      // Просто имитация добавления
       employees.push({ name: "Новый Сотрудник", role: "Курьер" });
       renderEmployees();
       closeModals();
     }
 
-    // Утилиты модалок
-    function openModal(id) {
-      document.getElementById(id).style.display = 'flex';
-    }
-    function closeModals() {
-      document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
-    }
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
 
   </script>
 </body>
