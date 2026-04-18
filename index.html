@@ -199,7 +199,6 @@
 
     // Порядок соединения для пентаграммы
     // Индексы: 0(низ), 1(лево-низ), 2(лево-верх), 3(право-верх), 4(право-низ)
-    // Важно: порядок должен соответствовать тому, как идут линии в пентаграмме
     const CONNECTION_ORDER = [
         { from: 0, to: 2 }, // Низ -> Лево-Верх
         { from: 2, to: 4 }, // Лево-Верх -> Право-Низ
@@ -223,22 +222,26 @@
              startIndexInOrder = 0;
         }
 
+        let stepsDrawn = 0; // Счетчик нарисованных линий
         let currentStep = startIndexInOrder;
 
         function drawNextLine() {
-            if (currentStep >= CONNECTION_ORDER.length) {
-                // Все 5 линий нарисованы, анимация завершена
+            // ВАЖНОЕ ИЗМЕНЕНИЕ: Проверяем, нарисовали ли мы все 5 линий
+            if (stepsDrawn >= 5) {
                 isAnimating = false;
                 return;
             }
 
-            const connection = CONNECTION_ORDER[currentStep];
+            // Используем оператор остатка %, чтобы индекс зацикливался (0,1,2,3,4,0,1...)
+            const connection = CONNECTION_ORDER[currentStep % CONNECTION_ORDER.length];
+            
             const startPoint = stars[connection.from];
             const endPoint = stars[connection.to];
 
             animateLine(startPoint, endPoint, () => {
-                currentStep++;
-                drawNextLine(); // Рекурсивно вызываем для следующей линии
+                stepsDrawn++;       // Увеличиваем счетчик нарисованных линий
+                currentStep++;      // Переходим к следующему индексу в массиве
+                drawNextLine();     // Рекурсивно вызываем для следующей линии
             });
         }
 
