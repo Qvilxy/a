@@ -1,713 +1,243 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, user-scalable=0" />
-  <title>Flower Mini App</title>
-  <style>
-    :root {
-      --bg-color: #f5f5f7;
-      --text-color: #000;
-      --card-bg: #fff;
-      --accent-color: #ff69b4;
-      --green-placeholder: #c1f0c1;
-      --nav-bg: rgba(255, 255, 255, 0.85);
-      --shadow: 0 4px 12px rgba(0,0,0,0.1);
-      --border-radius: 16px;
-      --icon-fill: #333;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Pentagram Mini App</title>
+    <!-- Подключаем скрипт Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000; /* Черный фон */
+            overflow: hidden; /* Убираем прокрутку */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            touch-action: none; /* Отключаем стандартные жесты браузера */
+        }
 
-    body.dark-mode {
-      --bg-color: #1c1c1e;
-      --text-color: #fff;
-      --card-bg: #2c2c2e;
-      --green-placeholder: #2d4a25;
-      --nav-bg: rgba(44, 44, 46, 0.85);
-      --shadow: 0 4px 12px rgba(0,0,0,0.3);
-      --icon-fill: #fff;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    
-    body, html {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-
-    /* === ЗАГРУЗОЧНЫЙ ЭКРАН === */
-    #splash-screen {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-color: #ffffff;
-      z-index: 9999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: opacity 0.5s ease-out, visibility 0.5s;
-    }
-    #splash-screen.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-    .splash-img {
-      max-width: 80%;
-      max-height: 80%;
-      object-fit: contain;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-
-    /* === ОСНОВНОЙ ИНТЕРФЕЙС === */
-    #app-interface {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      opacity: 0;
-      transition: opacity 0.5s ease-in;
-    }
-    #app-interface.visible {
-      opacity: 1;
-    }
-
-    .main-scroll-area {
-      flex: 1;
-      overflow-y: auto;
-      padding: 100px 16px 120px 16px;
-      position: relative;
-    }
-
-    .header {
-      display: flex; 
-      justify-content: center; /* Центрируем содержимое */
-      align-items: center;
-      position: sticky; 
-      top: 0; 
-      background: var(--bg-color); 
-      z-index: 10;
-      padding-bottom: 10px;
-      padding-top: 10px;
-    }
-    
-    /* Стили для логотипа-картинки в шапке */
-    .header-logo-img {
-      height: 40px; /* Высота логотипа */
-      width: auto;
-      object-fit: contain;
-    }
-
-    .screen { display: none; animation: fadeIn 0.3s; }
-    .screen.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* === SVG ИКОНКИ === */
-    .svg-icon {
-      width: 24px;
-      height: 24px;
-      fill: var(--icon-fill);
-      transition: fill 0.3s;
-    }
-    .nav-icon .svg-icon {
-      width: 26px;
-      height: 26px;
-    }
-
-    /* === КОМПОНЕНТЫ === */
-    .search-row { display: flex; gap: 10px; margin-bottom: 20px; }
-    .search-bar {
-      flex: 1; background: var(--card-bg); border-radius: 20px; padding: 10px 15px;
-      display: flex; align-items: center; box-shadow: var(--shadow);
-    }
-    .search-bar input { border: none; outline: none; background: transparent; width: 100%; color: var(--text-color); font-size: 16px; }
-    .cart-btn {
-      width: 44px; height: 44px; background: var(--card-bg); border-radius: 50%;
-      display: flex; justify-content: center; align-items: center; box-shadow: var(--shadow); position: relative; cursor: pointer;
-    }
-    .cart-badge {
-      position: absolute; top: -5px; right: -5px; background: red; color: white;
-      font-size: 10px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%;
-      display: flex; justify-content: center; align-items: center; display: none;
-    }
-
-    .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .product-card { background: var(--card-bg); border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; }
-    .product-img { width: 100%; aspect-ratio: 1; background-color: var(--green-placeholder); object-fit: cover; }
-    .product-info { padding: 10px; }
-    .product-title { font-weight: 600; margin-bottom: 5px; font-size: 14px; }
-    .product-price { color: var(--accent-color); font-weight: bold; }
-    .add-to-cart-btn {
-      margin-top: 8px; width: 100%; padding: 8px; background: var(--text-color);
-      color: var(--bg-color); border: none; border-radius: 8px; font-weight: 600;
-    }
-
-    /* Профиль */
-    .profile-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-    .avatar { width: 60px; height: 60px; border-radius: 50%; background: #ddd; object-fit: cover; }
-    .user-info h2 { font-size: 18px; }
-    .user-info span { color: #888; font-size: 14px; }
-    .theme-toggle {
-      margin-left: auto; width: 40px; height: 40px; background: var(--card-bg);
-      border-radius: 50%; display: flex; justify-content: center; align-items: center;
-      box-shadow: var(--shadow); cursor: pointer;
-    }
-
-    .pill-section {
-      background: var(--card-bg); border-radius: var(--border-radius); padding: 15px;
-      margin-bottom: 15px; box-shadow: var(--shadow);
-    }
-    .section-title { font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-    
-    .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
-    .cal-day { padding: 8px 0; font-size: 14px; border-radius: 50%; cursor: pointer; }
-    .cal-day.today { background: #333; color: #fff; }
-    .cal-day.event { background: #ff4d4d; color: #fff; }
-    .cal-day.empty { pointer-events: none; }
-
-    .address-list { list-style: none; }
-    .address-item { padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; }
-    .add-address-btn { color: var(--accent-color); font-weight: 600; cursor: pointer; margin-top: 5px; display: block; }
-
-    .history-stats { display: flex; justify-content: space-between; align-items: center; }
-    .order-count { font-size: 24px; font-weight: bold; color: var(--accent-color); }
-
-    /* Курьер */
-    .courier-task { background: var(--card-bg); border-radius: var(--border-radius); padding: 15px; margin-bottom: 15px; box-shadow: var(--shadow); }
-    .task-images { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 10px; padding-bottom: 5px; }
-    .task-img { width: 80px; height: 80px; background: var(--green-placeholder); border-radius: 8px; flex-shrink: 0; object-fit: cover; }
-    .task-details p { margin-bottom: 4px; font-size: 14px; }
-    .task-details strong { font-weight: 600; }
-
-    /* Админ */
-    .employee-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-    .emp-info { display: flex; flex-direction: column; }
-    .emp-name { font-weight: 600; }
-    .emp-role { font-size: 12px; color: #888; }
-    .emp-menu-btn { cursor: pointer; padding: 5px; }
-    .emp-menu-btn .svg-icon { width: 20px; height: 20px; }
-
-    /* === НАВИГАЦИЯ === */
-    .nav-wrapper {
-      position: fixed; bottom: 20px; left: 0; width: 100%;
-      display: flex; justify-content: center; z-index: 100; pointer-events: none;
-    }
-
-    .nav-pill {
-      background: var(--nav-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      border-radius: 30px; padding: 5px; display: flex; gap: 5px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2); pointer-events: auto;
-      position: relative; width: 90%; max-width: 400px; justify-content: space-around;
-    }
-
-    .nav-item {
-      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 10px 0; font-size: 10px; color: #888; z-index: 2; transition: color 0.3s;
-      cursor: pointer;
-      user-select: none; -webkit-user-select: none;
-    }
-    .nav-item.active { color: var(--accent-color); font-weight: 600; }
-    .nav-icon { margin-bottom: 2px; }
-
-    .nav-indicator {
-      position: absolute; top: 5px; left: 5px;
-      height: calc(100% - 10px);
-      background: #e0e0e0; border-radius: 25px; z-index: 1;
-      cursor: grab; touch-action: none;
-      will-change: transform, width, left;
-    }
-    .nav-indicator:active { cursor: grabbing; background: #d0d0d0; }
-    
-    /* Модалки */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); z-index: 1000;
-      display: none; justify-content: center; align-items: center;
-    }
-    .modal-content {
-      background: var(--card-bg); width: 85%; max-width: 320px;
-      border-radius: 20px; padding: 20px; position: relative;
-    }
-    .modal-close { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: var(--text-color); }
-    .modal-input {
-      width: 100%; padding: 10px; margin: 10px 0;
-      border: 1px solid #ddd; border-radius: 8px;
-      background: var(--bg-color); color: var(--text-color);
-    }
-    .modal-btn {
-      width: 100%; padding: 12px; background: var(--accent-color);
-      color: white; border: none; border-radius: 10px; font-weight: bold; margin-top: 10px;
-    }
-
-  </style>
+        canvas {
+            display: block;
+        }
+    </style>
 </head>
 <body>
 
-  <!-- ЗАГРУЗОЧНЫЙ ЭКРАН -->
-  <div id="splash-screen">
-    <!-- Используем то же фото, что и для заставки -->
-    <img src="ballonrose.png" alt="Loading..." class="splash-img">
-  </div>
+<canvas id="canvas"></canvas>
 
-  <!-- Основной интерфейс -->
-  <div id="app-interface">
-    
-    <div class="main-scroll-area">
-      
-      <!-- ВКЛАДКА 1: ГЛАВНАЯ -->
-      <div id="tab-home" class="screen active">
-        <div class="header">
-          <!-- ЛОГОТИП ПО ЦЕНТРУ -->
-          <img src="ballonrose.png" alt="Logo" class="header-logo-img">
-        </div>
+<script>
+    // Инициализация Telegram WebApp
+    const tg = window.Telegram.WebApp;
+    tg.expand(); // Разворачиваем приложение на весь экран
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height, centerX, centerY, radius;
+    let stars = [];
+    let lines = [];
+    let isAnimating = false;
+    let animationFrameId;
+
+    // Параметры звезд
+    const STAR_RADIUS = 8;
+    const PENTAGON_RADIUS_FACTOR = 0.35; // Радиус пятиугольника относительно размера экрана
+
+    function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        centerX = width / 2;
+        centerY = height / 2;
+        radius = Math.min(width, height) * PENTAGON_RADIUS_FACTOR;
         
-        <div class="search-row">
-          <div class="search-bar">
-            <svg class="svg-icon" style="margin-right:8px; width:20px; height:20px;" viewBox="0 0 24 24">
-              <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-            </svg>
-            <input type="text" id="search-input" placeholder="Поиск цветов...">
-          </div>
-          <div class="cart-btn" onclick="alert('Корзина пока в разработке')">
-            <svg class="svg-icon" viewBox="0 0 24 24">
-              <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-            </svg>
-            <div class="cart-badge" id="cart-badge">0</div>
-          </div>
-        </div>
-
-        <div class="product-grid" id="product-grid"></div>
-      </div>
-
-      <!-- ВКЛАДКА 2: ПРОФИЛЬ -->
-      <div id="tab-profile" class="screen">
-        <div class="header">
-           <!-- ЛОГОТИП ПО ЦЕНТРУ -->
-           <img src="ballonrose.png" alt="Logo" class="header-logo-img">
-        </div>
-
-        <div class="profile-header">
-          <img src="https://via.placeholder.com/60" alt="Avatar" class="avatar" id="user-avatar">
-          <div class="user-info">
-            <h2 id="user-name">Загрузка...</h2>
-            <span id="user-username">@username</span>
-          </div>
-          <div class="theme-toggle" id="theme-btn">
-            <svg class="svg-icon" viewBox="0 0 24 24">
-              <path d="M9 2c-1.05 0-2.05.16-3 .46 1.69 1.23 2.79 3.24 2.79 5.54 0 3.87-3.13 7-7 7-1.06 0-2.06-.23-2.96-.63C.23 16.04 3.69 19 8 19c4.97 0 9-4.03 9-9 0-4.31-2.96-7.96-7.56-8.54C9.05 2.06 9.03 2 9 2z"/>
-            </svg>
-          </div>
-        </div>
-
-        <div class="pill-section">
-          <div class="section-title">Важные даты</div>
-          <div class="calendar-header">
-            <button id="prev-month" style="background:none; border:none; cursor:pointer;">
-               <svg class="svg-icon" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-            </button>
-            <span id="current-month-year">Март 2026</span>
-            <button id="next-month" style="background:none; border:none; cursor:pointer;">
-              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
-            </button>
-          </div>
-          <div class="calendar-grid" id="calendar-grid"></div>
-        </div>
-
-        <div class="pill-section">
-          <div class="section-title">Адреса доставки</div>
-          <ul class="address-list" id="address-list"></ul>
-          <span class="add-address-btn" onclick="openModal('address-modal')">+ Добавить адрес</span>
-        </div>
-
-        <div class="pill-section" onclick="switchTab('tab-orders')">
-          <div class="history-stats">
-            <span>История заказов</span>
-            <span class="order-count" id="order-count-display">0</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ВКЛАДКА 3: КУРЬЕР -->
-      <div id="tab-courier" class="screen">
-        <div class="header">
-           <!-- ЛОГОТИП ПО ЦЕНТРУ -->
-           <img src="ballonrose.png" alt="Logo" class="header-logo-img">
-        </div>
-        <div id="courier-list"></div>
-      </div>
-
-      <!-- ВКЛАДКА 4: АДМИН -->
-      <div id="tab-admin" class="screen">
-        <div class="header">
-           <!-- ЛОГОТИП ПО ЦЕНТРУ -->
-           <img src="ballonrose.png" alt="Logo" class="header-logo-img">
-        </div>
-        
-        <div class="pill-section">
-          <div class="section-title">Сотрудники</div>
-          <div id="employee-list"></div>
-          <button class="modal-btn" onclick="openModal('add-employee-modal')" style="margin-top:15px">+ Добавить сотрудника</button>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- НИЖНЯЯ НАВИГАЦИЯ -->
-    <div class="nav-wrapper">
-      <div class="nav-pill" id="nav-pill">
-        <div class="nav-indicator" id="nav-indicator"></div>
-        
-        <div class="nav-item active" data-target="tab-home">
-          <div class="nav-icon">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-          </div><span>Главная</span>
-        </div>
-        <div class="nav-item" data-target="tab-profile">
-          <div class="nav-icon">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-          </div><span>Профиль</span>
-        </div>
-        <div class="nav-item" data-target="tab-courier">
-          <div class="nav-icon">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-          </div><span>Курьер</span>
-        </div>
-        <div class="nav-item" data-target="tab-admin">
-          <div class="nav-icon">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .55-.45 1-1 1H6c-.55 0-1-.45-1-1v-1h14v1z"/></svg>
-          </div><span>Админ</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- МОДАЛКИ -->
-  <div class="modal-overlay" id="event-modal">
-    <div class="modal-content">
-      <span class="modal-close" onclick="closeModals()">&times;</span>
-      <h3>Сохранить событие</h3>
-      <p id="event-date-display" style="margin:10px 0; color:#888"></p>
-      <input type="text" class="modal-input" id="event-desc" placeholder="Описание события">
-      <button class="modal-btn" onclick="saveEvent()">Сохранить</button>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="address-modal">
-    <div class="modal-content">
-      <span class="modal-close" onclick="closeModals()">&times;</span>
-      <h3>Новый адрес</h3>
-      <input type="text" class="modal-input" id="new-address" placeholder="Улица, дом, квартира">
-      <button class="modal-btn" onclick="addAddress()">Добавить</button>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="add-employee-modal">
-    <div class="modal-content">
-      <span class="modal-close" onclick="closeModals()">&times;</span>
-      <h3>Новый сотрудник</h3>
-      <input type="text" class="modal-input" placeholder="ФИО">
-      <input type="text" class="modal-input" placeholder="@username">
-      <div style="display:flex; gap:10px; margin:10px 0;">
-        <div style="flex:1; height:60px; background:#eee; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#000;">Паспорт (Лицо)</div>
-        <div style="flex:1; height:60px; background:#eee; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#000;">Прописка</div>
-      </div>
-      <select class="modal-input"><option>Курьер</option></select>
-      <button class="modal-btn" onclick="addEmployee()">Оформить</button>
-    </div>
-  </div>
-
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const tg = window.Telegram.WebApp;
-      tg.ready();
-      tg.expand();
-
-      // Логика загрузочного экрана
-      setTimeout(() => {
-        const splash = document.getElementById('splash-screen');
-        const app = document.getElementById('app-interface');
-        
-        splash.classList.add('hidden');
-        app.classList.add('visible');
-        
-        setTimeout(() => {
-          splash.style.display = 'none';
-        }, 500);
-      }, 2000);
-
-      const user = tg.initDataUnsafe?.user || { first_name: "Иван", username: "ivan_test", photo_url: "" };
-      document.getElementById('user-name').innerText = user.first_name;
-      document.getElementById('user-username').innerText = "@" + (user.username || "user");
-      if(user.photo_url) document.getElementById('user-avatar').src = user.photo_url;
-
-      initProducts();
-      initCalendar();
-      initNavigation();
-      initTheme();
-      renderAddresses();
-      renderEmployees();
-      renderCourierTasks();
-    });
-
-    function switchTab(tabId) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-
-      document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-        if(item.dataset.target === tabId) item.classList.add('active');
-      });
-
-      moveIndicatorTo(tabId);
+        calculateStarPositions();
+        draw();
     }
 
-    function initNavigation() {
-      const items = document.querySelectorAll('.nav-item');
-      items.forEach(item => {
-        item.addEventListener('click', () => switchTab(item.dataset.target));
-      });
-
-      const indicator = document.getElementById('nav-indicator');
-      const navPill = document.getElementById('nav-pill');
-      
-      let isDragging = false;
-      let startX = 0;
-      let startLeft = 0;
-
-      indicator.addEventListener('touchstart', (e) => {
-        isDragging = true;
-        startX = e.touches[0].clientX;
-        const rect = indicator.getBoundingClientRect();
-        const parentRect = navPill.getBoundingClientRect();
-        startLeft = rect.left - parentRect.left;
-        indicator.style.transition = 'none'; 
-      }, {passive: false});
-
-      indicator.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        e.preventDefault();
-        const currentX = e.touches[0].clientX;
-        const diff = currentX - startX;
-        let newLeft = startLeft + diff;
-        const maxLeft = navPill.clientWidth - indicator.clientWidth;
-        if (newLeft < 0) newLeft = 0;
-        if (newLeft > maxLeft) newLeft = maxLeft;
-        indicator.style.left = `${newLeft}px`;
-      }, {passive: false});
-
-      indicator.addEventListener('touchend', (e) => {
-        if (!isDragging) return;
-        isDragging = false;
-        indicator.style.transition = 'left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
-        const rect = indicator.getBoundingClientRect();
-        const parentRect = navPill.getBoundingClientRect();
-        const currentLeft = rect.left - parentRect.left;
-        const itemWidth = parentRect.clientWidth / 4;
-        const index = Math.round(currentLeft / itemWidth);
-        const targets = ['tab-home', 'tab-profile', 'tab-courier', 'tab-admin'];
-        switchTab(targets[index]);
-      });
+    // Рассчитываем позиции 5 звезд (вершин пятиугольника)
+    function calculateStarPositions() {
+        stars = [];
+        for (let i = 0; i < 5; i++) {
+            // Начинаем с верхней точки (-PI/2) и делим круг на 5 частей
+            const angle = (i * 2 * Math.PI / 5) - (Math.PI / 2);
+            stars.push({
+                x: centerX + radius * Math.cos(angle),
+                y: centerY + radius * Math.sin(angle),
+                index: i
+            });
+        }
     }
 
-    function moveIndicatorTo(tabId) {
-      const indicator = document.getElementById('nav-indicator');
-      const items = Array.from(document.querySelectorAll('.nav-item'));
-      const targetItem = items.find(i => i.dataset.target === tabId);
-      if (!targetItem) return;
-      const navPill = document.getElementById('nav-pill');
-      const parentRect = navPill.getBoundingClientRect();
-      const itemRect = targetItem.getBoundingClientRect();
-      const relativeLeft = itemRect.left - parentRect.left;
-      indicator.style.left = `${relativeLeft}px`;
-      indicator.style.width = `${itemRect.width}px`;
+    // Функция для рисования одной звезды (крестика)
+    function drawStar(x, y) {
+        ctx.beginPath();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        // Горизонтальная линия крестика
+        ctx.moveTo(x - STAR_RADIUS, y);
+        ctx.lineTo(x + STAR_RADIUS, y);
+        // Вертикальная линия крестика
+        ctx.moveTo(x, y - STAR_RADIUS);
+        ctx.lineTo(x, y + STAR_RADIUS);
+        ctx.stroke();
     }
 
-    const products = [
-      { name: "Пион 'Sarah'", price: 5000 }, { name: "Роза 'Red Naomi'", price: 3500 },
-      { name: "Тюльпан Микс", price: 2000 }, { name: "Гортензия", price: 4500 },
-      { name: "Лилия", price: 3000 }, { name: "Эустома", price: 2500 },
-    ];
-    let cartCount = 0;
+    // Основная функция отрисовки
+    function draw() {
+        // Очищаем холст
+        ctx.clearRect(0, 0, width, height);
 
-    function initProducts() {
-      const grid = document.getElementById('product-grid');
-      const searchInput = document.getElementById('search-input');
-      function render(list) {
-        grid.innerHTML = '';
-        list.forEach(p => {
-          const card = document.createElement('div');
-          card.className = 'product-card';
-          card.innerHTML = `
-            <div class="product-img"></div>
-            <div class="product-info">
-              <div class="product-title">${p.name}</div>
-              <div class="product-price">${p.price} ₽</div>
-              <button class="add-to-cart-btn" onclick="addToCart()">В корзину</button>
-            </div>
-          `;
-          grid.appendChild(card);
+        // Рисуем все звезды
+        stars.forEach(star => drawStar(star.x, star.y));
+
+        // Рисуем все существующие линии
+        lines.forEach(line => {
+            ctx.beginPath();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.moveTo(line.startX, line.startY);
+            ctx.lineTo(line.endX, line.endY);
+            ctx.stroke();
         });
-      }
-      render(products);
-      searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        render(products.filter(p => p.name.toLowerCase().includes(term)));
-      });
-    }
 
-    function addToCart() {
-      cartCount++;
-      const badge = document.getElementById('cart-badge');
-      badge.innerText = cartCount;
-      badge.style.display = 'flex';
-    }
-
-    function initTheme() {
-      const btn = document.getElementById('theme-btn');
-      let isDark = false;
-      btn.addEventListener('click', () => {
-        isDark = !isDark;
-        document.body.classList.toggle('dark-mode', isDark);
-        if(isDark) {
-             btn.innerHTML = '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>';
-        } else {
-             btn.innerHTML = '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 2c-1.05 0-2.05.16-3 .46 1.69 1.23 2.79 3.24 2.79 5.54 0 3.87-3.13 7-7 7-1.06 0-2.06-.23-2.96-.63C.23 16.04 3.69 19 8 19c4.97 0 9-4.03 9-9 0-4.31-2.96-7.96-7.56-8.54C9.05 2.06 9.03 2 9 2z"/></svg>';
+        // Если идет анимация, рисуем текущую анимируемую линию
+        if (isAnimating && currentAnimationLine) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.moveTo(currentAnimationLine.startX, currentAnimationLine.startY);
+            ctx.lineTo(currentAnimationLine.currentX, currentAnimationLine.currentY);
+            ctx.stroke();
         }
-      });
     }
 
-    let currentDate = new Date();
-    const events = {};
-    function initCalendar() {
-      const grid = document.getElementById('calendar-grid');
-      const monthLabel = document.getElementById('current-month-year');
-      function renderCalendar() {
-        grid.innerHTML = '';
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
-        const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        monthLabel.innerText = `${monthNames[month]} ${year}`;
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const today = new Date();
-        for (let i = 0; i < firstDay; i++) {
-          const div = document.createElement('div');
-          div.className = 'cal-day empty';
-          grid.appendChild(div);
+    let currentAnimationLine = null;
+
+    // Логика анимации
+    function animateLine(startPoint, endPoint, callback) {
+        const duration = 400; // Длительность анимации одной линии в мс
+        const startTime = performance.now();
+
+        currentAnimationLine = {
+            startX: startPoint.x,
+            startY: startPoint.y,
+            endX: endPoint.x,
+            endY: endPoint.y,
+            currentX: startPoint.x,
+            currentY: startPoint.y
+        };
+
+        function step(timestamp) {
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // Линейная интерполяция (lerp) для плавного движения
+            currentAnimationLine.currentX = startPoint.x + (endPoint.x - startPoint.x) * progress;
+            currentAnimationLine.currentY = startPoint.y + (endPoint.y - startPoint.y) * progress;
+
+            draw();
+
+            if (progress < 1) {
+                animationFrameId = requestAnimationFrame(step);
+            } else {
+                // Анимация линии завершена
+                currentAnimationLine = null;
+                // Добавляем завершенную линию в массив
+                lines.push({
+                    startX: startPoint.x,
+                    startY: startPoint.y,
+                    endX: endPoint.x,
+                    endY: endPoint.y
+                });
+                draw(); // Перерисовываем с новой линией
+                callback(); // Вызываем коллбек для следующей линии
+            }
         }
-        for (let i = 1; i <= daysInMonth; i++) {
-          const div = document.createElement('div');
-          div.className = 'cal-day';
-          div.innerText = i;
-          if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) div.classList.add('today');
-          if (events[`${year}-${month}-${i}`]) div.classList.add('event');
-          div.onclick = () => openEventModal(year, month, i);
-          grid.appendChild(div);
+        animationFrameId = requestAnimationFrame(step);
+    }
+
+    // Последовательность соединения точек для пентаграммы
+    // Индексы звезд: 0(верх), 1(право-низ), 2(лево-низ), 3(право-верх), 4(лево-верх)
+    // Порядок соединения: 0->2, 2->4, 4->1, 1->3, 3->0
+    const CONNECTION_ORDER = [
+        { from: 0, to: 2 },
+        { from: 2, to: 4 },
+        { from: 4, to: 1 },
+        { from: 1, to: 3 },
+        { from: 3, to: 0 }
+    ];
+
+    function startPentagramAnimation(startStarIndex) {
+        if (isAnimating || lines.length > 0) return; // Не запускаем, если уже идет анимация или рисунок готов
+
+        isAnimating = true;
+        lines = []; // Очищаем предыдущие линии, если были
+        
+        // Находим, с какого шага начать, исходя из нажатой звезды
+        let startIndexInOrder = CONNECTION_ORDER.findIndex(conn => conn.from === startStarIndex);
+        
+        // Если нажали на звезду, которая не является началом ни одного соединения в нашем порядке,
+        // начинаем с первого доступного соединения.
+        if (startIndexInOrder === -1) {
+             startIndexInOrder = 0;
         }
-      }
-      document.getElementById('prev-month').onclick = () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); };
-      document.getElementById('next-month').onclick = () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); };
-      renderCalendar();
+
+        let currentStep = startIndexInOrder;
+
+        function drawNextLine() {
+            if (currentStep >= CONNECTION_ORDER.length) {
+                // Все линии нарисованы
+                isAnimating = false;
+                return;
+            }
+
+            const connection = CONNECTION_ORDER[currentStep];
+            const startPoint = stars[connection.from];
+            const endPoint = stars[connection.to];
+
+            animateLine(startPoint, endPoint, () => {
+                currentStep++;
+                drawNextLine();
+            });
+        }
+
+        drawNextLine();
     }
 
-    let selectedDateKey = null;
-    function openEventModal(y, m, d) {
-      selectedDateKey = `${y}-${m}-${d}`;
-      document.getElementById('event-date-display').innerText = `${d}.${m+1}.${y}`;
-      document.getElementById('event-desc').value = events[selectedDateKey] || '';
-      openModal('event-modal');
-    }
-    function saveEvent() {
-      const desc = document.getElementById('event-desc').value;
-      if (desc.trim()) events[selectedDateKey] = desc;
-      else delete events[selectedDateKey];
-      closeModals();
-      initCalendar();
-    }
-
-    const addresses = [];
-    function renderAddresses() {
-      const list = document.getElementById('address-list');
-      list.innerHTML = '';
-      if(addresses.length === 0) {
-        list.innerHTML = '<li style="color:#888; font-size:14px;">Нет сохраненных адресов</li>';
-        return;
-      }
-      addresses.slice(0, 5).forEach(addr => {
-        const li = document.createElement('li');
-        li.className = 'address-item';
-        li.innerText = addr;
-        list.appendChild(li);
-      });
-    }
-    function addAddress() {
-      const val = document.getElementById('new-address').value;
-      if(val && addresses.length < 5) {
-        addresses.push(val);
-        renderAddresses();
-        closeModals();
-        document.getElementById('new-address').value = '';
-      }
+    // Обработка кликов/тапов
+    function handleInput(clientX, clientY) {
+        // Проверяем, попал ли клик по какой-либо звезде
+        for (let star of stars) {
+            const dx = clientX - star.x;
+            const dy = clientY - star.y;
+            // Увеличиваем область нажатия для удобства
+            if (dx * dx + dy * dy < (STAR_RADIUS * 3) ** 2) {
+                startPentagramAnimation(star.index);
+                break;
+            }
+        }
     }
 
-    function renderCourierTasks() {
-      const list = document.getElementById('courier-list');
-      const tasks = [
-        { addr: 'ул. Ленина 1', date: '18.04.2026 14:00', phone: '+79001234567' },
-        { addr: 'пр. Мира 15', date: '18.04.2026 16:30', phone: '+79007654321' },
-      ];
-      list.innerHTML = '';
-      tasks.forEach(t => {
-        const div = document.createElement('div');
-        div.className = 'courier-task';
-        div.innerHTML = `
-          <div class="task-images"><div class="task-img"></div><div class="task-img"></div></div>
-          <div class="task-details">
-            <p><strong>Адрес:</strong> ${t.addr}</p>
-            <p><strong>Дата/Время:</strong> ${t.date}</p>
-            <p><strong>Телефон:</strong> <a href="tel:${t.phone}" style="color:var(--accent-color)">${t.phone}</a></p>
-          </div>
-        `;
-        list.appendChild(div);
-      });
-    }
+    // Слушатели событий
+    canvas.addEventListener('click', e => handleInput(e.clientX, e.clientY));
+    canvas.addEventListener('touchstart', e => {
+        // Предотвращаем двойное срабатывание (click + touchstart)
+        e.preventDefault(); 
+        const touch = e.touches[0];
+        handleInput(touch.clientX, touch.clientY);
+    }, { passive: false });
 
-    const employees = [{ name: "Алексей Петров", role: "Курьер" }, { name: "Мария Иванова", role: "Менеджер" }];
-    function renderEmployees() {
-      const list = document.getElementById('employee-list');
-      list.innerHTML = '';
-      employees.forEach(emp => {
-        const div = document.createElement('div');
-        div.className = 'employee-item';
-        div.innerHTML = `
-          <div class="emp-info"><span class="emp-name">${emp.name}</span><span class="emp-role">${emp.role}</span></div>
-          <div class="emp-menu-btn">
-             <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
-          </div>
-        `;
-        div.querySelector('.emp-menu-btn').onclick = () => alert(`Паспорт: ${emp.name}\nДолжность: ${emp.role}`);
-        list.appendChild(div);
-      });
-    }
-    function addEmployee() {
-      employees.push({ name: "Новый Сотрудник", role: "Курьер" });
-      renderEmployees();
-      closeModals();
-    }
+    window.addEventListener('resize', resize);
 
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
+    // Первый запуск
+    resize();
 
-  </script>
+</script>
+
 </body>
 </html>
-
