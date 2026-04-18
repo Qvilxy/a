@@ -43,7 +43,7 @@
     let animationFrameId;
 
     // Параметры
-    const STAR_RADIUS = 10; // Радиус крестика-звезды
+    const DIAMOND_SIZE = 6; // Размер маленького ромба (половина диагонали)
     const PENTAGON_RADIUS_FACTOR = 0.35; 
     const LINE_WIDTH = 8; 
     const GLOW_BLUR = 15; 
@@ -100,22 +100,22 @@
         });
     }
 
-    // Функция для рисования звезды-крестика со свечением
-    function drawStar(x, y) {
+    // Функция для рисования маленького ромба со свечением
+    function drawDiamond(x, y) {
         ctx.save();
         ctx.shadowColor = GLOW_COLOR;
         ctx.shadowBlur = GLOW_BLUR;
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 2; // Толщина линий крестика
+        ctx.fillStyle = 'white';
         
         ctx.beginPath();
-        // Горизонтальная линия
-        ctx.moveTo(x - STAR_RADIUS, y);
-        ctx.lineTo(x + STAR_RADIUS, y);
-        // Вертикальная линия
-        ctx.moveTo(x, y - STAR_RADIUS);
-        ctx.lineTo(x, y + STAR_RADIUS);
-        ctx.stroke();
+        // Рисуем маленький ромб
+        ctx.moveTo(x, y - DIAMOND_SIZE);     // Верх
+        ctx.lineTo(x + DIAMOND_SIZE, y);     // Право
+        ctx.lineTo(x, y + DIAMOND_SIZE);     // Низ
+        ctx.lineTo(x - DIAMOND_SIZE, y);     // Лево
+        ctx.closePath();
+        ctx.fill();
+        
         ctx.restore();
     }
 
@@ -152,8 +152,8 @@
             ctx.restore();
         }
 
-        // Рисуем звезды поверх линий
-        stars.forEach(star => drawStar(star.x, star.y));
+        // Рисуем маленькие ромбы поверх линий
+        stars.forEach(star => drawDiamond(star.x, star.y));
     }
 
     let currentAnimationLine = null;
@@ -199,6 +199,7 @@
 
     // Порядок соединения для пентаграммы
     // Индексы: 0(низ), 1(лево-низ), 2(лево-верх), 3(право-верх), 4(право-низ)
+    // Важно: порядок должен соответствовать тому, как идут линии в пентаграмме
     const CONNECTION_ORDER = [
         { from: 0, to: 2 }, // Низ -> Лево-Верх
         { from: 2, to: 4 }, // Лево-Верх -> Право-Низ
@@ -212,12 +213,17 @@
         if (isAnimating || lines.length > 0) return;
 
         isAnimating = true;
-        lines = []; // Очищаем старые линии, если были (на всякий случай)
+        lines = []; // Очищаем старые линии
         
-        // ВАЖНОЕ ИЗМЕНЕНИЕ: Всегда начинаем анимацию с самого первого соединения в списке.
-        // Нажатие на любую звезду просто запускает полный процесс отрисовки.
-        // Это гарантирует, что пентаграмма всегда будет нарисована полностью.
-        let currentStep = 0;
+        // НАЙДЕН ИНДЕКС СОЕДИНЕНИЯ, КОТОРОЕ НАЧИНАЕТСЯ С НАЖАТОЙ ЗВЕЗДЫ
+        let startIndexInOrder = CONNECTION_ORDER.findIndex(conn => conn.from === startStarIndex);
+        
+        // Если вдруг не нашли (что маловероятно в замкнутом цикле), начинаем с начала
+        if (startIndexInOrder === -1) {
+             startIndexInOrder = 0;
+        }
+
+        let currentStep = startIndexInOrder;
 
         function drawNextLine() {
             if (currentStep >= CONNECTION_ORDER.length) {
@@ -243,8 +249,8 @@
         for (let star of stars) {
             const dx = clientX - star.x;
             const dy = clientY - star.y;
-            // Увеличиваем область нажатия для удобства
-            if (dx * dx + dy * dy < (STAR_RADIUS * 3) ** 2) {
+            // Увеличиваем область нажатия для удобства (радиус кликабельной зоны)
+            if (dx * dx + dy * dy < (DIAMOND_SIZE * 4) ** 2) {
                 startPentagramAnimation(star.index);
                 break;
             }
