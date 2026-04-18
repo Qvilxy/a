@@ -43,7 +43,7 @@
     let animationFrameId;
 
     // Параметры
-    const STAR_SIZE = 12; // Размер острой звезды
+    const STAR_RADIUS = 10; // Радиус крестика-звезды
     const PENTAGON_RADIUS_FACTOR = 0.35; 
     const LINE_WIDTH = 8; 
     const GLOW_BLUR = 15; 
@@ -100,22 +100,22 @@
         });
     }
 
-    // Функция для рисования острой звезды (ромба)
-    function drawSharpStar(x, y) {
+    // Функция для рисования звезды-крестика со свечением
+    function drawStar(x, y) {
         ctx.save();
         ctx.shadowColor = GLOW_COLOR;
         ctx.shadowBlur = GLOW_BLUR;
-        ctx.fillStyle = 'white';
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2; // Толщина линий крестика
         
         ctx.beginPath();
-        // Рисуем ромб
-        ctx.moveTo(x, y - STAR_SIZE); // Верхняя точка
-        ctx.lineTo(x + STAR_SIZE / 2, y); // Правая точка
-        ctx.lineTo(x, y + STAR_SIZE); // Нижняя точка
-        ctx.lineTo(x - STAR_SIZE / 2, y); // Левая точка
-        ctx.closePath();
-        ctx.fill();
-        
+        // Горизонтальная линия
+        ctx.moveTo(x - STAR_RADIUS, y);
+        ctx.lineTo(x + STAR_RADIUS, y);
+        // Вертикальная линия
+        ctx.moveTo(x, y - STAR_RADIUS);
+        ctx.lineTo(x, y + STAR_RADIUS);
+        ctx.stroke();
         ctx.restore();
     }
 
@@ -152,8 +152,8 @@
             ctx.restore();
         }
 
-        // Рисуем острые звезды поверх линий
-        stars.forEach(star => drawSharpStar(star.x, star.y));
+        // Рисуем звезды поверх линий
+        stars.forEach(star => drawStar(star.x, star.y));
     }
 
     let currentAnimationLine = null;
@@ -208,20 +208,16 @@
     ];
 
     function startPentagramAnimation(startStarIndex) {
+        // Если анимация уже идет или рисунок уже готов, ничего не делаем
         if (isAnimating || lines.length > 0) return;
 
         isAnimating = true;
-        lines = []; // Очищаем старые линии
+        lines = []; // Очищаем старые линии, если были (на всякий случай)
         
-        // НАЙДЕН ПЕРВОЕ СОЕДИНЕНИЕ, КОТОРОЕ НАЧИНАЕТСЯ С НАЖАТОЙ ЗВЕЗДЫ
-        let startIndexInOrder = CONNECTION_ORDER.findIndex(conn => conn.from === startStarIndex);
-        
-        // Если вдруг не нашли (что маловероятно в замкнутом цикле), начинаем с начала
-        if (startIndexInOrder === -1) {
-             startIndexInOrder = 0;
-        }
-
-        let currentStep = startIndexInOrder;
+        // ВАЖНОЕ ИЗМЕНЕНИЕ: Всегда начинаем анимацию с самого первого соединения в списке.
+        // Нажатие на любую звезду просто запускает полный процесс отрисовки.
+        // Это гарантирует, что пентаграмма всегда будет нарисована полностью.
+        let currentStep = 0;
 
         function drawNextLine() {
             if (currentStep >= CONNECTION_ORDER.length) {
@@ -248,7 +244,7 @@
             const dx = clientX - star.x;
             const dy = clientY - star.y;
             // Увеличиваем область нажатия для удобства
-            if (dx * dx + dy * dy < (STAR_SIZE * 2.5) ** 2) {
+            if (dx * dx + dy * dy < (STAR_RADIUS * 3) ** 2) {
                 startPentagramAnimation(star.index);
                 break;
             }
