@@ -10,13 +10,14 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #000000; /* Черный фон */
-            overflow: hidden; /* Убираем прокрутку */
+            background-color: #000000; /* Черный фон по умолчанию */
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            touch-action: none; /* Отключаем стандартные жесты браузера */
+            touch-action: none;
+            transition: background-color 2s ease; /* Плавный переход цвета фона */
         }
 
         canvas {
@@ -38,17 +39,25 @@
 
     let width, height, centerX, centerY, radius;
     let stars = [];
-    let lines = [];
+    
+    // Массивы для хранения линий
+    let whiteLines = [];
+    let redLines = [];
+    
     let isAnimating = false;
     let animationFrameId;
+    
+    // Состояние приложения
+    let isWhitePentagramDone = false;
+    let isRedPentagramDone = false;
 
     // Параметры
-    const DIAMOND_SIZE = 6; // Размер маленького ромба (половина диагонали)
+    const DIAMOND_SIZE = 6; 
     const PENTAGON_RADIUS_FACTOR = 0.35; 
     const LINE_WIDTH = 8; 
-    const GLOW_BLUR = 15; 
-    const GLOW_COLOR = 'white'; 
-    const BOTTOM_STAR_OFFSET = 100; // Смещение нижней звезды вниз на 100px
+    const WHITE_GLOW_BLUR = 15; 
+    const RED_GLOW_BLUR = 30; // Усиленное свечение для красного, чтобы "сливалось" с фоном
+    const BOTTOM_STAR_OFFSET = 100; 
 
     function resize() {
         const dpr = window.devicePixelRatio || 1;
@@ -65,8 +74,6 @@
         width = logicalWidth;
         height = logicalHeight;
         centerX = width / 2;
-        
-        // Немного поднимаем центр всей фигуры, чтобы компенсировать смещение нижней звезды вниз
         centerY = height * 0.45; 
         
         radius = Math.min(width, height) * PENTAGON_RADIUS_FACTOR;
@@ -75,14 +82,10 @@
         draw();
     }
 
-    // Рассчитываем позиции звезд с учетом смещения нижней
     function calculateStarPositions() {
         stars = [];
-        
-        // Сначала рассчитываем позиции как для обычного перевернутого пятиугольника
         const tempStars = [];
         for (let i = 0; i < 5; i++) {
-            // Угол для перевернутого пятиугольника (0 - внизу)
             const angle = (i * 2 * Math.PI / 5) + (Math.PI / 2);
             tempStars.push({
                 x: centerX + radius * Math.cos(angle),
@@ -91,7 +94,6 @@
             });
         }
 
-        // Применяем смещение к нижней звезде (индекс 0)
         stars = tempStars.map(star => {
             if (star.index === 0) {
                 return { ...star, y: star.y + BOTTOM_STAR_OFFSET };
@@ -100,33 +102,30 @@
         });
     }
 
-    // Функция для рисования маленького ромба со свечением
-    function drawDiamond(x, y) {
+    function drawDiamond(x, y, color = 'white') {
         ctx.save();
-        ctx.shadowColor = GLOW_COLOR;
-        ctx.shadowBlur = GLOW_BLUR;
-        ctx.fillStyle = 'white';
+        ctx.shadowColor = color;
+        ctx.shadowBlur = color === 'white' ? WHITE_GLOW_BLUR : RED_GLOW_BLUR;
+        ctx.fillStyle = color;
         
         ctx.beginPath();
-        // Рисуем маленький ромб
-        ctx.moveTo(x, y - DIAMOND_SIZE);     // Верх
-        ctx.lineTo(x + DIAMOND_SIZE, y);     // Право
-        ctx.lineTo(x, y + DIAMOND_SIZE);     // Низ
-        ctx.lineTo(x - DIAMOND_SIZE, y);     // Лево
+        ctx.moveTo(x, y - DIAMOND_SIZE);
+        ctx.lineTo(x + DIAMOND_SIZE, y);
+        ctx.lineTo(x, y + DIAMOND_SIZE);
+        ctx.lineTo(x - DIAMOND_SIZE, y);
         ctx.closePath();
         ctx.fill();
-        
         ctx.restore();
     }
 
     function draw() {
         ctx.clearRect(0, 0, width, height);
 
-        // Рисуем линии
-        lines.forEach(line => {
+        // 1. Рисуем белые линии
+        whiteLines.forEach(line => {
             ctx.save();
-            ctx.shadowColor = GLOW_COLOR;
-            ctx.shadowBlur = GLOW_BLUR;
+            ctx.shadowColor = 'white';
+            ctx.shadowBlur = WHITE_GLOW_BLUR;
             ctx.beginPath();
             ctx.strokeStyle = 'white';
             ctx.lineWidth = LINE_WIDTH;
@@ -137,11 +136,11 @@
             ctx.restore();
         });
 
-        // Рисуем анимируемую линию
-        if (isAnimating && currentAnimationLine) {
+        // 2. Рисуем текущую анимируемую белую линию (если есть)
+        if (isAnimating && currentAnimationLine && !isRedMode) {
             ctx.save();
-            ctx.shadowColor = GLOW_COLOR;
-            ctx.shadowBlur = GLOW_BLUR;
+            ctx.shadowColor = 'white';
+            ctx.shadowBlur = WHITE_GLOW_BLUR;
             ctx.beginPath();
             ctx.strokeStyle = 'white';
             ctx.lineWidth = LINE_WIDTH;
@@ -152,13 +151,47 @@
             ctx.restore();
         }
 
-        // Рисуем маленькие ромбы поверх линий
-        stars.forEach(star => drawDiamond(star.x, star.y));
+        // 3. Рисуем красные линии (поверх белых)
+        redLines.forEach(line => {
+            ctx.save();
+            ctx.shadowColor = '#ff0000';
+            ctx.shadowBlur = RED_GLOW_BLUR;
+            ctx.beginPath();
+            ctx.strokeStyle = '#aa0000'; // Темно-красный цвет линии
+            ctx.lineWidth = LINE_WIDTH;
+            ctx.lineCap = 'round';
+            ctx.moveTo(line.startX, line.startY);
+            ctx.lineTo(line.endX, line.endY);
+            ctx.stroke();
+            ctx.restore();
+        });
+
+        // 4. Рисуем текущую анимируемую красную линию (если есть)
+        if (isAnimating && currentAnimationLine && isRedMode) {
+            ctx.save();
+            ctx.shadowColor = '#ff0000';
+            ctx.shadowBlur = RED_GLOW_BLUR;
+            ctx.beginPath();
+            ctx.strokeStyle = '#aa0000';
+            ctx.lineWidth = LINE_WIDTH;
+            ctx.lineCap = 'round';
+            ctx.moveTo(currentAnimationLine.startX, currentAnimationLine.startY);
+            ctx.lineTo(currentAnimationLine.currentX, currentAnimationLine.currentY);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // 5. Рисуем звезды поверх всего
+        // Если красный режим активен, звезды тоже можно сделать красными или оставить белыми для контраста.
+        // Давайте сделаем их темно-красными, чтобы они "сливались"
+        const starColor = isRedMode || isRedPentagramDone ? '#aa0000' : 'white';
+        stars.forEach(star => drawDiamond(star.x, star.y, starColor));
     }
 
     let currentAnimationLine = null;
+    let isRedMode = false; // Флаг, указывающий, что мы сейчас рисуем красную пентаграмму
 
-    function animateLine(startPoint, endPoint, callback) {
+    function animateLine(startPoint, endPoint, callback, colorType) {
         const duration = 500;
         const startTime = performance.now();
 
@@ -184,12 +217,23 @@
                 animationFrameId = requestAnimationFrame(step);
             } else {
                 currentAnimationLine = null;
-                lines.push({
-                    startX: startPoint.x,
-                    startY: startPoint.y,
-                    endX: endPoint.x,
-                    endY: endPoint.y
-                });
+                // Добавляем линию в соответствующий массив
+                if (colorType === 'red') {
+                    redLines.push({
+                        startX: startPoint.x,
+                        startY: startPoint.y,
+                        endX: endPoint.x,
+                        endY: endPoint.y
+                    });
+                } else {
+                    whiteLines.push({
+                        startX: startPoint.x,
+                        startY: startPoint.y,
+                        endX: endPoint.x,
+                        endY: endPoint.y
+                    });
+                }
+                
                 draw();
                 callback();
             }
@@ -197,62 +241,107 @@
         animationFrameId = requestAnimationFrame(step);
     }
 
-    // Порядок соединения для пентаграммы
-    // Индексы: 0(низ), 1(лево-низ), 2(лево-верх), 3(право-верх), 4(право-низ)
     const CONNECTION_ORDER = [
-        { from: 0, to: 2 }, // Низ -> Лево-Верх
-        { from: 2, to: 4 }, // Лево-Верх -> Право-Низ
-        { from: 4, to: 1 }, // Право-Низ -> Лево-Низ
-        { from: 1, to: 3 }, // Лево-Низ -> Право-Верх
-        { from: 3, to: 0 }  // Право-Верх -> Низ
+        { from: 0, to: 2 },
+        { from: 2, to: 4 },
+        { from: 4, to: 1 },
+        { from: 1, to: 3 },
+        { from: 3, to: 0 }
     ];
 
     function startPentagramAnimation(startStarIndex) {
-        // Если анимация уже идет или рисунок уже готов, ничего не делаем
-        if (isAnimating || lines.length > 0) return;
+        if (isAnimating) return; // Не прерываем текущую анимацию
 
-        isAnimating = true;
-        lines = []; // Очищаем старые линии
-        
-        // НАЙДЕН ИНДЕКС СОЕДИНЕНИЯ, КОТОРОЕ НАЧИНАЕТСЯ С НАЖАТОЙ ЗВЕЗДЫ
-        let startIndexInOrder = CONNECTION_ORDER.findIndex(conn => conn.from === startStarIndex);
-        
-        // Если вдруг не нашли (что маловероятно в замкнутом цикле), начинаем с начала
-        if (startIndexInOrder === -1) {
-             startIndexInOrder = 0;
-        }
-
-        let stepsDrawn = 0; // Счетчик нарисованных линий
-        let currentStep = startIndexInOrder;
-
-        function drawNextLine() {
-            // ВАЖНОЕ ИЗМЕНЕНИЕ: Проверяем, нарисовали ли мы все 5 линий
-            if (stepsDrawn >= 5) {
-                isAnimating = false;
-                return;
-            }
-
-            // Используем оператор остатка %, чтобы индекс зацикливался (0,1,2,3,4,0,1...)
-            const connection = CONNECTION_ORDER[currentStep % CONNECTION_ORDER.length];
+        // Сценарий 1: Белая пентаграмма еще не нарисована
+        if (!isWhitePentagramDone) {
+            isAnimating = true;
+            whiteLines = [];
+            redLines = [];
+            isRedMode = false;
             
-            const startPoint = stars[connection.from];
-            const endPoint = stars[connection.to];
+            // Сброс фона на черный
+            document.body.style.backgroundColor = '#000000';
 
-            animateLine(startPoint, endPoint, () => {
-                stepsDrawn++;       // Увеличиваем счетчик нарисованных линий
-                currentStep++;      // Переходим к следующему индексу в массиве
-                drawNextLine();     // Рекурсивно вызываем для следующей линии
-            });
+            let startIndexInOrder = CONNECTION_ORDER.findIndex(conn => conn.from === startStarIndex);
+            if (startIndexInOrder === -1) startIndexInOrder = 0;
+
+            let stepsDrawn = 0;
+            let currentStep = startIndexInOrder;
+
+            function drawNextWhiteLine() {
+                if (stepsDrawn >= 5) {
+                    isAnimating = false;
+                    isWhitePentagramDone = true;
+                    return;
+                }
+
+                const connection = CONNECTION_ORDER[currentStep % CONNECTION_ORDER.length];
+                const startPoint = stars[connection.from];
+                const endPoint = stars[connection.to];
+
+                animateLine(startPoint, endPoint, () => {
+                    stepsDrawn++;
+                    currentStep++;
+                    drawNextWhiteLine();
+                }, 'white');
+            }
+            drawNextWhiteLine();
+        } 
+        // Сценарий 2: Белая уже есть, красной еще нет -> Рисуем красную
+        else if (isWhitePentagramDone && !isRedPentagramDone) {
+            isAnimating = true;
+            redLines = []; // Очищаем красные линии перед новой отрисовкой
+            isRedMode = true;
+
+            // Анимация смены фона на темно-красный
+            document.body.style.backgroundColor = '#4a0000'; // Темно-красный фон
+
+            let startIndexInOrder = CONNECTION_ORDER.findIndex(conn => conn.from === startStarIndex);
+            if (startIndexInOrder === -1) startIndexInOrder = 0;
+
+            let stepsDrawn = 0;
+            let currentStep = startIndexInOrder;
+
+            function drawNextRedLine() {
+                if (stepsDrawn >= 5) {
+                    isAnimating = false;
+                    isRedPentagramDone = true;
+                    return;
+                }
+
+                const connection = CONNECTION_ORDER[currentStep % CONNECTION_ORDER.length];
+                const startPoint = stars[connection.from];
+                const endPoint = stars[connection.to];
+
+                animateLine(startPoint, endPoint, () => {
+                    stepsDrawn++;
+                    currentStep++;
+                    drawNextRedLine();
+                }, 'red');
+            }
+            drawNextRedLine();
         }
+        // Сценарий 3: Обе пентаграммы есть -> Можно сбросить или ничего не делать
+        else {
+            // Опционально: сброс при третьем нажатии
+            resetApp();
+        }
+    }
 
-        drawNextLine();
+    function resetApp() {
+        whiteLines = [];
+        redLines = [];
+        isWhitePentagramDone = false;
+        isRedPentagramDone = false;
+        isRedMode = false;
+        document.body.style.backgroundColor = '#000000';
+        draw();
     }
 
     function handleInput(clientX, clientY) {
         for (let star of stars) {
             const dx = clientX - star.x;
             const dy = clientY - star.y;
-            // Увеличиваем область нажатия для удобства (радиус кликабельной зоны)
             if (dx * dx + dy * dy < (DIAMOND_SIZE * 4) ** 2) {
                 startPentagramAnimation(star.index);
                 break;
