@@ -43,7 +43,7 @@
     let animationFrameId;
 
     // Параметры
-    const STAR_RADIUS = 10; 
+    const STAR_SIZE = 12; // Размер острой звезды
     const PENTAGON_RADIUS_FACTOR = 0.35; 
     const LINE_WIDTH = 8; 
     const GLOW_BLUR = 15; 
@@ -67,7 +67,6 @@
         centerX = width / 2;
         
         // Немного поднимаем центр всей фигуры, чтобы компенсировать смещение нижней звезды вниз
-        // и чтобы верхние звезды не ушли за экран
         centerY = height * 0.45; 
         
         radius = Math.min(width, height) * PENTAGON_RADIUS_FACTOR;
@@ -81,7 +80,6 @@
         stars = [];
         
         // Сначала рассчитываем позиции как для обычного перевернутого пятиугольника
-        // чтобы сохранить пропорции между верхними звездами
         const tempStars = [];
         for (let i = 0; i < 5; i++) {
             // Угол для перевернутого пятиугольника (0 - внизу)
@@ -93,32 +91,31 @@
             });
         }
 
-        // Теперь применяем смещение к нижней звезде (индекс 0)
-        // и пересчитываем остальные, чтобы они остались соединенными правильно?
-        // Нет, в пентаграмме линии соединяют конкретные точки.
-        // Если мы двигаем одну точку, линии просто будут длиннее. Это то, что нужно.
-        
+        // Применяем смещение к нижней звезде (индекс 0)
         stars = tempStars.map(star => {
             if (star.index === 0) {
-                // Смещаем самую нижнюю звезду вниз на 100px
                 return { ...star, y: star.y + BOTTOM_STAR_OFFSET };
             }
             return star;
         });
     }
 
-    function drawStar(x, y) {
+    // Функция для рисования острой звезды (ромба)
+    function drawSharpStar(x, y) {
         ctx.save();
         ctx.shadowColor = GLOW_COLOR;
         ctx.shadowBlur = GLOW_BLUR;
+        ctx.fillStyle = 'white';
+        
         ctx.beginPath();
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 2;
-        ctx.moveTo(x - STAR_RADIUS, y);
-        ctx.lineTo(x + STAR_RADIUS, y);
-        ctx.moveTo(x, y - STAR_RADIUS);
-        ctx.lineTo(x, y + STAR_RADIUS);
-        ctx.stroke();
+        // Рисуем ромб
+        ctx.moveTo(x, y - STAR_SIZE); // Верхняя точка
+        ctx.lineTo(x + STAR_SIZE / 2, y); // Правая точка
+        ctx.lineTo(x, y + STAR_SIZE); // Нижняя точка
+        ctx.lineTo(x - STAR_SIZE / 2, y); // Левая точка
+        ctx.closePath();
+        ctx.fill();
+        
         ctx.restore();
     }
 
@@ -155,8 +152,8 @@
             ctx.restore();
         }
 
-        // Рисуем звезды поверх линий
-        stars.forEach(star => drawStar(star.x, star.y));
+        // Рисуем острые звезды поверх линий
+        stars.forEach(star => drawSharpStar(star.x, star.y));
     }
 
     let currentAnimationLine = null;
@@ -200,27 +197,8 @@
         animationFrameId = requestAnimationFrame(step);
     }
 
-    // Порядок соединения для пентаграммы (0 - нижняя, 1 - правая нижняя, 2 - правая верхняя, 3 - левая верхняя, 4 - левая нижняя)
-    // В нашем расчете углов:
-    // 0: PI/2 (низ)
-    // 1: PI/2 + 72deg (право-низ) -> нет, это зависит от направления.
-    // Давайте проверим порядок индексов в calculateStarPositions:
-    // i=0: angle = PI/2 (90 deg) -> Низ
-    // i=1: angle = PI/2 + 2PI/5 (162 deg) -> Лево-Низ (в 3 четверти декартовой, но в canvas Y вниз, так что это Право-Низ? Нет.
-    // Canvas: X вправо, Y вниз.
-    // 0 deg: Право
-    // 90 deg (PI/2): Низ
-    // 180 deg (PI): Лево
-    // 270 deg (3PI/2): Верх
-    
-    // i=0 (90 deg): Низ
-    // i=1 (162 deg): Лево-Низ
-    // i=2 (234 deg): Лево-Верх
-    // i=3 (306 deg): Право-Верх
-    // i=4 (378 deg = 18 deg): Право-Низ
-
-    // Пентаграмма соединяет через одну вершину.
-    // Порядок: 0 -> 2 -> 4 -> 1 -> 3 -> 0
+    // Порядок соединения для пентаграммы
+    // Индексы: 0(низ), 1(лево-низ), 2(лево-верх), 3(право-верх), 4(право-низ)
     const CONNECTION_ORDER = [
         { from: 0, to: 2 }, // Низ -> Лево-Верх
         { from: 2, to: 4 }, // Лево-Верх -> Право-Низ
@@ -233,10 +211,12 @@
         if (isAnimating || lines.length > 0) return;
 
         isAnimating = true;
-        lines = [];
+        lines = []; // Очищаем старые линии
         
+        // НАЙДЕН ПЕРВОЕ СОЕДИНЕНИЕ, КОТОРОЕ НАЧИНАЕТСЯ С НАЖАТОЙ ЗВЕЗДЫ
         let startIndexInOrder = CONNECTION_ORDER.findIndex(conn => conn.from === startStarIndex);
         
+        // Если вдруг не нашли (что маловероятно в замкнутом цикле), начинаем с начала
         if (startIndexInOrder === -1) {
              startIndexInOrder = 0;
         }
@@ -245,6 +225,7 @@
 
         function drawNextLine() {
             if (currentStep >= CONNECTION_ORDER.length) {
+                // Все 5 линий нарисованы, анимация завершена
                 isAnimating = false;
                 return;
             }
@@ -255,7 +236,7 @@
 
             animateLine(startPoint, endPoint, () => {
                 currentStep++;
-                drawNextLine();
+                drawNextLine(); // Рекурсивно вызываем для следующей линии
             });
         }
 
@@ -266,7 +247,8 @@
         for (let star of stars) {
             const dx = clientX - star.x;
             const dy = clientY - star.y;
-            if (dx * dx + dy * dy < (STAR_RADIUS * 3) ** 2) {
+            // Увеличиваем область нажатия для удобства
+            if (dx * dx + dy * dy < (STAR_SIZE * 2.5) ** 2) {
                 startPentagramAnimation(star.index);
                 break;
             }
