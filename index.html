@@ -94,9 +94,9 @@ body {
   color: #999;
 }
 
-/* CATALOG SECTIONS */
+/* COLLECTION SECTIONS (Одинаковый стиль для обоих блоков) */
 .catalog-section {
-  margin: 12px 0 0 0;
+  margin: 12px 0 0 0; /* Отступ как у строки поиска */
   background: #e5e5e5;
   border-radius: 0;
   padding: 16px 0 16px 0;
@@ -116,7 +116,7 @@ body {
   letter-spacing: -0.3px;
 }
 
-/* FEATURED PRODUCT (большой товар сверху) */
+/* FEATURED PRODUCT (Большой товар) */
 .featured-product {
   margin: 0 16px 12px 16px;
   background: #fff;
@@ -181,7 +181,7 @@ body {
   font-weight: 500;
 }
 
-/* PRODUCT SLIDER */
+/* PRODUCT SLIDER (Шторка) */
 .product-slider {
   display: flex;
   gap: 10px;
@@ -282,72 +282,6 @@ body {
   will-change: left, width;
 }
 
-/* OLD COLLECTION (вертикальный список) */
-.old-collection {
-  padding: 0 16px;
-}
-
-.old-product-card {
-  display: flex;
-  background: #fff;
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  margin-bottom: 10px;
-  gap: 12px;
-}
-
-.old-product-photo {
-  width: 100px;
-  height: 100px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  transition: background-color 0.3s ease;
-}
-
-.old-product-photo[data-state="0"] { background-color: #e0f5d0; }
-.old-product-photo[data-state="1"] { background-color: #f5e0e8; }
-.old-product-photo[data-state="2"] { background-color: #e8d5f5; }
-
-.old-product-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding-right: 12px;
-  min-width: 0;
-}
-
-.old-product-name {
-  font-size: 15px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 4px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.old-product-price {
-  font-size: 14px;
-  color: #666;
-  margin: 0;
-  font-weight: 500;
-}
-
-.old-product-date {
-  font-size: 12px;
-  color: #999;
-  margin-top: 4px;
-}
-
-/* CONTENT */
-.content {
-  padding: 12px 16px;
-}
-
 /* NAV */
 .nav {
   position: fixed;
@@ -438,7 +372,7 @@ body.no-scroll {
     <input type="text" placeholder="Поиск" />
   </div>
 
-  <!-- БЛОК ОСНОВНОЙ КОЛЛЕКЦИИ -->
+  <!-- БЛОК 1: ОСНОВНАЯ КОЛЛЕКЦИЯ (Большое фото + Шторка) -->
   <div class="catalog-section">
     <div class="catalog-section-inner">
       <h2 class="section-title">Новая коллекция</h2>
@@ -459,8 +393,7 @@ body.no-scroll {
       </div>
 
       <!-- Шторка с товарами -->
-      <div class="product-slider" id="productSlider">
-
+      <div class="product-slider" id="slider1">
         <div class="product-card">
           <div class="product-photo" data-state="0">
             <div class="dots">
@@ -502,56 +435,68 @@ body.no-scroll {
             <p class="product-price">Цена</p>
           </div>
         </div>
-
       </div>
 
-      <!-- Ползунок скролла -->
+      <!-- Ползунок для основной шторки -->
       <div class="scroll-indicator">
-        <div class="scroll-indicator-thumb" id="scrollThumb"></div>
+        <div class="scroll-indicator-thumb" id="thumb1"></div>
       </div>
     </div>
   </div>
 
-  <!-- БЛОК СТАРОЙ КОЛЛЕКЦИИ (уходит вниз по дате) -->
+  <!-- БЛОК 2: СТАРАЯ КОЛЛЕКЦИЯ (Только шторка) -->
   <div class="catalog-section">
     <div class="catalog-section-inner">
       <h2 class="section-title">Старая коллекция</h2>
 
-      <div class="old-collection">
-
-        <div class="old-product-card">
-          <div class="old-product-photo" data-state="0">
-            <div class="dots" style="display:none;"></div>
+      <!-- Шторка с товарами (без большой фотографии) -->
+      <div class="product-slider" id="slider2">
+        <div class="product-card">
+          <div class="product-photo" data-state="0">
+            <div class="dots">
+              <span class="active"></span>
+              <span></span>
+              <span></span>
+            </div>
           </div>
-          <div class="old-product-info">
-            <p class="old-product-name">Название товара</p>
-            <p class="old-product-price">Цена</p>
-            <p class="old-product-date">12 января 2024</p>
-          </div>
-        </div>
-
-        <div class="old-product-card">
-          <div class="old-product-photo" data-state="1">
-            <div class="dots" style="display:none;"></div>
-          </div>
-          <div class="old-product-info">
-            <p class="old-product-name">Название товара</p>
-            <p class="old-product-price">Цена</p>
-            <p class="old-product-date">5 декабря 2023</p>
+          <div class="product-info">
+            <p class="product-name">Название товара</p>
+            <p class="product-price">Цена</p>
           </div>
         </div>
 
-        <div class="old-product-card">
-          <div class="old-product-photo" data-state="2">
-            <div class="dots" style="display:none;"></div>
+        <div class="product-card">
+          <div class="product-photo" data-state="0">
+            <div class="dots">
+              <span class="active"></span>
+              <span></span>
+              <span></span>
+            </div>
           </div>
-          <div class="old-product-info">
-            <p class="old-product-name">Название товара</p>
-            <p class="old-product-price">Цена</p>
-            <p class="old-product-date">18 ноября 2023</p>
+          <div class="product-info">
+            <p class="product-name">Название товара</p>
+            <p class="product-price">Цена</p>
           </div>
         </div>
 
+        <div class="product-card">
+          <div class="product-photo" data-state="0">
+            <div class="dots">
+              <span class="active"></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <div class="product-info">
+            <p class="product-name">Название товара</p>
+            <p class="product-price">Цена</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ползунок для старой шторки -->
+      <div class="scroll-indicator">
+        <div class="scroll-indicator-thumb" id="thumb2"></div>
       </div>
     </div>
   </div>
@@ -682,68 +627,65 @@ document.querySelectorAll(".nav-item").forEach((el, i) => {
   };
 });
 
-/* PRODUCT SLIDER SCROLL INDICATOR */
-const slider = document.getElementById("productSlider");
-const thumb = document.getElementById("scrollThumb");
+/* PRODUCT SLIDER SCROLL INDICATOR - Универсальная функция */
+function initSlider(sliderId, thumbId) {
+  const slider = document.getElementById(sliderId);
+  const thumb = document.getElementById(thumbId);
+  if (!slider || !thumb) return;
 
-function updateScrollThumb() {
-  if (!slider) return;
+  function updateThumb() {
+    const products = slider.querySelectorAll('.product-card');
+    const totalProducts = products.length;
+    if (totalProducts === 0) return;
 
-  const products = slider.querySelectorAll('.product-card');
-  const totalProducts = products.length;
+    const cardWidth = products[0].offsetWidth;
+    const gap = 10;
+    const visibleWidth = slider.clientWidth;
+    const visibleProducts = visibleWidth / (cardWidth + gap);
+    
+    const thumbWidthPercent = Math.min((visibleProducts / totalProducts) * 100, 100);
+    
+    const scrollLeft = slider.scrollLeft;
+    const maxScroll = slider.scrollWidth - slider.clientWidth;
+    const thumbLeftPercent = maxScroll > 0 ? (scrollLeft / maxScroll) * (100 - thumbWidthPercent) : 0;
+    
+    thumb.style.width = thumbWidthPercent + '%';
+    thumb.style.left = thumbLeftPercent + '%';
+  }
+
+  slider.addEventListener("scroll", updateThumb, { passive: true });
   
-  const cardWidth = products[0].offsetWidth;
-  const gap = 10;
-  const visibleWidth = slider.clientWidth;
-  const visibleProducts = visibleWidth / (cardWidth + gap);
-  
-  const thumbWidthPercent = Math.min((visibleProducts / totalProducts) * 100, 100);
-  
-  const scrollLeft = slider.scrollLeft;
-  const maxScroll = slider.scrollWidth - slider.clientWidth;
-  const thumbLeftPercent = maxScroll > 0 ? (scrollLeft / maxScroll) * (100 - thumbWidthPercent) : 0;
-  
-  thumb.style.width = thumbWidthPercent + '%';
-  thumb.style.left = thumbLeftPercent + '%';
+  // Инициализация
+  setTimeout(updateThumb, 100);
+  window.addEventListener("resize", updateThumb);
 }
 
-slider.addEventListener("scroll", updateScrollThumb, { passive: true });
+// Запуск обоих слайдеров
+initSlider('slider1', 'thumb1');
+initSlider('slider2', 'thumb2');
 
-window.addEventListener("load", () => {
-  setTimeout(updateScrollThumb, 100);
-});
 
-window.addEventListener("resize", updateScrollThumb);
+/* PRODUCT PHOTO SWITCHER (Точки) */
+function initPhotoSwitcher(containerSelector, photoSelector, dotsSelector) {
+  document.querySelectorAll(containerSelector).forEach(card => {
+    const photo = card.querySelector(photoSelector);
+    const dots = card.querySelectorAll(dotsSelector);
 
-/* FEATURED PRODUCT PHOTO SWITCHER */
-document.querySelectorAll('.featured-product').forEach(card => {
-  const photo = card.querySelector('.featured-photo');
-  const dots = card.querySelectorAll('.dots span');
-
-  dots.forEach((dot, idx) => {
-    dot.addEventListener('click', (e) => {
-      e.stopPropagation();
-      dots.forEach(d => d.classList.remove('active'));
-      dot.classList.add('active');
-      photo.dataset.state = idx;
+    dots.forEach((dot, idx) => {
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dots.forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+        photo.dataset.state = idx;
+      });
     });
   });
-});
+}
 
-/* PRODUCT CARD PHOTO SWITCHER */
-document.querySelectorAll('.product-card').forEach(card => {
-  const photo = card.querySelector('.product-photo');
-  const dots = card.querySelectorAll('.dots span');
+// Запуск переключения фото для всех типов карточек
+initPhotoSwitcher('.featured-product', '.featured-photo', '.featured-photo .dots span');
+initPhotoSwitcher('.product-card', '.product-photo', '.product-photo .dots span');
 
-  dots.forEach((dot, idx) => {
-    dot.addEventListener('click', (e) => {
-      e.stopPropagation();
-      dots.forEach(d => d.classList.remove('active'));
-      dot.classList.add('active');
-      photo.dataset.state = idx;
-    });
-  });
-});
 </script>
 
 </body>
