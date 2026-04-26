@@ -15,7 +15,6 @@
 
 * {
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -23,30 +22,6 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
   overflow: hidden;
-}
-
-/* SPLASH */
-#splash {
-  position: fixed;
-  inset: 0;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  transition: opacity 0.6s ease;
-}
-
-#splash img {
-  width: 120px;
-  height: 120px;
-}
-
-/* APP */
-#app {
-  display: none;
-  height: 100vh;
-  padding-top: env(safe-area-inset-top);
 }
 
 /* HEADER */
@@ -67,13 +42,6 @@ body {
   animation: gradientFlow 8s ease infinite;
 }
 
-.header::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  backdrop-filter: blur(20px);
-}
-
 @keyframes gradientFlow {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -83,17 +51,28 @@ body {
 /* LOGO */
 .logo {
   position: absolute;
-  top: calc(50% + 11px); /* было 7px → стало 11px */
+  top: calc(50% + 4px); /* только 4px вниз */
   left: 50%;
   transform: translate(-50%, -50%);
   width: 60px;
   height: 60px;
-  z-index: 2;
 }
 
 /* CONTENT */
 .content {
   padding: 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.card {
+  height: 120px;
+  background: #b8e994;
+  border-radius: 14px;
 }
 
 /* NAV */
@@ -103,7 +82,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: 260px;
-  height: 68px; /* +8px */
+  height: 68px;
   backdrop-filter: blur(20px);
   background: rgba(255,255,255,0.4);
   border-radius: 34px;
@@ -111,7 +90,7 @@ body {
   align-items: center;
   padding: 6px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  overflow: hidden;
+  overflow: visible; /* разрешаем вылазить */
 }
 
 /* INDICATOR */
@@ -119,16 +98,19 @@ body {
   position: absolute;
   height: calc(100% - 12px);
   width: calc(50% - 6px);
-  background: rgba(200,200,200,0.6);
   border-radius: 30px;
-  transition: transform 0.35s cubic-bezier(.22,1,.36,1), 
-              scale 0.25s cubic-bezier(.22,1,.36,1);
+  background: rgba(200,200,200,0.6);
+  transition: transform 0.35s cubic-bezier(.22,1,.36,1);
 }
 
-/* liquid press */
+/* LIQUID GLASS ACTIVE */
 .dragging .indicator {
-  scale: 1.3;
-  transition: none;
+  backdrop-filter: blur(25px);
+  background: rgba(255,255,255,0.25);
+  box-shadow:
+    inset 0 0 10px rgba(255,255,255,0.6),
+    0 0 20px rgba(0,122,255,0.2);
+  transform: scale(1.15);
 }
 
 /* NAV ITEMS */
@@ -162,29 +144,34 @@ body {
 
 <body>
 
-<div id="splash">
-  <img src="logoredbox.png" />
-</div>
-
 <div id="app">
 
-  <div id="home" class="page">
+  <div id="home">
     <div class="header">
       <img src="logoredbox.png" class="logo">
     </div>
-  </div>
 
-  <div id="profile" class="page"></div>
+    <div class="content">
+      <h2>Каталог</h2>
+
+      <div class="grid">
+        <div class="card"></div>
+        <div class="card"></div>
+        <div class="card"></div>
+        <div class="card"></div>
+      </div>
+    </div>
+  </div>
 
   <div class="nav" id="nav">
     <div class="indicator" id="indicator"></div>
 
     <div class="nav-item active">
-      <!-- 🌹 БУКЕТ РОЗ -->
+      <!-- КАТАЛОГ ИКОНКА -->
       <svg viewBox="0 0 24 24">
-        <path d="M12 2c1 2 2 3 3 4 2-1 3-1 5 0-1 2-2 3-4 4 2 1 3 2 4 4-2 1-3 2-5 3-2-1-3-2-5-3 1-2 2-3 4-4-2-1-3-2-4-4 2-1 3-1 5 0 1-1 2-2 3-4zM9 18l3 4 3-4z"/>
+        <path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>
       </svg>
-      Главная
+      Каталог
     </div>
 
     <div class="nav-item">
@@ -198,63 +185,41 @@ body {
 </div>
 
 <script>
-const tg = window.Telegram.WebApp;
-tg.expand();
-
-const splash = document.getElementById("splash");
-const app = document.getElementById("app");
-
-setTimeout(() => {
-  splash.style.opacity = 0;
-  setTimeout(() => {
-    splash.style.display = "none";
-    app.style.display = "block";
-  }, 600);
-}, 1200);
-
 let current = 0;
-let dragPosition = 0;
+let startX = 0;
+let dragging = false;
 
 const indicator = document.getElementById("indicator");
 const nav = document.getElementById("nav");
 
-function getTabWidth() {
+function tabWidth() {
   return nav.offsetWidth / 2;
 }
 
-function updateUI() {
-  indicator.style.transform = `translateX(${current * getTabWidth()}px)`;
+function update() {
+  indicator.style.transform = `translateX(${current * tabWidth()}px)`;
 
   document.querySelectorAll(".nav-item").forEach((el, i) => {
     el.classList.toggle("active", i === current);
   });
 }
 
-updateUI();
+update();
 
 /* DRAG */
-let startX = 0;
-let dragging = false;
-
-nav.addEventListener("touchstart", (e) => {
+nav.addEventListener("touchstart", e => {
   startX = e.touches[0].clientX;
   dragging = true;
-  dragPosition = current * getTabWidth();
   nav.classList.add("dragging");
 });
 
-nav.addEventListener("touchmove", (e) => {
+nav.addEventListener("touchmove", e => {
   if (!dragging) return;
 
   let dx = e.touches[0].clientX - startX;
-  let pos = dragPosition + dx;
-
-  let max = getTabWidth();
-  pos = Math.max(0, Math.min(max, pos));
+  let pos = current * tabWidth() + dx;
 
   indicator.style.transform = `translateX(${pos}px)`;
-
-  // сохраняем позицию
   indicator.dataset.pos = pos;
 });
 
@@ -263,19 +228,17 @@ nav.addEventListener("touchend", () => {
   nav.classList.remove("dragging");
 
   let pos = parseFloat(indicator.dataset.pos || 0);
-  let tabWidth = getTabWidth();
 
-  // 💡 выбираем ближайшую вкладку
-  current = pos > tabWidth / 2 ? 1 : 0;
+  current = pos > tabWidth() / 2 ? 1 : 0;
 
-  updateUI();
+  update();
 });
 
 /* TAP */
 document.querySelectorAll(".nav-item").forEach((el, i) => {
   el.onclick = () => {
     current = i;
-    updateUI();
+    update();
   };
 });
 </script>
