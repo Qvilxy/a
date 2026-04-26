@@ -96,11 +96,11 @@ body {
 
 /* COLLECTION BANNER */
 .collection-banner {
-  margin: 12px 16px 0 16px;
+  margin: 12px 0 0 0;       /* убраны боковые отступы */
   background: #e5e5e5;
-  border-radius: 16px;
-  padding: 16px 16px 12px 16px;
-  overflow: hidden;
+  border-radius: 0;          /* убрано скругление */
+  padding: 16px 0 12px 0;    /* боковые паддинги перенесены в слайдер */
+  width: 100%;
 }
 
 .collection-title {
@@ -108,22 +108,19 @@ body {
   font-weight: 800;
   color: #1a1a1a;
   margin: 0 0 12px 0;
+  padding: 0 16px;           /* отступ заголовка */
   letter-spacing: -0.3px;
 }
 
 /* PRODUCT SLIDER */
-.product-slider-wrapper {
-  position: relative;
-}
-
 .product-slider {
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain; /* предотвращает скролл страницы при достижении края */
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  padding-bottom: 4px;
+  padding: 0 16px 4px 16px;       /* отступы по бокам внутри баннера */
 }
 
 .product-slider::-webkit-scrollbar {
@@ -132,7 +129,6 @@ body {
 
 .product-card {
   flex: 0 0 calc(50% - 5px);
-  scroll-snap-align: start;
   background: #fff;
   border-radius: 14px;
   overflow: hidden;
@@ -192,7 +188,7 @@ body {
   height: 3px;
   background: rgba(0,0,0,0.15);
   border-radius: 100px;
-  margin-top: 10px;
+  margin: 10px 16px 0 16px;
   position: relative;
   overflow: hidden;
 }
@@ -204,8 +200,9 @@ body {
   height: 100%;
   background: #fff;
   border-radius: 100px;
-  transition: left 0.15s ease;
+  transition: left 0.1s ease-out;
   box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  will-change: left, width;
 }
 
 /* CONTENT (fallback) */
@@ -307,60 +304,58 @@ body.no-scroll {
   <div class="collection-banner">
     <h2 class="collection-title">Название коллекции</h2>
 
-    <div class="product-slider-wrapper">
-      <div class="product-slider" id="productSlider">
+    <div class="product-slider" id="productSlider">
 
-        <!-- Товар 1 -->
-        <div class="product-card">
-          <div class="product-photo">
-            <div class="dots">
-              <span class="active"></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-          <div class="product-info">
-            <p class="product-name">Название товара</p>
-            <p class="product-price">Цена</p>
+      <!-- Товар 1 -->
+      <div class="product-card">
+        <div class="product-photo">
+          <div class="dots">
+            <span class="active"></span>
+            <span></span>
+            <span></span>
           </div>
         </div>
-
-        <!-- Товар 2 -->
-        <div class="product-card">
-          <div class="product-photo">
-            <div class="dots">
-              <span class="active"></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-          <div class="product-info">
-            <p class="product-name">Название товара</p>
-            <p class="product-price">Цена</p>
-          </div>
+        <div class="product-info">
+          <p class="product-name">Название товара</p>
+          <p class="product-price">Цена</p>
         </div>
-
-        <!-- Товар 3 -->
-        <div class="product-card">
-          <div class="product-photo">
-            <div class="dots">
-              <span class="active"></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-          <div class="product-info">
-            <p class="product-name">Название товара</p>
-            <p class="product-price">Цена</p>
-          </div>
-        </div>
-
       </div>
 
-      <!-- Ползунок скролла -->
-      <div class="scroll-indicator">
-        <div class="scroll-indicator-thumb" id="scrollThumb"></div>
+      <!-- Товар 2 -->
+      <div class="product-card">
+        <div class="product-photo">
+          <div class="dots">
+            <span class="active"></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+        <div class="product-info">
+          <p class="product-name">Название товара</p>
+          <p class="product-price">Цена</p>
+        </div>
       </div>
+
+      <!-- Товар 3 -->
+      <div class="product-card">
+        <div class="product-photo">
+          <div class="dots">
+            <span class="active"></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+        <div class="product-info">
+          <p class="product-name">Название товара</p>
+          <p class="product-price">Цена</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Ползунок скролла -->
+    <div class="scroll-indicator">
+      <div class="scroll-indicator-thumb" id="scrollThumb"></div>
     </div>
   </div>
 
@@ -438,7 +433,7 @@ function update(animate = true) {
 
 update(true);
 
-/* DRAG */
+/* NAV DRAG */
 nav.addEventListener("touchstart", e => {
   startX = e.touches[0].clientX;
   dragging = true;
@@ -501,10 +496,7 @@ function updateScrollThumb() {
   const scrollWidth = slider.scrollWidth;
   const clientWidth = slider.clientWidth;
   
-  // Ширина ползунка = пропорция видимой области к общему скроллу
   const thumbWidthPercent = (clientWidth / scrollWidth) * 100;
-  
-  // Позиция ползунка
   const maxScroll = scrollWidth - clientWidth;
   const thumbLeftPercent = maxScroll > 0 ? (scrollLeft / maxScroll) * (100 - thumbWidthPercent) : 0;
   
@@ -514,12 +506,10 @@ function updateScrollThumb() {
 
 slider.addEventListener("scroll", updateScrollThumb, { passive: true });
 
-// Инициализация ползунка
 window.addEventListener("load", () => {
   setTimeout(updateScrollThumb, 100);
 });
 
-// Обновление при изменении размера
 window.addEventListener("resize", updateScrollThumb);
 </script>
 
