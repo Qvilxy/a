@@ -17,9 +17,10 @@ body {
   background: #f5f5f7;
   -webkit-user-select: none;
   user-select: none;
+  overflow-x: hidden;
 }
 
-/* HEADER — анимированный переливающийся градиент */
+/* HEADER */
 .header {
   height: 100px;
   position: relative;
@@ -46,10 +47,10 @@ body {
   100% { background-position: 0% 50%; }
 }
 
-/* LOGO — опущен на 3px вниз */
+/* LOGO */
 .logo {
   position: absolute;
-  top: calc(50% + 7px); /* было +4px, стало +7px */
+  top: calc(50% + 7px);
   left: 50%;
   transform: translate(-50%,-50%);
   width: 60px;
@@ -59,8 +60,8 @@ body {
 .search-bar {
   margin: 12px 16px 0 16px;
   background: #fff;
-  border-radius: 14px;
-  padding: 0 16px;
+  border-radius: 100px; /* скругление 100 */
+  padding: 0 18px;
   height: 46px;
   display: flex;
   align-items: center;
@@ -91,7 +92,11 @@ body {
 
 /* CONTENT */
 .content {
-  padding: 16px;
+  padding: 12px 16px; /* одинаковое расстояние сверху (12px) как у search-bar margin-top */
+}
+
+.content h2 {
+  margin: 0 0 12px 0;
 }
 
 .grid {
@@ -130,7 +135,7 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* INDICATOR — очень светло-серый */
+/* INDICATOR */
 .indicator {
   position: absolute;
   height: calc(100% - 12px);
@@ -178,6 +183,12 @@ body {
   inset: 0;
   padding-bottom: 100px;
 }
+
+/* NO SCROLL при драге */
+body.no-scroll {
+  overflow: hidden;
+  touch-action: none;
+}
 </style>
 </head>
 
@@ -189,7 +200,7 @@ body {
     <img src="logoredbox.png" class="logo">
   </div>
 
-  <!-- Строка поиска -->
+  <!-- Строка поиска (только на главной) -->
   <div class="search-bar">
     <svg viewBox="0 0 24 24">
       <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
@@ -209,18 +220,14 @@ body {
   </div>
 </div>
 
-<!-- PROFILE -->
+<!-- PROFILE (без поисковой строки) -->
 <div id="profile" class="page" style="display:none;">
   <div class="header">
     <img src="logoredbox.png" class="logo">
   </div>
 
-  <!-- Строка поиска в профиле -->
-  <div class="search-bar">
-    <svg viewBox="0 0 24 24">
-      <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-    </svg>
-    <input type="text" placeholder="Поиск" />
+  <div class="content">
+    <h2>Профиль</h2>
   </div>
 </div>
 
@@ -249,6 +256,7 @@ tg.expand();
 
 const nav = document.getElementById("nav");
 const indicator = document.getElementById("indicator");
+const body = document.body;
 
 const pages = [
   document.getElementById("home"),
@@ -290,12 +298,16 @@ nav.addEventListener("touchstart", e => {
   dragging = true;
   basePos = current * tabWidth();
   
+  // Блокируем скролл при зажатии индикатора
+  body.classList.add("no-scroll");
+  
   indicator.style.transition = 'none';
   setIndicator(basePos, 1.3);
 }, { passive: true });
 
 nav.addEventListener("touchmove", e => {
   if (!dragging) return;
+  e.preventDefault(); // блокируем скролл
 
   let dx = e.touches[0].clientX - startX;
   let pos = basePos + dx;
@@ -305,11 +317,14 @@ nav.addEventListener("touchmove", e => {
 
   setIndicator(pos, 1.3);
   indicator.dataset.pos = pos;
-}, { passive: true });
+}, { passive: false });
 
 nav.addEventListener("touchend", () => {
   if (!dragging) return;
   dragging = false;
+
+  // Разблокируем скролл
+  body.classList.remove("no-scroll");
 
   let pos = parseFloat(indicator.dataset.pos || 0);
   let threshold = tabWidth() / 2;
