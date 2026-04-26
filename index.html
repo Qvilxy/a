@@ -5,243 +5,243 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>Mini App</title>
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-<style>
-:root {
-  --bg: #f5f5f7;
-  --glass: rgba(255,255,255,0.25);
-  --blur: blur(20px);
-  --accent: #007aff;
-}
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
-  overflow: hidden;
-}
-
-/* Splash */
-#splash {
-  position: fixed;
-  inset: 0;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  transition: opacity 0.6s ease;
-}
-
-#splash img {
-  width: 100px;
-  height: 100px;
-}
-
-/* App */
-#app {
-  display: none;
-  height: 100vh;
-  padding-top: env(safe-area-inset-top);
-}
-
-/* Header */
-.header {
-  height: 120px;
-  background: linear-gradient(135deg, #6a11cb, #b16cea);
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
-}
-
-/* Content */
-.content {
-  padding: 16px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.card {
-  height: 120px;
-  background: #b8e994;
-  border-radius: 14px;
-}
-
-/* Pages */
-.page {
-  position: absolute;
-  inset: 0;
-  padding-bottom: 90px;
-  transition: transform 0.4s cubic-bezier(.22,1,.36,1);
-}
-
-#home { transform: translateX(0%); }
-#profile { transform: translateX(100%); }
-
-/* Nav (Liquid Glass) */
-.nav {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 260px;
-  height: 60px;
-  backdrop-filter: var(--blur);
-  background: var(--glass);
-  border-radius: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-.nav-item {
-  flex: 1;
-  text-align: center;
-  font-size: 12px;
-  color: #555;
-  z-index: 2;
-}
-
-.nav-item.active {
-  color: white;
-}
-
-/* Liquid indicator */
-.indicator {
-  position: absolute;
-  width: 120px;
-  height: 50px;
-  background: var(--accent);
-  border-radius: 25px;
-  transition: transform 0.4s cubic-bezier(.22,1,.36,1);
-}
-
-/* Smooth drag */
-.dragging .indicator {
-  transition: none;
-}
-</style>
-</head>
-
-<body>
-
-<!-- Splash -->
-<div id="splash">
-  <img src="logoredbox.png" />
-</div>
-
-<!-- App -->
-<div id="app">
-
-  <!-- Pages -->
-  <div id="home" class="page">
-    <div class="header"></div>
-    <div class="content">
-      <h2>Категории</h2>
-      <div class="grid">
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  
+  <style>
+  :root {
+    --bg: #f5f5f7;
+    --glass: rgba(255,255,255,0.25);
+    --blur: blur(20px);
+    --accent: #007aff;
+  }
+  
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    overflow: hidden;
+  }
+  
+  /* Splash */
+  #splash {
+    position: fixed;
+    inset: 0;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: opacity 0.6s ease;
+  }
+  
+  #splash img {
+    width: 100px;
+    height: 100px;
+  }
+  
+  /* App */
+  #app {
+    display: none;
+    height: 100vh;
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  /* Header */
+  .header {
+    height: 120px;
+    background: linear-gradient(135deg, #6a11cb, #b16cea);
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+  }
+  
+  /* Content */
+  .content {
+    padding: 16px;
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  
+  .card {
+    height: 120px;
+    background: #b8e994;
+    border-radius: 14px;
+  }
+  
+  /* Pages */
+  .page {
+    position: absolute;
+    inset: 0;
+    padding-bottom: 90px;
+    transition: transform 0.4s cubic-bezier(.22,1,.36,1);
+  }
+  
+  #home { transform: translateX(0%); }
+  #profile { transform: translateX(100%); }
+  
+  /* Nav (Liquid Glass) */
+  .nav {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 260px;
+    height: 60px;
+    backdrop-filter: var(--blur);
+    background: var(--glass);
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+  
+  .nav-item {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    color: #555;
+    z-index: 2;
+  }
+  
+  .nav-item.active {
+    color: white;
+  }
+  
+  /* Liquid indicator */
+  .indicator {
+    position: absolute;
+    width: 120px;
+    height: 50px;
+    background: var(--accent);
+    border-radius: 25px;
+    transition: transform 0.4s cubic-bezier(.22,1,.36,1);
+  }
+  
+  /* Smooth drag */
+  .dragging .indicator {
+    transition: none;
+  }
+  </style>
+  </head>
+  
+  <body>
+  
+  <!-- Splash -->
+  <div id="splash">
+    <img src="logoredbox.png" />
+  </div>
+  
+  <!-- App -->
+  <div id="app">
+  
+    <!-- Pages -->
+    <div id="home" class="page">
+      <div class="header"></div>
+      <div class="content">
+        <h2>Категории</h2>
+        <div class="grid">
+          <div class="card"></div>
+          <div class="card"></div>
+          <div class="card"></div>
+          <div class="card"></div>
+        </div>
       </div>
     </div>
-  </div>
-
-  <div id="profile" class="page">
-    <div class="content">
-      <h2>Профиль</h2>
+  
+    <div id="profile" class="page">
+      <div class="content">
+        <h2>Профиль</h2>
+      </div>
     </div>
+  
+    <!-- Nav -->
+    <div class="nav" id="nav">
+      <div class="indicator" id="indicator"></div>
+  
+      <div class="nav-item active">Главная</div>
+      <div class="nav-item">Профиль</div>
+    </div>
+  
   </div>
-
-  <!-- Nav -->
-  <div class="nav" id="nav">
-    <div class="indicator" id="indicator"></div>
-
-    <div class="nav-item active">Главная</div>
-    <div class="nav-item">Профиль</div>
-  </div>
-
-</div>
-
-<script>
-const tg = window.Telegram.WebApp;
-tg.expand();
-
-// Splash → App
-setTimeout(() => {
-  document.getElementById("splash").style.opacity = 0;
+  
+  <script>
+  const tg = window.Telegram.WebApp;
+  tg.expand();
+  
+  // Splash → App
   setTimeout(() => {
-    document.getElementById("splash").style.display = "none";
-    document.getElementById("app").style.display = "block";
-  }, 600);
-}, 1200);
-
-// Navigation logic
-let current = 0;
-const pages = [
-  document.getElementById("home"),
-  document.getElementById("profile")
-];
-const indicator = document.getElementById("indicator");
-const nav = document.getElementById("nav");
-
-function updateUI() {
-  pages[0].style.transform = `translateX(${-current * 100}%)`;
-  pages[1].style.transform = `translateX(${100 - current * 100}%)`;
-  indicator.style.transform = `translateX(${current * 130}px)`;
-
-  document.querySelectorAll(".nav-item").forEach((el, i) => {
-    el.classList.toggle("active", i === current);
-  });
-}
-
-updateUI();
-
-// Drag gesture (liquid swipe)
-let startX = 0;
-let dragging = false;
-
-nav.addEventListener("touchstart", e => {
-  startX = e.touches[0].clientX;
-  dragging = true;
-  nav.classList.add("dragging");
-});
-
-nav.addEventListener("touchmove", e => {
-  if (!dragging) return;
-
-  let dx = e.touches[0].clientX - startX;
-  let percent = dx / 150;
-
-  let temp = Math.min(1, Math.max(0, current + percent));
-  indicator.style.transform = `translateX(${temp * 130}px)`;
-});
-
-nav.addEventListener("touchend", e => {
-  dragging = false;
-  nav.classList.remove("dragging");
-
-  let dx = e.changedTouches[0].clientX - startX;
-
-  if (dx > 50) current = 0;
-  else if (dx < -50) current = 1;
-
+    document.getElementById("splash").style.opacity = 0;
+    setTimeout(() => {
+      document.getElementById("splash").style.display = "none";
+      document.getElementById("app").style.display = "block";
+    }, 600);
+  }, 1200);
+  
+  // Navigation logic
+  let current = 0;
+  const pages = [
+    document.getElementById("home"),
+    document.getElementById("profile")
+  ];
+  const indicator = document.getElementById("indicator");
+  const nav = document.getElementById("nav");
+  
+  function updateUI() {
+    pages[0].style.transform = `translateX(${-current * 100}%)`;
+    pages[1].style.transform = `translateX(${100 - current * 100}%)`;
+    indicator.style.transform = `translateX(${current * 130}px)`;
+  
+    document.querySelectorAll(".nav-item").forEach((el, i) => {
+      el.classList.toggle("active", i === current);
+    });
+  }
+  
   updateUI();
-});
-
-// Tap navigation
-document.querySelectorAll(".nav-item").forEach((el, i) => {
-  el.onclick = () => {
-    current = i;
+  
+  // Drag gesture (liquid swipe)
+  let startX = 0;
+  let dragging = false;
+  
+  nav.addEventListener("touchstart", e => {
+    startX = e.touches[0].clientX;
+    dragging = true;
+    nav.classList.add("dragging");
+  });
+  
+  nav.addEventListener("touchmove", e => {
+    if (!dragging) return;
+  
+    let dx = e.touches[0].clientX - startX;
+    let percent = dx / 150;
+  
+    let temp = Math.min(1, Math.max(0, current + percent));
+    indicator.style.transform = `translateX(${temp * 130}px)`;
+  });
+  
+  nav.addEventListener("touchend", e => {
+    dragging = false;
+    nav.classList.remove("dragging");
+  
+    let dx = e.changedTouches[0].clientX - startX;
+  
+    if (dx > 50) current = 0;
+    else if (dx < -50) current = 1;
+  
     updateUI();
-  };
-});
-</script>
-
-</body>
-</html>
+  });
+  
+  // Tap navigation
+  document.querySelectorAll(".nav-item").forEach((el, i) => {
+    el.onclick = () => {
+      current = i;
+      updateUI();
+    };
+  });
+  </script>
+  
+  </body>
+  </html>
