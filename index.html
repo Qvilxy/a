@@ -103,6 +103,11 @@ body {
   width: 100%;
 }
 
+/* Обёртка для сдвига внутреннего интерфейса на 2px вверх */
+.collection-inner {
+  transform: translateY(-2px);
+}
+
 .collection-title {
   font-size: 22px;
   font-weight: 800;
@@ -312,60 +317,62 @@ body.no-scroll {
 
   <!-- Collection Banner -->
   <div class="collection-banner">
-    <h2 class="collection-title">Название коллекции</h2>
+    <div class="collection-inner">
+      <h2 class="collection-title">Название коллекции</h2>
 
-    <div class="product-slider" id="productSlider">
+      <div class="product-slider" id="productSlider">
 
-      <!-- Товар 1 -->
-      <div class="product-card">
-        <div class="product-photo" data-state="0">
-          <div class="dots">
-            <span class="active"></span>
-            <span></span>
-            <span></span>
+        <!-- Товар 1 -->
+        <div class="product-card">
+          <div class="product-photo" data-state="0">
+            <div class="dots">
+              <span class="active"></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <div class="product-info">
+            <p class="product-name">Название товара</p>
+            <p class="product-price">Цена</p>
           </div>
         </div>
-        <div class="product-info">
-          <p class="product-name">Название товара</p>
-          <p class="product-price">Цена</p>
-        </div>
-      </div>
 
-      <!-- Товар 2 -->
-      <div class="product-card">
-        <div class="product-photo" data-state="0">
-          <div class="dots">
-            <span class="active"></span>
-            <span></span>
-            <span></span>
+        <!-- Товар 2 -->
+        <div class="product-card">
+          <div class="product-photo" data-state="0">
+            <div class="dots">
+              <span class="active"></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <div class="product-info">
+            <p class="product-name">Название товара</p>
+            <p class="product-price">Цена</p>
           </div>
         </div>
-        <div class="product-info">
-          <p class="product-name">Название товара</p>
-          <p class="product-price">Цена</p>
-        </div>
-      </div>
 
-      <!-- Товар 3 -->
-      <div class="product-card">
-        <div class="product-photo" data-state="0">
-          <div class="dots">
-            <span class="active"></span>
-            <span></span>
-            <span></span>
+        <!-- Товар 3 -->
+        <div class="product-card">
+          <div class="product-photo" data-state="0">
+            <div class="dots">
+              <span class="active"></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <div class="product-info">
+            <p class="product-name">Название товара</p>
+            <p class="product-price">Цена</p>
           </div>
         </div>
-        <div class="product-info">
-          <p class="product-name">Название товара</p>
-          <p class="product-price">Цена</p>
-        </div>
+
       </div>
 
-    </div>
-
-    <!-- Ползунок скролла -->
-    <div class="scroll-indicator">
-      <div class="scroll-indicator-thumb" id="scrollThumb"></div>
+      <!-- Ползунок скролла -->
+      <div class="scroll-indicator">
+        <div class="scroll-indicator-thumb" id="scrollThumb"></div>
+      </div>
     </div>
   </div>
 
@@ -535,14 +542,10 @@ document.querySelectorAll('.product-card').forEach(card => {
 
   dots.forEach((dot, idx) => {
     dot.addEventListener('click', (e) => {
-      e.stopPropagation(); // чтобы клик не всплывал к карточке
+      e.stopPropagation();
       
-      // Сбрасываем активную точку
       dots.forEach(d => d.classList.remove('active'));
-      // Активируем нажатую
       dot.classList.add('active');
-      
-      // Меняем состояние фото (цвет)
       photo.dataset.state = idx;
     });
   });
