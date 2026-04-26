@@ -94,27 +94,91 @@ body {
   color: #999;
 }
 
-/* COLLECTION BANNER */
-.collection-banner {
+/* CATALOG SECTIONS */
+.catalog-section {
   margin: 12px 0 0 0;
   background: #e5e5e5;
   border-radius: 0;
-  padding: 16px 0 12px 0;
+  padding: 16px 0 16px 0;
   width: 100%;
 }
 
-/* Обёртка для сдвига внутреннего интерфейса на 2px вверх */
-.collection-inner {
+.catalog-section-inner {
   transform: translateY(-2px);
 }
 
-.collection-title {
+.section-title {
   font-size: 22px;
   font-weight: 800;
   color: #1a1a1a;
   margin: 0 0 12px 0;
   text-align: center;
   letter-spacing: -0.3px;
+}
+
+/* FEATURED PRODUCT (большой товар сверху) */
+.featured-product {
+  margin: 0 16px 12px 16px;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.featured-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1.1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+.featured-photo[data-state="0"] { background-color: #e0f5d0; }
+.featured-photo[data-state="1"] { background-color: #f5e0e8; }
+.featured-photo[data-state="2"] { background-color: #e8d5f5; }
+
+.featured-photo .dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+}
+
+.featured-photo .dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.15);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.featured-photo .dots span.active {
+  background: rgba(0,0,0,0.5);
+  transform: scale(1.2);
+}
+
+.featured-info {
+  padding: 10px 14px 12px 14px;
+}
+
+.featured-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 2px 0;
+}
+
+.featured-price {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  font-weight: 500;
 }
 
 /* PRODUCT SLIDER */
@@ -140,7 +204,6 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-/* PHOTO & DOTS */
 .product-photo {
   width: 100%;
   aspect-ratio: 1 / 1.1;
@@ -151,10 +214,9 @@ body {
   transition: background-color 0.3s ease;
 }
 
-/* Цвета-эмуляции фото */
-.product-photo[data-state="0"] { background-color: #e0f5d0; } /* салатовый */
-.product-photo[data-state="1"] { background-color: #f5e0e8; } /* светло-розовый */
-.product-photo[data-state="2"] { background-color: #e8d5f5; } /* светло-пурпурный */
+.product-photo[data-state="0"] { background-color: #e0f5d0; }
+.product-photo[data-state="1"] { background-color: #f5e0e8; }
+.product-photo[data-state="2"] { background-color: #e8d5f5; }
 
 .product-photo .dots {
   position: absolute;
@@ -218,6 +280,67 @@ body {
   transition: left 0.1s ease-out;
   box-shadow: 0 0 4px rgba(0,0,0,0.1);
   will-change: left, width;
+}
+
+/* OLD COLLECTION (вертикальный список) */
+.old-collection {
+  padding: 0 16px;
+}
+
+.old-product-card {
+  display: flex;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-bottom: 10px;
+  gap: 12px;
+}
+
+.old-product-photo {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+.old-product-photo[data-state="0"] { background-color: #e0f5d0; }
+.old-product-photo[data-state="1"] { background-color: #f5e0e8; }
+.old-product-photo[data-state="2"] { background-color: #e8d5f5; }
+
+.old-product-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-right: 12px;
+  min-width: 0;
+}
+
+.old-product-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.old-product-price {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  font-weight: 500;
+}
+
+.old-product-date {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
 }
 
 /* CONTENT */
@@ -315,14 +438,29 @@ body.no-scroll {
     <input type="text" placeholder="Поиск" />
   </div>
 
-  <!-- Collection Banner -->
-  <div class="collection-banner">
-    <div class="collection-inner">
-      <h2 class="collection-title">Название коллекции</h2>
+  <!-- БЛОК ОСНОВНОЙ КОЛЛЕКЦИИ -->
+  <div class="catalog-section">
+    <div class="catalog-section-inner">
+      <h2 class="section-title">Новая коллекция</h2>
 
+      <!-- Основной большой товар -->
+      <div class="featured-product">
+        <div class="featured-photo" data-state="0">
+          <div class="dots">
+            <span class="active"></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+        <div class="featured-info">
+          <p class="featured-name">Название товара</p>
+          <p class="featured-price">Цена</p>
+        </div>
+      </div>
+
+      <!-- Шторка с товарами -->
       <div class="product-slider" id="productSlider">
 
-        <!-- Товар 1 -->
         <div class="product-card">
           <div class="product-photo" data-state="0">
             <div class="dots">
@@ -337,7 +475,6 @@ body.no-scroll {
           </div>
         </div>
 
-        <!-- Товар 2 -->
         <div class="product-card">
           <div class="product-photo" data-state="0">
             <div class="dots">
@@ -352,7 +489,6 @@ body.no-scroll {
           </div>
         </div>
 
-        <!-- Товар 3 -->
         <div class="product-card">
           <div class="product-photo" data-state="0">
             <div class="dots">
@@ -372,6 +508,50 @@ body.no-scroll {
       <!-- Ползунок скролла -->
       <div class="scroll-indicator">
         <div class="scroll-indicator-thumb" id="scrollThumb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- БЛОК СТАРОЙ КОЛЛЕКЦИИ (уходит вниз по дате) -->
+  <div class="catalog-section">
+    <div class="catalog-section-inner">
+      <h2 class="section-title">Старая коллекция</h2>
+
+      <div class="old-collection">
+
+        <div class="old-product-card">
+          <div class="old-product-photo" data-state="0">
+            <div class="dots" style="display:none;"></div>
+          </div>
+          <div class="old-product-info">
+            <p class="old-product-name">Название товара</p>
+            <p class="old-product-price">Цена</p>
+            <p class="old-product-date">12 января 2024</p>
+          </div>
+        </div>
+
+        <div class="old-product-card">
+          <div class="old-product-photo" data-state="1">
+            <div class="dots" style="display:none;"></div>
+          </div>
+          <div class="old-product-info">
+            <p class="old-product-name">Название товара</p>
+            <p class="old-product-price">Цена</p>
+            <p class="old-product-date">5 декабря 2023</p>
+          </div>
+        </div>
+
+        <div class="old-product-card">
+          <div class="old-product-photo" data-state="2">
+            <div class="dots" style="display:none;"></div>
+          </div>
+          <div class="old-product-info">
+            <p class="old-product-name">Название товара</p>
+            <p class="old-product-price">Цена</p>
+            <p class="old-product-date">18 ноября 2023</p>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -535,7 +715,22 @@ window.addEventListener("load", () => {
 
 window.addEventListener("resize", updateScrollThumb);
 
-/* PRODUCT PHOTO SWITCHER (ТОЧКИ) */
+/* FEATURED PRODUCT PHOTO SWITCHER */
+document.querySelectorAll('.featured-product').forEach(card => {
+  const photo = card.querySelector('.featured-photo');
+  const dots = card.querySelectorAll('.dots span');
+
+  dots.forEach((dot, idx) => {
+    dot.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dots.forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+      photo.dataset.state = idx;
+    });
+  });
+});
+
+/* PRODUCT CARD PHOTO SWITCHER */
 document.querySelectorAll('.product-card').forEach(card => {
   const photo = card.querySelector('.product-photo');
   const dots = card.querySelectorAll('.dots span');
@@ -543,7 +738,6 @@ document.querySelectorAll('.product-card').forEach(card => {
   dots.forEach((dot, idx) => {
     dot.addEventListener('click', (e) => {
       e.stopPropagation();
-      
       dots.forEach(d => d.classList.remove('active'));
       dot.classList.add('active');
       photo.dataset.state = idx;
