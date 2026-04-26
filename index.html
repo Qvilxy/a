@@ -1,363 +1,246 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Pentagram Mini App</title>
-    <!-- Подключаем скрипт Telegram WebApp -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000000; /* Черный фон */
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            touch-action: none;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Mini App</title>
 
-        canvas {
-            display: block;
-        }
-    </style>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+:root {
+  --bg: #f5f5f7;
+  --glass: rgba(255,255,255,0.25);
+  --blur: blur(20px);
+  --accent: #007aff;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+/* Splash */
+#splash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: opacity 0.6s ease;
+}
+
+#splash img {
+  width: 100px;
+  height: 100px;
+}
+
+/* App */
+#app {
+  display: none;
+  height: 100vh;
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Header */
+.header {
+  height: 120px;
+  background: linear-gradient(135deg, #6a11cb, #b16cea);
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+/* Content */
+.content {
+  padding: 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.card {
+  height: 120px;
+  background: #b8e994;
+  border-radius: 14px;
+}
+
+/* Pages */
+.page {
+  position: absolute;
+  inset: 0;
+  padding-bottom: 90px;
+  transition: transform 0.4s cubic-bezier(.22,1,.36,1);
+}
+
+#home { transform: translateX(0%); }
+#profile { transform: translateX(100%); }
+
+/* Nav (Liquid Glass) */
+.nav {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  height: 60px;
+  backdrop-filter: var(--blur);
+  background: var(--glass);
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.nav-item {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  color: #555;
+  z-index: 2;
+}
+
+.nav-item.active {
+  color: white;
+}
+
+/* Liquid indicator */
+.indicator {
+  position: absolute;
+  width: 120px;
+  height: 50px;
+  background: var(--accent);
+  border-radius: 25px;
+  transition: transform 0.4s cubic-bezier(.22,1,.36,1);
+}
+
+/* Smooth drag */
+.dragging .indicator {
+  transition: none;
+}
+</style>
 </head>
+
 <body>
 
-<canvas id="canvas"></canvas>
+<!-- Splash -->
+<div id="splash">
+  <img src="logoredbox.png" />
+</div>
+
+<!-- App -->
+<div id="app">
+
+  <!-- Pages -->
+  <div id="home" class="page">
+    <div class="header"></div>
+    <div class="content">
+      <h2>Категории</h2>
+      <div class="grid">
+        <div class="card"></div>
+        <div class="card"></div>
+        <div class="card"></div>
+        <div class="card"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="profile" class="page">
+    <div class="content">
+      <h2>Профиль</h2>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <div class="nav" id="nav">
+    <div class="indicator" id="indicator"></div>
+
+    <div class="nav-item active">Главная</div>
+    <div class="nav-item">Профиль</div>
+  </div>
+
+</div>
 
 <script>
-    // Инициализация Telegram WebApp
-    const tg = window.Telegram.WebApp;
-    tg.expand(); 
+const tg = window.Telegram.WebApp;
+tg.expand();
 
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
+// Splash → App
+setTimeout(() => {
+  document.getElementById("splash").style.opacity = 0;
+  setTimeout(() => {
+    document.getElementById("splash").style.display = "none";
+    document.getElementById("app").style.display = "block";
+  }, 600);
+}, 1200);
 
-    let width, height, centerX, centerY, radius;
-    let stars = [];
-    let lines = []; // Массив для хранения нарисованных линий
-    
-    let isAnimating = false;
-    let animationFrameId;
-    
-    // Состояние: нарисована ли пентаграмма полностью
-    let isPentagramComplete = false;
+// Navigation logic
+let current = 0;
+const pages = [
+  document.getElementById("home"),
+  document.getElementById("profile")
+];
+const indicator = document.getElementById("indicator");
+const nav = document.getElementById("nav");
 
-    // Параметры
-    const DIAMOND_SIZE = 6; 
-    const PENTAGON_RADIUS_FACTOR = 0.35; 
-    const LINE_WIDTH = 8; 
-    const GLOW_BLUR = 15; 
-    const GLOW_COLOR = 'white'; 
-    const BOTTOM_STAR_OFFSET = 100; 
+function updateUI() {
+  pages[0].style.transform = `translateX(${-current * 100}%)`;
+  pages[1].style.transform = `translateX(${100 - current * 100}%)`;
+  indicator.style.transform = `translateX(${current * 130}px)`;
 
-    function resize() {
-        const dpr = window.devicePixelRatio || 1;
-        const logicalWidth = window.innerWidth;
-        const logicalHeight = window.innerHeight;
+  document.querySelectorAll(".nav-item").forEach((el, i) => {
+    el.classList.toggle("active", i === current);
+  });
+}
 
-        canvas.width = logicalWidth * dpr;
-        canvas.height = logicalHeight * dpr;
-        ctx.scale(dpr, dpr);
+updateUI();
 
-        canvas.style.width = `${logicalWidth}px`;
-        canvas.style.height = `${logicalHeight}px`;
+// Drag gesture (liquid swipe)
+let startX = 0;
+let dragging = false;
 
-        width = logicalWidth;
-        height = logicalHeight;
-        centerX = width / 2;
-        centerY = height * 0.45; 
-        
-        radius = Math.min(width, height) * PENTAGON_RADIUS_FACTOR;
-        
-        calculateStarPositions();
-        draw();
-    }
+nav.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+  dragging = true;
+  nav.classList.add("dragging");
+});
 
-    function calculateStarPositions() {
-        stars = [];
-        const tempStars = [];
-        for (let i = 0; i < 5; i++) {
-            const angle = (i * 2 * Math.PI / 5) + (Math.PI / 2);
-            tempStars.push({
-                x: centerX + radius * Math.cos(angle),
-                y: centerY + radius * Math.sin(angle),
-                index: i
-            });
-        }
+nav.addEventListener("touchmove", e => {
+  if (!dragging) return;
 
-        stars = tempStars.map(star => {
-            if (star.index === 0) {
-                return { ...star, y: star.y + BOTTOM_STAR_OFFSET };
-            }
-            return star;
-        });
-    }
+  let dx = e.touches[0].clientX - startX;
+  let percent = dx / 150;
 
-    function drawDiamond(x, y) {
-        ctx.save();
-        ctx.shadowColor = GLOW_COLOR;
-        ctx.shadowBlur = GLOW_BLUR;
-        ctx.fillStyle = 'white';
-        
-        ctx.beginPath();
-        ctx.moveTo(x, y - DIAMOND_SIZE);
-        ctx.lineTo(x + DIAMOND_SIZE, y);
-        ctx.lineTo(x, y + DIAMOND_SIZE);
-        ctx.lineTo(x - DIAMOND_SIZE, y);
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
-    }
+  let temp = Math.min(1, Math.max(0, current + percent));
+  indicator.style.transform = `translateX(${temp * 130}px)`;
+});
 
-    function draw() {
-        ctx.clearRect(0, 0, width, height);
+nav.addEventListener("touchend", e => {
+  dragging = false;
+  nav.classList.remove("dragging");
 
-        // Рисуем все сохраненные линии
-        lines.forEach(line => {
-            ctx.save();
-            ctx.shadowColor = GLOW_COLOR;
-            ctx.shadowBlur = GLOW_BLUR;
-            ctx.beginPath();
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = LINE_WIDTH;
-            ctx.lineCap = 'round';
-            ctx.moveTo(line.startX, line.startY);
-            ctx.lineTo(line.endX, line.endY);
-            ctx.stroke();
-            ctx.restore();
-        });
+  let dx = e.changedTouches[0].clientX - startX;
 
-        // Рисуем текущую анимируемую линию (при рисовании или стирании)
-        if (isAnimating && currentAnimationLine) {
-            ctx.save();
-            ctx.shadowColor = GLOW_COLOR;
-            ctx.shadowBlur = GLOW_BLUR;
-            ctx.beginPath();
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = LINE_WIDTH;
-            ctx.lineCap = 'round';
-            
-            if (isErasing) {
-                // При стирании линия идет от начала к текущей точке (которая движется к концу)
-                // Но визуально мы хотим, чтобы она "исчезала".
-                // Проще всего: рисуем линию от Start до Current. 
-                // Если Current движется от End к Start, то линия сокращается.
-                ctx.moveTo(currentAnimationLine.startX, currentAnimationLine.startY);
-                ctx.lineTo(currentAnimationLine.currentX, currentAnimationLine.currentY);
-            } else {
-                // При рисовании линия растет от Start к End
-                ctx.moveTo(currentAnimationLine.startX, currentAnimationLine.startY);
-                ctx.lineTo(currentAnimationLine.currentX, currentAnimationLine.currentY);
-            }
-            
-            ctx.stroke();
-            ctx.restore();
-        }
+  if (dx > 50) current = 0;
+  else if (dx < -50) current = 1;
 
-        // Рисуем ромбы поверх всего
-        stars.forEach(star => drawDiamond(star.x, star.y));
-    }
+  updateUI();
+});
 
-    let currentAnimationLine = null;
-    let isErasing = false; // Флаг, указывающий, что сейчас идет процесс стирания
-
-    // Функция анимации линии. 
-    // reverse: если true, анимация идет от endPoint к startPoint (для стирания)
-    function animateLine(startPoint, endPoint, callback, reverse = false) {
-        const duration = 400; // Чуть быстрее для динамики
-        const startTime = performance.now();
-
-        // Определяем реальные точки начала и конца движения для анимации
-        const animStart = reverse ? endPoint : startPoint;
-        const animEnd = reverse ? startPoint : endPoint;
-
-        currentAnimationLine = {
-            startX: startPoint.x, // Логическое начало линии (для отрисовки)
-            startY: startPoint.y,
-            endX: endPoint.x,     // Логический конец линии
-            endY: endPoint.y,
-            currentX: animStart.x, // Текущая позиция "пера"
-            currentY: animStart.y
-        };
-
-        function step(timestamp) {
-            const elapsed = timestamp - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-
-            // Двигаем текущую точку от animStart к animEnd
-            currentAnimationLine.currentX = animStart.x + (animEnd.x - animStart.x) * progress;
-            currentAnimationLine.currentY = animStart.y + (animEnd.y - animStart.y) * progress;
-
-            draw();
-
-            if (progress < 1) {
-                animationFrameId = requestAnimationFrame(step);
-            } else {
-                currentAnimationLine = null;
-                
-                if (!reverse) {
-                    // Если рисовали, добавляем линию в массив
-                    lines.push({
-                        startX: startPoint.x,
-                        startY: startPoint.y,
-                        endX: endPoint.x,
-                        endY: endPoint.y
-                    });
-                } else {
-                    // Если стирали, линия уже не нужна, она просто исчезла из вида
-                }
-                
-                draw();
-                callback();
-            }
-        }
-        animationFrameId = requestAnimationFrame(step);
-    }
-
-    // Порядок соединения для пентаграммы
-    const CONNECTION_ORDER = [
-        { from: 0, to: 2 },
-        { from: 2, to: 4 },
-        { from: 4, to: 1 },
-        { from: 1, to: 3 },
-        { from: 3, to: 0 }
-    ];
-
-    function startDrawing(startStarIndex) {
-        isAnimating = true;
-        isErasing = false;
-        lines = []; // Очищаем старые линии
-
-        let startIndexInOrder = CONNECTION_ORDER.findIndex(conn => conn.from === startStarIndex);
-        if (startIndexInOrder === -1) startIndexInOrder = 0;
-
-        let stepsDrawn = 0;
-        let currentStep = startIndexInOrder;
-
-        function drawNextLine() {
-            if (stepsDrawn >= 5) {
-                isAnimating = false;
-                isPentagramComplete = true;
-                return;
-            }
-
-            const connection = CONNECTION_ORDER[currentStep % CONNECTION_ORDER.length];
-            const startPoint = stars[connection.from];
-            const endPoint = stars[connection.to];
-
-            animateLine(startPoint, endPoint, () => {
-                stepsDrawn++;
-                currentStep++;
-                drawNextLine();
-            }, false); // false = рисуем вперед
-        }
-        drawNextLine();
-    }
-
-    function startErasing(endStarIndex) {
-        isAnimating = true;
-        isErasing = true;
-        // Мы будем удалять линии из массива lines по мере их "стирания"
-        // Но чтобы визуализация была красивой, мы сначала должны определить порядок стирания.
-        
-        // Порядок стирания должен быть обратным порядку рисования, но начинаться с той точки, куда "стекается" линия.
-        // В пентаграмме линии замкнуты. Если мы нажали на звезду X, мы хотим, чтобы последняя линия пришла в X.
-        
-        // Найдем индекс соединения, которое ЗАКАНЧИВАЕТСЯ в нажатой звезде.
-        // Это будет последняя линия, которую мы нарисуем (вернее, сотрем).
-        let lastConnectionIndex = CONNECTION_ORDER.findIndex(conn => conn.to === endStarIndex);
-        
-        if (lastConnectionIndex === -1) {
-            // Если вдруг не нашли (ошибка логики), берем последнюю в списке
-            lastConnectionIndex = CONNECTION_ORDER.length - 1;
-        }
-
-        // Теперь нам нужно пройти по всем 5 соединениям в обратном порядке, начиная с lastConnectionIndex
-        // Порядок индексов в CONNECTION_ORDER: 0, 1, 2, 3, 4
-        // Если lastConnectionIndex = 2, то порядок стирания: 2, 1, 0, 4, 3
-        
-        let stepsErased = 0;
-        let currentStepIndex = lastConnectionIndex;
-
-        function eraseNextLine() {
-            if (stepsErased >= 5) {
-                isAnimating = false;
-                isPentagramComplete = false;
-                lines = []; // Гарантированно очищаем массив
-                draw();
-                return;
-            }
-
-            // Берем соединение по индексу
-            const connection = CONNECTION_ORDER[currentStepIndex];
-            const startPoint = stars[connection.from];
-            const endPoint = stars[connection.to];
-
-            // Анимация стирания: линия "сворачивается" от endPoint к startPoint?
-            // Нет, пользователь хочет, чтобы она исчезала в сторону нажатого ромба.
-            // Если мы стираем линию A->B, и B является частью пути к нажатому ромбу,
-            // то линия должна исчезать от A к B.
-            
-            // Однако, массив lines хранит линии в порядке их создания.
-            // Чтобы было красиво, давайте просто будем удалять последнюю добавленную линию из массива `lines`
-            // и анимировать её исчезновение.
-            
-            // Но задача сложнее: нужно соблюдать геометрию пентаграммы.
-            // Давайте сделаем проще: мы знаем полный путь пентаграммы.
-            // Мы запустим анимацию "обратного рисования" для каждого сегмента.
-            
-            animateLine(startPoint, endPoint, () => {
-                // После завершения анимации стирания этой линии, переходим к предыдущей в цикле соединений
-                stepsErased++;
-                // Двигаемся назад по кругу соединений
-                currentStepIndex--;
-                if (currentStepIndex < 0) currentStepIndex = CONNECTION_ORDER.length - 1;
-                
-                eraseNextLine();
-            }, true); // true = reverse (анимация идет от End к Start)
-        }
-        
-        eraseNextLine();
-    }
-
-    function handleInput(clientX, clientY) {
-        // Проверяем попадание в ромб
-        let clickedStarIndex = -1;
-        for (let star of stars) {
-            const dx = clientX - star.x;
-            const dy = clientY - star.y;
-            if (dx * dx + dy * dy < (DIAMOND_SIZE * 4) ** 2) {
-                clickedStarIndex = star.index;
-                break;
-            }
-        }
-
-        if (clickedStarIndex !== -1) {
-            if (!isPentagramComplete && !isAnimating) {
-                // Если пентаграммы нет, рисуем её, начиная с нажатого ромба
-                startDrawing(clickedStarIndex);
-            } else if (isPentagramComplete && !isAnimating) {
-                // Если пентаграмма есть, стираем её, заканчивая в нажатом ромбе
-                startErasing(clickedStarIndex);
-            }
-        }
-    }
-
-    canvas.addEventListener('click', e => handleInput(e.clientX, e.clientY));
-    canvas.addEventListener('touchstart', e => {
-        e.preventDefault(); 
-        const touch = e.touches[0];
-        handleInput(touch.clientX, touch.clientY);
-    }, { passive: false });
-
-    window.addEventListener('resize', resize);
-
-    resize();
-
+// Tap navigation
+document.querySelectorAll(".nav-item").forEach((el, i) => {
+  el.onclick = () => {
+    current = i;
+    updateUI();
+  };
+});
 </script>
 
 </body>
