@@ -11,6 +11,10 @@
   --blue: #007aff;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, sans-serif;
@@ -60,7 +64,7 @@ body {
 .search-bar {
   margin: 12px 16px 0 16px;
   background: #fff;
-  border-radius: 100px; /* скругление 100 */
+  border-radius: 100px;
   padding: 0 18px;
   height: 46px;
   display: flex;
@@ -90,30 +94,123 @@ body {
   color: #999;
 }
 
-/* CONTENT */
-.content {
-  padding: 12px 16px; /* одинаковое расстояние сверху (12px) как у search-bar margin-top */
+/* COLLECTION BANNER */
+.collection-banner {
+  margin: 12px 16px 0 16px;
+  background: #e5e5e5;
+  border-radius: 16px;
+  padding: 16px 16px 12px 16px;
+  overflow: hidden;
 }
 
-.content h2 {
+.collection-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a1a1a;
   margin: 0 0 12px 0;
+  letter-spacing: -0.3px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+/* PRODUCT SLIDER */
+.product-slider-wrapper {
+  position: relative;
 }
 
-.card {
-  height: 120px;
-  background: #b8e994;
+.product-slider {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+
+.product-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.product-card {
+  flex: 0 0 calc(50% - 5px);
+  scroll-snap-align: start;
+  background: #fff;
   border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.product-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1.1;
+  background: #e0f5d0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
-  font-weight: bold;
+  position: relative;
+}
+
+.product-photo .dots {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 3px;
+}
+
+.product-photo .dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.2);
+}
+
+.product-photo .dots span.active {
+  background: rgba(0,0,0,0.5);
+}
+
+.product-info {
+  padding: 8px 10px 10px 10px;
+}
+
+.product-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 2px 0;
+}
+
+.product-price {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* SCROLL INDICATOR */
+.scroll-indicator {
+  height: 3px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 100px;
+  margin-top: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.scroll-indicator-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: #fff;
+  border-radius: 100px;
+  transition: left 0.15s ease;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+}
+
+/* CONTENT (fallback) */
+.content {
+  padding: 12px 16px;
 }
 
 /* NAV */
@@ -184,7 +281,6 @@ body {
   padding-bottom: 100px;
 }
 
-/* NO SCROLL при драге */
 body.no-scroll {
   overflow: hidden;
   touch-action: none;
@@ -200,7 +296,6 @@ body.no-scroll {
     <img src="logoredbox.png" class="logo">
   </div>
 
-  <!-- Строка поиска (только на главной) -->
   <div class="search-bar">
     <svg viewBox="0 0 24 24">
       <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
@@ -208,24 +303,75 @@ body.no-scroll {
     <input type="text" placeholder="Поиск" />
   </div>
 
-  <div class="content">
-    <h2>Каталог</h2>
+  <!-- Collection Banner -->
+  <div class="collection-banner">
+    <h2 class="collection-title">Название коллекции</h2>
 
-    <div class="grid">
-      <div class="card">1</div>
-      <div class="card">2</div>
-      <div class="card">3</div>
-      <div class="card">4</div>
+    <div class="product-slider-wrapper">
+      <div class="product-slider" id="productSlider">
+
+        <!-- Товар 1 -->
+        <div class="product-card">
+          <div class="product-photo">
+            <div class="dots">
+              <span class="active"></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <div class="product-info">
+            <p class="product-name">Название товара</p>
+            <p class="product-price">Цена</p>
+          </div>
+        </div>
+
+        <!-- Товар 2 -->
+        <div class="product-card">
+          <div class="product-photo">
+            <div class="dots">
+              <span class="active"></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <div class="product-info">
+            <p class="product-name">Название товара</p>
+            <p class="product-price">Цена</p>
+          </div>
+        </div>
+
+        <!-- Товар 3 -->
+        <div class="product-card">
+          <div class="product-photo">
+            <div class="dots">
+              <span class="active"></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <div class="product-info">
+            <p class="product-name">Название товара</p>
+            <p class="product-price">Цена</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Ползунок скролла -->
+      <div class="scroll-indicator">
+        <div class="scroll-indicator-thumb" id="scrollThumb"></div>
+      </div>
     </div>
   </div>
+
+  <div class="content"></div>
 </div>
 
-<!-- PROFILE (без поисковой строки) -->
+<!-- PROFILE -->
 <div id="profile" class="page" style="display:none;">
   <div class="header">
     <img src="logoredbox.png" class="logo">
   </div>
-
   <div class="content">
     <h2>Профиль</h2>
   </div>
@@ -298,7 +444,6 @@ nav.addEventListener("touchstart", e => {
   dragging = true;
   basePos = current * tabWidth();
   
-  // Блокируем скролл при зажатии индикатора
   body.classList.add("no-scroll");
   
   indicator.style.transition = 'none';
@@ -307,7 +452,7 @@ nav.addEventListener("touchstart", e => {
 
 nav.addEventListener("touchmove", e => {
   if (!dragging) return;
-  e.preventDefault(); // блокируем скролл
+  e.preventDefault();
 
   let dx = e.touches[0].clientX - startX;
   let pos = basePos + dx;
@@ -323,7 +468,6 @@ nav.addEventListener("touchend", () => {
   if (!dragging) return;
   dragging = false;
 
-  // Разблокируем скролл
   body.classList.remove("no-scroll");
 
   let pos = parseFloat(indicator.dataset.pos || 0);
@@ -345,6 +489,38 @@ document.querySelectorAll(".nav-item").forEach((el, i) => {
     update(true);
   };
 });
+
+/* PRODUCT SLIDER SCROLL INDICATOR */
+const slider = document.getElementById("productSlider");
+const thumb = document.getElementById("scrollThumb");
+
+function updateScrollThumb() {
+  if (!slider) return;
+
+  const scrollLeft = slider.scrollLeft;
+  const scrollWidth = slider.scrollWidth;
+  const clientWidth = slider.clientWidth;
+  
+  // Ширина ползунка = пропорция видимой области к общему скроллу
+  const thumbWidthPercent = (clientWidth / scrollWidth) * 100;
+  
+  // Позиция ползунка
+  const maxScroll = scrollWidth - clientWidth;
+  const thumbLeftPercent = maxScroll > 0 ? (scrollLeft / maxScroll) * (100 - thumbWidthPercent) : 0;
+  
+  thumb.style.width = thumbWidthPercent + '%';
+  thumb.style.left = thumbLeftPercent + '%';
+}
+
+slider.addEventListener("scroll", updateScrollThumb, { passive: true });
+
+// Инициализация ползунка
+window.addEventListener("load", () => {
+  setTimeout(updateScrollThumb, 100);
+});
+
+// Обновление при изменении размера
+window.addEventListener("resize", updateScrollThumb);
 </script>
 
 </body>
