@@ -96,10 +96,10 @@ body {
 
 /* COLLECTION BANNER */
 .collection-banner {
-  margin: 12px 0 0 0;       /* убраны боковые отступы */
+  margin: 12px 0 0 0;
   background: #e5e5e5;
-  border-radius: 0;          /* убрано скругление */
-  padding: 16px 0 12px 0;    /* боковые паддинги перенесены в слайдер */
+  border-radius: 0;
+  padding: 16px 0 12px 0;
   width: 100%;
 }
 
@@ -108,7 +108,7 @@ body {
   font-weight: 800;
   color: #1a1a1a;
   margin: 0 0 12px 0;
-  padding: 0 16px;           /* отступ заголовка */
+  text-align: center; /* центрирование */
   letter-spacing: -0.3px;
 }
 
@@ -117,10 +117,10 @@ body {
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  overscroll-behavior-x: contain; /* предотвращает скролл страницы при достижении края */
+  overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  padding: 0 16px 4px 16px;       /* отступы по бокам внутри баннера */
+  padding: 0 16px 4px 16px;
 }
 
 .product-slider::-webkit-scrollbar {
@@ -128,7 +128,7 @@ body {
 }
 
 .product-card {
-  flex: 0 0 calc(50% - 5px);
+  flex: 0 0 calc(50% - 5px); /* 2 товара видно одновременно */
   background: #fff;
   border-radius: 14px;
   overflow: hidden;
@@ -205,7 +205,7 @@ body {
   will-change: left, width;
 }
 
-/* CONTENT (fallback) */
+/* CONTENT */
 .content {
   padding: 12px 16px;
 }
@@ -492,12 +492,22 @@ const thumb = document.getElementById("scrollThumb");
 function updateScrollThumb() {
   if (!slider) return;
 
-  const scrollLeft = slider.scrollLeft;
-  const scrollWidth = slider.scrollWidth;
-  const clientWidth = slider.clientWidth;
+  const products = slider.querySelectorAll('.product-card');
+  const totalProducts = products.length;
   
-  const thumbWidthPercent = (clientWidth / scrollWidth) * 100;
-  const maxScroll = scrollWidth - clientWidth;
+  // Вычисляем сколько товаров видно одновременно
+  const cardWidth = products[0].offsetWidth;
+  const gap = 10; // gap из CSS
+  const visibleWidth = slider.clientWidth;
+  
+  // Приблизительное количество видимых товаров
+  const visibleProducts = visibleWidth / (cardWidth + gap);
+  
+  // Ширина ползунка = (видимые товары / всего товаров) * 100%
+  const thumbWidthPercent = Math.min((visibleProducts / totalProducts) * 100, 100);
+  
+  const scrollLeft = slider.scrollLeft;
+  const maxScroll = slider.scrollWidth - slider.clientWidth;
   const thumbLeftPercent = maxScroll > 0 ? (scrollLeft / maxScroll) * (100 - thumbWidthPercent) : 0;
   
   thumb.style.width = thumbWidthPercent + '%';
