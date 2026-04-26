@@ -11,6 +11,13 @@
   --blue: #007aff;
 }
 
+* {
+  box-sizing: border-box;
+  user-select: none;              /* ❗ убрали выделение */
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, sans-serif;
@@ -64,11 +71,11 @@ body {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 220px;           /* уменьшили */
-  height: 56px;           /* уменьшили */
+  width: 220px;
+  height: 56px;
   background: rgba(255,255,255,0.4);
   backdrop-filter: blur(20px);
-  border-radius: 100px;   /* скругление 100 */
+  border-radius: 100px;
   display: flex;
   padding: 6px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
@@ -80,7 +87,7 @@ body {
   height: calc(100% - 12px);
   width: calc(50% - 6px);
   border-radius: 100px;
-  background: rgba(200,200,200,0.6); /* как было */
+  background: rgba(200,200,200,0.6);
   transition: transform 0.25s ease;
 }
 
@@ -167,9 +174,6 @@ body {
 </div>
 
 <script>
-const tg = window.Telegram.WebApp;
-tg.expand();
-
 const nav = document.getElementById("nav");
 const indicator = document.getElementById("indicator");
 
@@ -181,10 +185,16 @@ const pages = [
 let current = 0;
 let startX = 0;
 let dragging = false;
-let basePos = 0;
+let startPos = 0;
 
 function tabWidth() {
-  return nav.offsetWidth / 2;
+  return (nav.offsetWidth - 12) / 2; // учитываем padding
+}
+
+function getTranslateX() {
+  const style = window.getComputedStyle(indicator);
+  const matrix = new DOMMatrix(style.transform);
+  return matrix.m41;
 }
 
 function setIndicator(x, scale = 1) {
@@ -205,20 +215,20 @@ function update() {
 
 update();
 
-/* DRAG — фикс телепорта */
+/* DRAG */
 nav.addEventListener("touchstart", e => {
   startX = e.touches[0].clientX;
   dragging = true;
 
-  // берём РЕАЛЬНУЮ текущую позицию индикатора
-  basePos = current * tabWidth();
+  // 🔥 берём РЕАЛЬНУЮ позицию — фикс телепорта
+  startPos = getTranslateX();
 });
 
 nav.addEventListener("touchmove", e => {
   if (!dragging) return;
 
   let dx = e.touches[0].clientX - startX;
-  let pos = basePos + dx;
+  let pos = startPos + dx;
 
   let max = tabWidth();
   pos = Math.max(0, Math.min(max, pos));
