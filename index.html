@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Mini App</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
@@ -13,13 +12,9 @@
   --blue: #007aff;
 }
 
-* {
-  box-sizing: border-box;
-}
-
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: -apple-system, sans-serif;
   background: var(--bg);
   overflow: hidden;
 }
@@ -37,42 +32,29 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(270deg, #6a11cb, #b16cea, #8e54e9, #6a11cb);
+  background: linear-gradient(270deg,#6a11cb,#b16cea,#8e54e9,#6a11cb);
   background-size: 400% 400%;
-  animation: gradientFlow 8s ease infinite;
+  animation: gradient 8s ease infinite;
 }
 
-@keyframes gradientFlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+@keyframes gradient {
+  0% {background-position:0%}
+  50% {background-position:100%}
+  100% {background-position:0%}
 }
 
 /* LOGO */
 .logo {
   position: absolute;
-  top: calc(50% + 4px); /* только 4px вниз */
+  top: calc(50% + 4px);
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%,-50%);
   width: 60px;
-  height: 60px;
 }
 
 /* CONTENT */
 .content {
   padding: 16px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.card {
-  height: 120px;
-  background: #b8e994;
-  border-radius: 14px;
 }
 
 /* NAV */
@@ -89,8 +71,6 @@ body {
   display: flex;
   align-items: center;
   padding: 6px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  overflow: visible; /* разрешаем вылазить */
 }
 
 /* INDICATOR */
@@ -103,14 +83,19 @@ body {
   transition: transform 0.35s cubic-bezier(.22,1,.36,1);
 }
 
-/* LIQUID GLASS ACTIVE */
+/* LIQUID MODE */
 .dragging .indicator {
-  backdrop-filter: blur(25px);
-  background: rgba(255,255,255,0.25);
+  transform: scale(1.3); /* строго 1.3 */
+  backdrop-filter: blur(30px);
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.7), transparent 60%),
+    radial-gradient(circle at 70% 70%, rgba(0,122,255,0.2), transparent 70%),
+    rgba(255,255,255,0.25);
+
   box-shadow:
-    inset 0 0 10px rgba(255,255,255,0.6),
-    0 0 20px rgba(0,122,255,0.2);
-  transform: scale(1.15);
+    inset 0 0 15px rgba(255,255,255,0.8),
+    inset 0 0 30px rgba(255,255,255,0.4),
+    0 8px 25px rgba(0,0,0,0.15);
 }
 
 /* NAV ITEMS */
@@ -123,7 +108,6 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
 .nav-item svg {
@@ -139,68 +123,78 @@ body {
 .nav-item.active svg {
   fill: var(--blue);
 }
+
+/* PAGES */
+.page {
+  position: absolute;
+  inset: 0;
+  padding-bottom: 100px;
+}
+
+#profile {
+  display: none;
+}
 </style>
 </head>
 
 <body>
 
-<div id="app">
-
-  <div id="home">
-    <div class="header">
-      <img src="logoredbox.png" class="logo">
-    </div>
-
-    <div class="content">
-      <h2>Каталог</h2>
-
-      <div class="grid">
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-      </div>
-    </div>
+<div id="home" class="page">
+  <div class="header">
+    <img src="logoredbox.png" class="logo">
   </div>
 
-  <div class="nav" id="nav">
-    <div class="indicator" id="indicator"></div>
+  <div class="content">
+    <h2>Каталог</h2>
+  </div>
+</div>
 
-    <div class="nav-item active">
-      <!-- КАТАЛОГ ИКОНКА -->
-      <svg viewBox="0 0 24 24">
-        <path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>
-      </svg>
-      Каталог
-    </div>
+<div id="profile" class="page">
+  <div class="header">
+    <img src="logoredbox.png" class="logo">
+  </div>
+</div>
 
-    <div class="nav-item">
-      <svg viewBox="0 0 24 24">
-        <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5z"/>
-      </svg>
-      Профиль
-    </div>
+<div class="nav" id="nav">
+  <div class="indicator" id="indicator"></div>
+
+  <div class="nav-item active">
+    <svg viewBox="0 0 24 24">
+      <path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>
+    </svg>
+    Каталог
   </div>
 
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24">
+      <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5z"/>
+    </svg>
+    Профиль
+  </div>
 </div>
 
 <script>
+const nav = document.getElementById("nav");
+const indicator = document.getElementById("indicator");
+const pages = [document.getElementById("home"), document.getElementById("profile")];
+
 let current = 0;
 let startX = 0;
 let dragging = false;
-
-const indicator = document.getElementById("indicator");
-const nav = document.getElementById("nav");
 
 function tabWidth() {
   return nav.offsetWidth / 2;
 }
 
 function update() {
-  indicator.style.transform = `translateX(${current * tabWidth()}px)`;
+  let x = current * tabWidth();
+  indicator.style.transform = `translateX(${x}px)`;
 
-  document.querySelectorAll(".nav-item").forEach((el, i) => {
-    el.classList.toggle("active", i === current);
+  pages[0].style.display = current === 0 ? "block" : "none";
+  pages[1].style.display = current === 1 ? "block" : "none";
+
+  document.querySelectorAll(".nav-item").forEach((el,i)=>{
+    el.classList.toggle("active", i===current);
   });
 }
 
@@ -219,6 +213,8 @@ nav.addEventListener("touchmove", e => {
   let dx = e.touches[0].clientX - startX;
   let pos = current * tabWidth() + dx;
 
+  pos = Math.max(0, Math.min(tabWidth(), pos));
+
   indicator.style.transform = `translateX(${pos}px)`;
   indicator.dataset.pos = pos;
 });
@@ -229,14 +225,14 @@ nav.addEventListener("touchend", () => {
 
   let pos = parseFloat(indicator.dataset.pos || 0);
 
-  current = pos > tabWidth() / 2 ? 1 : 0;
+  current = pos > tabWidth()/2 ? 1 : 0;
 
   update();
 });
 
 /* TAP */
-document.querySelectorAll(".nav-item").forEach((el, i) => {
-  el.onclick = () => {
+document.querySelectorAll(".nav-item").forEach((el,i)=>{
+  el.onclick = ()=>{
     current = i;
     update();
   };
