@@ -19,7 +19,54 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-color); color: var(--text-primary); overflow: hidden; height: 100vh; width: 100vw; }
 
-/* --- SPLASH & LAYOUT --- */
+/* --- ACCESS DENIED SCREEN (ДЛЯ ЧУЖАКОВ) --- */
+#access-denied {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff; /* Белый экран */
+  z-index: 10000;
+  display: none; /* Скрыто по умолчанию, покажем JS-ом если нужно */
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.denied-ring {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  animation: rotateRing 15s linear infinite; /* Вращение всего кольца */
+}
+
+.denied-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0 0; /* Вращение вокруг центра кольца */
+  font-size: 24px;
+  font-weight: 900;
+  color: #ff8c00; /* Оранжевый цвет */
+  white-space: nowrap;
+  text-transform: uppercase;
+  /* Начальная позиция будет задана через JS или inline styles для распределения по кругу */
+}
+
+@keyframes rotateRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); } /* Минус, чтобы вращалось справа налево (против часовой) */
+}
+
+/* --- APP INTERFACE (ДЛЯ АДМИНА) --- */
+#app-interface {
+  display: none; /* Скрыто до проверки прав */
+  width: 100%;
+  height: 100%;
+}
+
+/* SPLASH & LAYOUT */
 #splash-screen { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
 #splash-screen.hidden { opacity: 0; pointer-events: none; }
 .splash-logo { width: 80px; animation: pulse 2s infinite; }
@@ -42,7 +89,6 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
 .catalog-section { margin-bottom: 20px; background: var(--banner-bg); padding: 20px 0; }
 .section-title { font-size: 22px; font-weight: 800; text-align: center; text-transform: uppercase; margin-bottom: 16px; }
 
-/* Type 1: Featured (New Collection Style) */
 .featured-product { margin: 0 16px 16px; background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 .featured-photo { width: 100%; aspect-ratio: 1/1.1; background: #eee; position: relative; }
 .featured-photo img { width: 100%; height: 100%; object-fit: cover; }
@@ -50,7 +96,6 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
 .featured-name { font-weight: 700; font-size: 18px; margin: 0 0 4px; }
 .featured-price { color: var(--accent-color); font-weight: 600; margin: 0; }
 
-/* Type 2: Slider Only (Old Collection Style) */
 .product-slider { display: flex; gap: 12px; overflow-x: auto; padding: 0 16px 8px; scrollbar-width: none; }
 .product-slider::-webkit-scrollbar { display: none; }
 .product-card { flex: 0 0 calc(50% - 6px); background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
@@ -78,15 +123,7 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
 .input-label { display: block; font-size: 14px; color: #888; margin-bottom: 5px; }
 .input-field { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; }
 
-.mask-preview {
-  width: 100%;
-  background: var(--banner-bg); /* Серый фон как в каталоге */
-  padding: 20px 0;
-  margin-top: 15px;
-  border-radius: 12px;
-  overflow: hidden;
-  position: relative;
-}
+.mask-preview { width: 100%; background: var(--banner-bg); padding: 20px 0; margin-top: 15px; border-radius: 12px; overflow: hidden; position: relative; }
 .mask-label { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); color: white; padding: 2px 6px; font-size: 10px; border-radius: 4px; }
 
 .btn-action { width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 600; font-size: 16px; cursor: pointer; margin-top: 10px; }
@@ -101,44 +138,54 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
 
 <body>
 
-<!-- SPLASH -->
-<div id="splash-screen"><img src="logoredbox.png" class="splash-logo"></div>
-
-<!-- HOME PAGE -->
-<div id="home" class="page active-page">
-  <div class="page-wrapper">
-    <div class="fixed-top-area">
-      <div class="header">
-        <div class="logo-container" id="admin-trigger"><img src="logoredbox.png" class="logo-img"></div>
-      </div>
-      <div class="search-bar">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="#999"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        <input type="text" placeholder="Поиск...">
-      </div>
-    </div>
-    
-    <div class="page-content" id="catalog-container">
-      <!-- Сюда рендерится дизайн -->
-    </div>
+<!-- ACCESS DENIED SCREEN -->
+<div id="access-denied">
+  <div class="denied-ring" id="denied-ring">
+    <!-- Тексты будут добавлены через JS -->
   </div>
 </div>
 
-<!-- ADMIN PAGE -->
-<div id="admin" class="page">
-  <div class="page-wrapper">
-    <div class="fixed-top-area">
-      <div class="header"><div class="logo-container"><img src="logoredbox.png" class="logo-img"></div></div>
-    </div>
-    <div class="page-content admin-panel active">
-      <div class="admin-header">
-        <div class="admin-title">Конструктор</div>
-        <button class="btn-close" onclick="closeAdmin()">Закрыть</button>
-      </div>
+<!-- MAIN APP INTERFACE -->
+<div id="app-interface">
+  <!-- SPLASH -->
+  <div id="splash-screen"><img src="logoredbox.png" class="splash-logo"></div>
 
-      <button class="btn-action btn-add" onclick="addNewCollection()">+ Добавить коллекцию</button>
+  <!-- HOME PAGE -->
+  <div id="home" class="page active-page">
+    <div class="page-wrapper">
+      <div class="fixed-top-area">
+        <div class="header">
+          <div class="logo-container" id="admin-trigger"><img src="logoredbox.png" class="logo-img"></div>
+        </div>
+        <div class="search-bar">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="#999"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input type="text" placeholder="Поиск...">
+        </div>
+      </div>
       
-      <div id="collections-list">
-        <!-- Блоки редактирования коллекций -->
+      <div class="page-content" id="catalog-container">
+        <!-- Сюда рендерится дизайн -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN PAGE -->
+  <div id="admin" class="page">
+    <div class="page-wrapper">
+      <div class="fixed-top-area">
+        <div class="header"><div class="logo-container"><img src="logoredbox.png" class="logo-img"></div></div>
+      </div>
+      <div class="page-content admin-panel active">
+        <div class="admin-header">
+          <div class="admin-title">Конструктор</div>
+          <button class="btn-close" onclick="closeAdmin()">Закрыть</button>
+        </div>
+
+        <button class="btn-action btn-add" onclick="addNewCollection()">+ Добавить коллекцию</button>
+        
+        <div id="collections-list">
+          <!-- Блоки редактирования коллекций -->
+        </div>
       </div>
     </div>
   </div>
@@ -150,20 +197,69 @@ tg.expand();
 
 const ADMIN_USER = 'qvilxy';
 let isAdmin = false;
-let collections = []; // Структура данных дизайна
+let collections = []; 
 
-// --- INIT ---
+// --- INIT & ACCESS CONTROL ---
+
 window.addEventListener('load', () => {
   const user = tg.initDataUnsafe?.user;
-  if (user && user.username?.toLowerCase() === ADMIN_USER) isAdmin = true;
+  
+  // Проверка юзернейма
+  if (user && user.username && user.username.toLowerCase() === ADMIN_USER.toLowerCase()) {
+    isAdmin = true;
+    initApp(); // Запускаем приложение
+  } else {
+    initDeniedScreen(); // Запускаем экран "хуй тебе"
+  }
+});
+
+// --- LOGIC FOR DENIED SCREEN ---
+
+function initDeniedScreen() {
+  const deniedScreen = document.getElementById('access-denied');
+  const ring = document.getElementById('denied-ring');
+  
+  // Показываем экран отказа
+  deniedScreen.style.display = 'flex';
+  
+  // Создаем надписи по кругу
+  const text = "хуй тебе";
+  const count = 8; // Количество надписей
+  const radius = 120; // Радиус круга
+  
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'denied-text';
+    el.innerText = text;
+    
+    // Распределяем по кругу (360 / count)
+    const angle = (360 / count) * i;
+    
+    // Смещаем элемент от центра на радиус и поворачиваем его, чтобы он смотрел наружу или по касательной
+    // Здесь делаем так, чтобы текст шел по окружности
+    el.style.transform = `rotate(${angle}deg) translate(${radius}px) rotate(-${angle}deg)`; 
+    // Примечание: rotate(-angle) нужен, если мы хотим, чтобы текст всегда читался горизонтально относительно своего угла, 
+    // но для эффекта вращения кольца лучше просто повернуть и сдвинуть:
+    
+    // Вариант "по спицам колеса":
+    el.style.transform = `rotate(${angle}deg) translateY(-${radius}px)`;
+    
+    ring.appendChild(el);
+  }
+}
+
+// --- LOGIC FOR APP (ADMIN) ---
+
+function initApp() {
+  document.getElementById('app-interface').style.display = 'block';
   
   loadDesign();
   setTimeout(() => document.getElementById('splash-screen').classList.add('hidden'), 800);
-});
-
-document.getElementById('admin-trigger').onclick = () => {
-  if (isAdmin) openAdmin();
-};
+  
+  document.getElementById('admin-trigger').onclick = () => {
+    if (isAdmin) openAdmin();
+  };
+}
 
 // --- DATA MANAGEMENT ---
 
@@ -172,12 +268,11 @@ function loadDesign() {
   if (saved) {
     collections = JSON.parse(saved);
   } else {
-    // Дефолтный дизайн
     collections = [
       {
         id: Date.now(),
         title: "Новая коллекция",
-        type: "featured", // featured (с большим фото) или slider (просто шторка)
+        type: "featured",
         items: [
           { name: "Hoodie Black", price: "4500", img: "" },
           { name: "T-Shirt White", price: "2100", img: "" },
@@ -199,7 +294,7 @@ function saveDesign() {
   }
 }
 
-// --- RENDERING CATALOG (USER VIEW) ---
+// --- RENDERING CATALOG ---
 
 function renderCatalog() {
   const container = document.getElementById('catalog-container');
@@ -212,7 +307,6 @@ function renderCatalog() {
     let innerHTML = `<h2 class="section-title">${col.title}</h2>`;
 
     if (col.type === 'featured') {
-      // Стиль "Новая коллекция"
       const mainItem = col.items[0] || {name:"Пусто", price:"", img:""};
       innerHTML += `
         <div class="featured-product">
@@ -230,7 +324,6 @@ function renderCatalog() {
         <div class="scroll-indicator"><div class="scroll-thumb"></div></div>
       `;
     } else {
-      // Стиль "Предыдущая коллекция" (Только слайдер)
       innerHTML += `
         <div class="product-slider">
           ${col.items.map(item => createCardHTML(item)).join('')}
@@ -279,7 +372,6 @@ function renderAdminCollections() {
     const block = document.createElement('div');
     block.className = 'designer-block';
     
-    // Опции типа
     const typeOptions = `
       <option value="featured" ${col.type === 'featured' ? 'selected' : ''}>С заглавным фото (Новая)</option>
       <option value="slider" ${col.type === 'slider' ? 'selected' : ''}>Только слайдер (Старая)</option>
@@ -308,7 +400,6 @@ function renderAdminCollections() {
       <div id="items-${col.id}"></div>
       <button class="file-btn" onclick="addItemToCollection(${index})">+ Товар</button>
 
-      <!-- МАСКА ПРЕДПРОСМОТРА -->
       <div class="mask-preview">
         <div class="mask-label">PREVIEW</div>
         <div style="padding: 0 16px; pointer-events: none;">
@@ -338,8 +429,6 @@ function getPreviewFeatured(item) {
   `;
 }
 
-// --- EDITING FUNCTIONS ---
-
 function addNewCollection() {
   collections.push({
     id: Date.now(),
@@ -359,7 +448,7 @@ function deleteCollection(index) {
 }
 
 function updateColTitle(index, val) { collections[index].title = val; }
-function updateColType(index, val) { collections[index].type = val; renderAdminCollections(); } // Re-render to show preview change
+function updateColType(index, val) { collections[index].type = val; renderAdminCollections(); }
 
 function addItemToCollection(colIndex) {
   collections[colIndex].items.push({ name: "Новый товар", price: "0", img: "" });
@@ -378,7 +467,6 @@ function handleImageUpload(colIndex, itemIndex, input) {
   if (input.files && input.files[0]) {
     const reader = new FileReader();
     reader.onload = function(e) {
-      // Сжимаем картинку перед сохранением (простой ресайз через canvas был бы лучше, но пока так)
       collections[colIndex].items[itemIndex].img = e.target.result;
       renderAdminCollections();
     };
