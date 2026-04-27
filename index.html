@@ -8,7 +8,12 @@
 
 <style>
 :root {
-  --blue: #007aff;
+  --bg-color: #ffffff;       /* Белый фон приложения */
+  --banner-bg: #f2f2f7;      /* Светло-серый фон баннеров */
+  --surface-color: #ffffff;  /* Белые карточки */
+  --text-primary: #000000;
+  --text-secondary: #8e8e93;
+  --accent-color: #007aff;
 }
 
 * {
@@ -18,102 +23,47 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, sans-serif;
-  background: #f5f5f7;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-primary);
   -webkit-user-select: none;
   user-select: none;
-  overflow: hidden; /* Фиксируем body */
-  overscroll-behavior: none; /* Отключаем pull-to-refresh и оттягивание */
-  touch-action: none; /* Запрещаем стандартные жесты браузера */
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
   height: 100vh;
   width: 100vw;
 }
 
-/* HEADER */
-.header {
-  height: 100px;
-  position: relative;
-  overflow: hidden;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
-  background: linear-gradient(
-    135deg,
-    #6a11cb,
-    #8b3fd1,
-    #b16cea,
-    #a05cc4,
-    #7a2fb0,
-    #6a11cb,
-    #b16cea
-  );
-  background-size: 300% 300%;
-  animation: shimmerGradient 8s ease infinite;
-  flex-shrink: 0; /* Не сжимать */
-}
-
-@keyframes shimmerGradient {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* LOGO */
-.logo {
-  position: absolute;
-  top: calc(50% + 7px);
-  left: 50%;
-  transform: translate(-50%,-50%);
-  width: 60px;
-  pointer-events: none;
-  -webkit-user-drag: none;
-}
-
-/* SEARCH BAR */
-.search-bar {
-  margin: 12px 16px 0 16px;
-  background: #fff;
-  border-radius: 100px;
-  padding: 0 18px;
-  height: 46px;
+/* SPLASH SCREEN */
+#splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-color);
+  z-index: 9999;
   display: flex;
   align-items: center;
-  gap: 10px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  flex-shrink: 0;
+  justify-content: center;
+  transition: opacity 0.5s ease-out, visibility 0.5s;
 }
 
-.search-bar svg {
-  width: 20px;
-  height: 20px;
-  fill: #999;
-  flex-shrink: 0;
+#splash-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
   pointer-events: none;
 }
 
-.search-bar input {
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 16px;
-  color: #000;
-  width: 100%;
-  font-family: -apple-system, sans-serif;
-  -webkit-user-select: text;
-  user-select: text;
+.splash-logo {
+  width: 80px;
+  animation: pulseLogo 2s infinite ease-in-out;
 }
 
-.search-bar input::placeholder {
-  color: #999;
-}
-
-/* MAIN SCROLL AREA */
-.page-content {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 100px; /* Отступ под навигацию */
-  width: 100%;
-  touch-action: pan-y; /* Разрешаем вертикальный скролл внутри контента */
+@keyframes pulseLogo {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
 }
 
 /* LAYOUT WRAPPER */
@@ -127,36 +77,120 @@ body {
   left: 0;
 }
 
-/* COLLECTION SECTIONS */
-.catalog-section {
-  margin: 12px 0 0 0;
-  background: #e5e5e5;
-  border-radius: 0;
-  padding: 16px 0 16px 0;
+/* FIXED TOP AREA - Фиксируется сверху при скролле */
+.fixed-top-area {
+  flex-shrink: 0;
+  background: var(--bg-color);
+  z-index: 100; /* Высокий z-index, чтобы перекрывать контент при скролле */
+  position: sticky; /* Ключевое свойство для фиксации */
+  top: 0;
   width: 100%;
+  padding-bottom: 10px; /* Отступ от поиска до контента */
 }
 
-.catalog-section-inner {
-  transform: translateY(-2px);
+/* HEADER */
+.header {
+  height: 100px;
+  position: relative;
+  overflow: hidden;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  background: var(--bg-color);
+  box-shadow: none; 
+  border-bottom: none;
+}
+
+.logo {
+  position: absolute;
+  top: calc(50% + 7px);
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: 60px;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  z-index: 3;
+}
+
+/* SEARCH BAR - ТАБЛЕТКА С ТЕНЬЮ */
+.search-bar {
+  margin: 0 16px;
+  background: var(--surface-color);
+  border: none; /* УБРАН КОНТУР */
+  border-radius: 100px;
+  padding: 0 20px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* ТЕНЬ ВОКРУГ ТАБЛЕТКИ */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
+  transition: box-shadow 0.2s ease;
+}
+
+.search-bar svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--text-secondary);
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.search-bar input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 17px;
+  color: var(--text-primary);
+  width: 100%;
+  font-family: inherit;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.search-bar input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* SCROLLABLE CONTENT AREA */
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 40px;
+  width: 100%;
+  touch-action: pan-y;
+  /* Важно: фон контента белый, но секции будут серыми */
+  background: var(--bg-color);
+}
+
+/* COLLECTION SECTIONS - Серые баннеры */
+.catalog-section {
+  margin: 0 0 20px 0;
+  background: var(--banner-bg); /* СЕРЫЙ ФОН */
+  padding: 20px 0;
+  width: 100%;
 }
 
 .section-title {
   font-size: 22px;
   font-weight: 800;
-  color: #1a1a1a;
-  margin: 0 0 12px 0;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
   text-align: center;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.5px;
   pointer-events: none;
+  text-transform: uppercase;
 }
 
 /* FEATURED PRODUCT */
 .featured-product {
-  margin: 0 16px 12px 16px;
-  background: #fff;
-  border-radius: 14px;
+  margin: 0 16px 16px 16px;
+  background: var(--surface-color);
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  /* Легкая рамка для белого на сером */
+  border: 1px solid rgba(0,0,0,0.05); 
 }
 
 .featured-photo {
@@ -167,67 +201,70 @@ body {
   justify-content: center;
   position: relative;
   transition: background-color 0.3s ease;
-  touch-action: pan-y; /* Разрешаем вертикальный скролл, если нужно, но перехватываем горизонтальный */
+  touch-action: pan-y;
 }
 
-.featured-photo[data-state="0"] { background-color: #e0f5d0; }
-.featured-photo[data-state="1"] { background-color: #f5e0e8; }
-.featured-photo[data-state="2"] { background-color: #e8d5f5; }
+.featured-photo[data-state="0"] { background: linear-gradient(45deg, #e0f7fa, #b2ebf2); }
+.featured-photo[data-state="1"] { background: linear-gradient(45deg, #fce4ec, #f8bbd0); }
+.featured-photo[data-state="2"] { background: linear-gradient(45deg, #e8eaf6, #c5cae9); }
 
 .featured-photo .dots {
   position: absolute;
-  bottom: 10px;
+  bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 5px;
+  gap: 6px;
   pointer-events: auto;
+  background: rgba(255,255,255,0.6);
+  padding: 4px 8px;
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
 }
 
 .featured-photo .dots span {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.2);
   cursor: pointer;
-  touch-action: manipulation;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .featured-photo .dots span.active {
-  background: rgba(0,0,0,0.5);
+  background: #000;
   transform: scale(1.2);
 }
 
 .featured-info {
-  padding: 10px 14px 12px 14px;
+  padding: 14px 16px 16px 16px;
   pointer-events: none;
 }
 
 .featured-name {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
-  color: #1a1a1a;
-  margin: 0 0 2px 0;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
 }
 
 .featured-price {
-  font-size: 14px;
-  color: #666;
+  font-size: 15px;
+  color: var(--accent-color);
   margin: 0;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* PRODUCT SLIDER */
 .product-slider {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  padding: 0 16px 4px 16px;
-  touch-action: pan-y; /* Важно: разрешаем вертикальный скролл страницы при касании слайдера */
+  padding: 0 16px 8px 16px;
+  touch-action: pan-y;
   -ms-overflow-style: none;
 }
 
@@ -236,13 +273,14 @@ body {
 }
 
 .product-card {
-  flex: 0 0 calc(50% - 5px);
-  background: #fff;
-  border-radius: 14px;
+  flex: 0 0 calc(50% - 6px);
+  background: var(--surface-color);
+  border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
 .product-photo {
@@ -256,9 +294,9 @@ body {
   touch-action: pan-y; 
 }
 
-.product-photo[data-state="0"] { background-color: #e0f5d0; }
-.product-photo[data-state="1"] { background-color: #f5e0e8; }
-.product-photo[data-state="2"] { background-color: #e8d5f5; }
+.product-photo[data-state="0"] { background: linear-gradient(45deg, #e0f7fa, #b2ebf2); }
+.product-photo[data-state="1"] { background: linear-gradient(45deg, #fce4ec, #f8bbd0); }
+.product-photo[data-state="2"] { background: linear-gradient(45deg, #e8eaf6, #c5cae9); }
 
 .product-photo .dots {
   position: absolute;
@@ -268,55 +306,58 @@ body {
   display: flex;
   gap: 5px;
   pointer-events: auto;
+  background: rgba(255,255,255,0.6);
+  padding: 3px 6px;
+  border-radius: 10px;
+  backdrop-filter: blur(2px);
 }
 
 .product-photo .dots span {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.2);
   cursor: pointer;
-  touch-action: manipulation;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .product-photo .dots span.active {
-  background: rgba(0,0,0,0.5);
+  background: #000;
   transform: scale(1.2);
 }
 
 .product-info {
-  padding: 8px 10px 10px 10px;
-  pointer-events: auto; /* Включаем события для скролла */
+  padding: 10px 12px 12px 12px;
+  pointer-events: auto;
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* Убираем выделение текста при перетаскивании */
   -webkit-user-select: none;
   user-select: none;
 }
 
 .product-name {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 2px 0;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+  line-height: 1.2;
 }
 
 .product-price {
-  font-size: 13px;
-  color: #666;
+  font-size: 14px;
+  color: var(--accent-color);
   margin: 0;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* SCROLL INDICATOR */
 .scroll-indicator {
-  height: 4px; /* Увеличено с 3px до 4px */
-  background: rgba(0,0,0,0.15);
+  height: 4px;
+  background: rgba(0,0,0,0.1);
   border-radius: 100px;
-  margin: 10px 16px 0 16px;
+  margin: 12px 20px 0 20px;
   position: relative;
   overflow: hidden;
   touch-action: none;
@@ -327,10 +368,10 @@ body {
   top: 0;
   left: 0;
   height: 100%;
-  background: #fff;
+  background: #000;
   border-radius: 100px;
   transition: left 0.1s ease-out;
-  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  box-shadow: 0 0 4px rgba(0,0,0,0.2);
   will-change: left, width;
   cursor: grab;
   touch-action: none;
@@ -338,72 +379,7 @@ body {
 
 .scroll-indicator-thumb:active {
   cursor: grabbing;
-  background: #eee;
-}
-
-/* NAV */
-.nav {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 220px;
-  height: 56px;
-  background: rgba(255,255,255,0.4);
-  backdrop-filter: blur(20px);
-  border-radius: 100px;
-  display: flex;
-  padding: 6px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  z-index: 100;
-}
-
-/* INDICATOR */
-.indicator {
-  position: absolute;
-  height: calc(100% - 12px);
-  width: calc(50% - 6px);
-  border-radius: 100px;
-  background: rgba(240, 240, 240, 0.95);
-  transition: transform 0.25s ease;
-  pointer-events: none;
-  will-change: transform;
-}
-
-/* NAV ITEMS */
-.nav-item {
-  flex: 1;
-  text-align: center;
-  font-size: 13px;
-  color: #000;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  pointer-events: auto;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.nav-item svg {
-  width: 22px;
-  height: 22px;
-  fill: #000;
-  margin-bottom: 2px;
-  pointer-events: none;
-}
-
-.nav-item.active {
-  color: var(--blue);
-}
-
-.nav-item.active svg {
-  fill: var(--blue);
+  background: #333;
 }
 
 /* PAGES */
@@ -414,7 +390,7 @@ body {
 }
 
 .page.active-page {
-  display: flex; /* Используем flex для фиксации структуры */
+  display: flex;
 }
 
 </style>
@@ -422,22 +398,33 @@ body {
 
 <body>
 
+<!-- SPLASH SCREEN -->
+<div id="splash-screen">
+  <img src="logoredbox.png" class="splash-logo" alt="Loading...">
+</div>
+
 <!-- HOME -->
 <div id="home" class="page active-page">
   <div class="page-wrapper">
-    <div class="header">
-      <img src="logoredbox.png" class="logo">
+    
+    <!-- FIXED TOP AREA: Header + Search (Залипает сверху) -->
+    <div class="fixed-top-area">
+      <div class="header">
+        <img src="logoredbox.png" class="logo">
+      </div>
+
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24">
+          <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+        <input type="text" placeholder="Поиск..." />
+      </div>
     </div>
 
-    <div class="search-bar">
-      <svg viewBox="0 0 24 24">
-        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-      </svg>
-      <input type="text" placeholder="Поиск" />
-    </div>
-
+    <!-- SCROLLABLE CONTENT -->
     <div class="page-content">
-      <!-- БЛОК 1: ОСНОВНАЯ КОЛЛЕКЦИЯ -->
+      
+      <!-- БЛОК 1 -->
       <div class="catalog-section">
         <div class="catalog-section-inner">
           <h2 class="section-title">Новая коллекция</h2>
@@ -472,7 +459,7 @@ body {
             </div>
 
             <div class="product-card">
-              <div class="product-photo" data-state="0">
+              <div class="product-photo" data-state="1">
                 <div class="dots">
                   <span class="active"></span>
                   <span></span>
@@ -486,7 +473,7 @@ body {
             </div>
 
             <div class="product-card">
-              <div class="product-photo" data-state="0">
+              <div class="product-photo" data-state="2">
                 <div class="dots">
                   <span class="active"></span>
                   <span></span>
@@ -520,10 +507,10 @@ body {
         </div>
       </div>
 
-      <!-- БЛОК 2: СТАРАЯ КОЛЛЕКЦИЯ -->
+      <!-- БЛОК 2 -->
       <div class="catalog-section">
         <div class="catalog-section-inner">
-          <h2 class="section-title">Старая коллекция</h2>
+          <h2 class="section-title">Предыдущая коллекция</h2>
 
           <div class="product-slider" id="slider2">
             <div class="product-card">
@@ -541,7 +528,7 @@ body {
             </div>
 
             <div class="product-card">
-              <div class="product-photo" data-state="0">
+              <div class="product-photo" data-state="1">
                 <div class="dots">
                   <span class="active"></span>
                   <span></span>
@@ -555,7 +542,7 @@ body {
             </div>
 
             <div class="product-card">
-              <div class="product-photo" data-state="0">
+              <div class="product-photo" data-state="2">
                 <div class="dots">
                   <span class="active"></span>
                   <span></span>
@@ -597,33 +584,17 @@ body {
 <!-- PROFILE -->
 <div id="profile" class="page">
   <div class="page-wrapper">
-    <div class="header">
-      <img src="logoredbox.png" class="logo">
+    <div class="fixed-top-area">
+      <div class="header">
+        <img src="logoredbox.png" class="logo">
+      </div>
     </div>
     <div class="page-content">
       <div class="content" style="padding: 20px;">
-        <h2>Профиль</h2>
+        <h2 style="color: black;">Профиль</h2>
+        <p style="color: #888;">Здесь будет информация о пользователе...</p>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- NAV -->
-<div class="nav" id="nav">
-  <div class="indicator" id="indicator"></div>
-
-  <div class="nav-item active">
-    <svg viewBox="0 0 24 24">
-      <path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>
-    </svg>
-    Каталог
-  </div>
-
-  <div class="nav-item">
-    <svg viewBox="0 0 24 24">
-      <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5z"/>
-    </svg>
-    Профиль
   </div>
 </div>
 
@@ -631,104 +602,44 @@ body {
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// --- ВАЖНО: Блокировка сворачивания приложения свайпом вниз ---
+if (tg.setHeaderColor) {
+    tg.setHeaderColor('#ffffff');
+    tg.setBackgroundColor('#ffffff');
+}
+
 if (tg.disableVerticalSwipes) {
     tg.disableVerticalSwipes();
 }
-// -------------------------------------------------------------
 
-const nav = document.getElementById("nav");
-const indicator = document.getElementById("indicator");
+// ЛОГИКА ЭКРАНА ЗАГРУЗКИ
+window.addEventListener('load', () => {
+  const splash = document.getElementById('splash-screen');
+  setTimeout(() => {
+    splash.classList.add('hidden');
+  }, 1500);
+});
+
 const body = document.body;
-
 const pages = [
   document.getElementById("home"),
   document.getElementById("profile")
 ];
 
 let current = 0;
-let startX = 0;
-let dragging = false;
-let basePos = 0;
 
-function tabWidth() {
-  return indicator.offsetWidth;
-}
-
-function setIndicator(x, scale = 1) {
-  indicator.style.transform = `translateX(${x}px) scale(${scale})`;
-}
-
-function update(animate = true) {
-  indicator.style.transition = animate ? 'transform 0.25s ease' : 'none';
-  
-  let x = current * tabWidth();
-  setIndicator(x, 1);
-
+function updatePages() {
   pages.forEach((p, i) => {
       if (i === current) {
           p.classList.add('active-page');
-          p.style.display = 'flex'; // Восстанавливаем flex
+          p.style.display = 'flex';
       } else {
           p.classList.remove('active-page');
           p.style.display = 'none';
       }
   });
-
-  document.querySelectorAll(".nav-item").forEach((el, i) => {
-    el.classList.toggle("active", i === current);
-  });
 }
 
-update(true);
-
-/* NAV DRAG */
-nav.addEventListener("touchstart", e => {
-  startX = e.touches[0].clientX;
-  dragging = true;
-  basePos = current * tabWidth();
-  
-  indicator.style.transition = 'none';
-  setIndicator(basePos, 1.3);
-}, { passive: false });
-
-nav.addEventListener("touchmove", e => {
-  if (!dragging) return;
-  e.preventDefault();
-
-  let dx = e.touches[0].clientX - startX;
-  let pos = basePos + dx;
-
-  let max = tabWidth();
-  pos = Math.max(0, Math.min(max, pos));
-
-  setIndicator(pos, 1.3);
-  indicator.dataset.pos = pos;
-}, { passive: false });
-
-nav.addEventListener("touchend", () => {
-  if (!dragging) return;
-  dragging = false;
-
-  let pos = parseFloat(indicator.dataset.pos || 0);
-  let threshold = tabWidth() / 2;
-  
-  const targetTab = pos > threshold ? 1 : 0;
-  
-  if (targetTab !== current) {
-    current = targetTab;
-  }
-  
-  update(true);
-});
-
-/* TAP */
-document.querySelectorAll(".nav-item").forEach((el, i) => {
-  el.onclick = () => {
-    current = i;
-    update(true);
-  };
-});
+updatePages();
 
 /* PRODUCT SLIDER WITH IMPROVED DRAGGABLE THUMB */
 function initSlider(sliderId, thumbId) {
@@ -764,8 +675,6 @@ function initSlider(sliderId, thumbId) {
     thumb.style.left = thumbLeftPercent + '%';
   }
 
-  // --- Обработчики для перетаскивания ползунка ---
-  
   function onThumbStart(e) {
     isDraggingThumb = true;
     startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
@@ -815,40 +724,34 @@ function initSlider(sliderId, thumbId) {
   setTimeout(updateThumb, 100);
   window.addEventListener("resize", updateThumb);
 
-  // --- Логика для скролла за название/цену (блок product-info) ---
-  // Исправлено: используем глобальные слушатели для плавности и предотвращения телепортации
   let isDraggingInfo = false;
   let infoStartX = 0;
   let infoStartScroll = 0;
 
   slider.addEventListener('touchstart', (e) => {
-    // Проверяем, что нажатие произошло внутри product-info
     if (e.target.closest('.product-info')) {
       isDraggingInfo = true;
       infoStartX = e.touches[0].clientX;
       infoStartScroll = slider.scrollLeft;
-      slider.style.scrollBehavior = 'auto'; // Отключаем плавность для мгновенной реакции
+      slider.style.scrollBehavior = 'auto';
     }
   }, { passive: true });
 
-  // Слушаем move на window, чтобы не терять фокус, если палец ушел с элемента
   window.addEventListener('touchmove', (e) => {
     if (!isDraggingInfo) return;
     
     const currentX = e.touches[0].clientX;
     const diff = infoStartX - currentX;
     
-    // Если движение преимущественно горизонтальное, предотвращаем скролл страницы
-    // и двигаем слайдер
     if (Math.abs(diff) > 2) {
-       e.preventDefault(); // Блокируем вертикальный скролл страницы во время горизонтального тяга
+       e.preventDefault();
        slider.scrollLeft = infoStartScroll + diff;
     }
   }, { passive: false });
 
   window.addEventListener('touchend', () => {
     isDraggingInfo = false;
-    slider.style.scrollBehavior = ''; // Возвращаем поведение по умолчанию
+    slider.style.scrollBehavior = '';
   });
 }
 
@@ -862,7 +765,6 @@ function initPhotoInteractions(containerSelector, photoSelector, dotsSelector) {
     const dots = Array.from(card.querySelectorAll(dotsSelector));
     const totalStates = dots.length;
     
-    // Click on dots
     dots.forEach((dot, idx) => {
       dot.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -876,7 +778,6 @@ function initPhotoInteractions(containerSelector, photoSelector, dotsSelector) {
         photo.dataset.state = idx;
     }
 
-    // Swipe Logic
     let touchStartX = 0;
     let touchEndX = 0;
     let currentState = 0;
@@ -891,22 +792,19 @@ function initPhotoInteractions(containerSelector, photoSelector, dotsSelector) {
     }, {passive: true});
 
     function handleSwipe() {
-        const threshold = 30; // Минимальное расстояние для свайпа
+        const threshold = 30;
         const diff = touchStartX - touchEndX;
 
-        // Получаем текущий индекс из dataset или активной точки
         currentState = parseInt(photo.dataset.state) || 0;
 
         if (Math.abs(diff) > threshold) {
             if (diff > 0) {
-                // Свайп влево -> Следующее фото
                 let next = currentState + 1;
-                if (next >= totalStates) next = 0; // Циклично
+                if (next >= totalStates) next = 0;
                 setActiveState(next);
             } else {
-                // Свайп вправо -> Предыдущее фото
                 let prev = currentState - 1;
-                if (prev < 0) prev = totalStates - 1; // Циклично
+                if (prev < 0) prev = totalStates - 1;
                 setActiveState(prev);
             }
         }
@@ -917,7 +815,6 @@ function initPhotoInteractions(containerSelector, photoSelector, dotsSelector) {
 initPhotoInteractions('.featured-product', '.featured-photo', '.featured-photo .dots span');
 initPhotoInteractions('.product-card', '.product-photo', '.product-photo .dots span');
 
-// Prevent double tap zoom
 let lastTouchEnd = 0;
 document.addEventListener('touchend', (e) => {
   const now = Date.now();
