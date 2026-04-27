@@ -22,9 +22,11 @@ body {
   background: #f5f5f7;
   -webkit-user-select: none;
   user-select: none;
-  overflow-x: hidden;
-  overscroll-behavior-y: none; /* Важно для предотвращения pull-to-refresh браузера */
-  touch-action: manipulation;
+  overflow: hidden; /* Фиксируем body */
+  overscroll-behavior: none; /* Отключаем pull-to-refresh и оттягивание */
+  touch-action: none; /* Запрещаем стандартные жесты браузера */
+  height: 100vh;
+  width: 100vw;
 }
 
 /* HEADER */
@@ -46,6 +48,7 @@ body {
   );
   background-size: 300% 300%;
   animation: shimmerGradient 8s ease infinite;
+  flex-shrink: 0; /* Не сжимать */
 }
 
 @keyframes shimmerGradient {
@@ -76,6 +79,7 @@ body {
   align-items: center;
   gap: 10px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  flex-shrink: 0;
 }
 
 .search-bar svg {
@@ -100,6 +104,27 @@ body {
 
 .search-bar input::placeholder {
   color: #999;
+}
+
+/* MAIN SCROLL AREA */
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 100px; /* Отступ под навигацию */
+  width: 100%;
+  touch-action: pan-y; /* Разрешаем вертикальный скролл внутри контента */
+}
+
+/* LAYOUT WRAPPER */
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /* COLLECTION SECTIONS */
@@ -142,7 +167,7 @@ body {
   justify-content: center;
   position: relative;
   transition: background-color 0.3s ease;
-  touch-action: pan-y;
+  touch-action: pan-y; /* Разрешаем вертикальный скролл, если нужно, но перехватываем горизонтальный */
 }
 
 .featured-photo[data-state="0"] { background-color: #e0f5d0; }
@@ -202,7 +227,7 @@ body {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding: 0 16px 4px 16px;
-  touch-action: pan-y;
+  touch-action: pan-y; /* Важно: разрешаем вертикальный скролл страницы при касании слайдера */
   -ms-overflow-style: none;
 }
 
@@ -216,7 +241,8 @@ body {
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  touch-action: pan-y;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-photo {
@@ -227,7 +253,7 @@ body {
   justify-content: center;
   position: relative;
   transition: background-color 0.3s ease;
-  touch-action: pan-y;
+  touch-action: pan-y; 
 }
 
 .product-photo[data-state="0"] { background-color: #e0f5d0; }
@@ -261,7 +287,11 @@ body {
 
 .product-info {
   padding: 8px 10px 10px 10px;
-  pointer-events: none;
+  pointer-events: auto; /* Включаем события для скролла */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .product-name {
@@ -286,7 +316,7 @@ body {
   margin: 10px 16px 0 16px;
   position: relative;
   overflow: hidden;
-  touch-action: none; /* Отключаем стандартные жесты на индикаторе */
+  touch-action: none;
 }
 
 .scroll-indicator-thumb {
@@ -377,167 +407,201 @@ body {
 .page {
   position: absolute;
   inset: 0;
-  padding-bottom: 100px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  display: none;
 }
 
-body.no-scroll {
-  overflow: hidden;
-  touch-action: none;
+.page.active-page {
+  display: flex; /* Используем flex для фиксации структуры */
 }
+
 </style>
 </head>
 
 <body>
 
 <!-- HOME -->
-<div id="home" class="page">
-  <div class="header">
-    <img src="logoredbox.png" class="logo">
-  </div>
+<div id="home" class="page active-page">
+  <div class="page-wrapper">
+    <div class="header">
+      <img src="logoredbox.png" class="logo">
+    </div>
 
-  <div class="search-bar">
-    <svg viewBox="0 0 24 24">
-      <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-    </svg>
-    <input type="text" placeholder="Поиск" />
-  </div>
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24">
+        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </svg>
+      <input type="text" placeholder="Поиск" />
+    </div>
 
-  <!-- БЛОК 1: ОСНОВНАЯ КОЛЛЕКЦИЯ -->
-  <div class="catalog-section">
-    <div class="catalog-section-inner">
-      <h2 class="section-title">Новая коллекция</h2>
+    <div class="page-content">
+      <!-- БЛОК 1: ОСНОВНАЯ КОЛЛЕКЦИЯ -->
+      <div class="catalog-section">
+        <div class="catalog-section-inner">
+          <h2 class="section-title">Новая коллекция</h2>
 
-      <div class="featured-product">
-        <div class="featured-photo" data-state="0">
-          <div class="dots">
-            <span class="active"></span>
-            <span></span>
-            <span></span>
+          <div class="featured-product">
+            <div class="featured-photo" data-state="0">
+              <div class="dots">
+                <span class="active"></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div class="featured-info">
+              <p class="featured-name">Название товара</p>
+              <p class="featured-price">Цена</p>
+            </div>
           </div>
-        </div>
-        <div class="featured-info">
-          <p class="featured-name">Название товара</p>
-          <p class="featured-price">Цена</p>
+
+          <div class="product-slider" id="slider1">
+            <div class="product-card">
+              <div class="product-photo" data-state="0">
+                <div class="dots">
+                  <span class="active"></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-name">Название товара 1</p>
+                <p class="product-price">1000 ₽</p>
+              </div>
+            </div>
+
+            <div class="product-card">
+              <div class="product-photo" data-state="0">
+                <div class="dots">
+                  <span class="active"></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-name">Название товара 2</p>
+                <p class="product-price">2000 ₽</p>
+              </div>
+            </div>
+
+            <div class="product-card">
+              <div class="product-photo" data-state="0">
+                <div class="dots">
+                  <span class="active"></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-name">Название товара 3</p>
+                <p class="product-price">3000 ₽</p>
+              </div>
+            </div>
+            
+             <div class="product-card">
+              <div class="product-photo" data-state="0">
+                <div class="dots">
+                  <span class="active"></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-name">Название товара 4</p>
+                <p class="product-price">4000 ₽</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="scroll-indicator">
+            <div class="scroll-indicator-thumb" id="thumb1"></div>
+          </div>
         </div>
       </div>
 
-      <div class="product-slider" id="slider1">
-        <div class="product-card">
-          <div class="product-photo" data-state="0">
-            <div class="dots">
-              <span class="active"></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-          <div class="product-info">
-            <p class="product-name">Название товара</p>
-            <p class="product-price">Цена</p>
-          </div>
-        </div>
+      <!-- БЛОК 2: СТАРАЯ КОЛЛЕКЦИЯ -->
+      <div class="catalog-section">
+        <div class="catalog-section-inner">
+          <h2 class="section-title">Старая коллекция</h2>
 
-        <div class="product-card">
-          <div class="product-photo" data-state="0">
-            <div class="dots">
-              <span class="active"></span>
-              <span></span>
-              <span></span>
+          <div class="product-slider" id="slider2">
+            <div class="product-card">
+              <div class="product-photo" data-state="0">
+                <div class="dots">
+                  <span class="active"></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-name">Товар А</p>
+                <p class="product-price">500 ₽</p>
+              </div>
             </div>
-          </div>
-          <div class="product-info">
-            <p class="product-name">Название товара</p>
-            <p class="product-price">Цена</p>
-          </div>
-        </div>
 
-        <div class="product-card">
-          <div class="product-photo" data-state="0">
-            <div class="dots">
-              <span class="active"></span>
-              <span></span>
-              <span></span>
+            <div class="product-card">
+              <div class="product-photo" data-state="0">
+                <div class="dots">
+                  <span class="active"></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-name">Товар Б</p>
+                <p class="product-price">600 ₽</p>
+              </div>
+            </div>
+
+            <div class="product-card">
+              <div class="product-photo" data-state="0">
+                <div class="dots">
+                  <span class="active"></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-name">Товар В</p>
+                <p class="product-price">700 ₽</p>
+              </div>
+            </div>
+            
+            <div class="product-card">
+              <div class="product-photo" data-state="0">
+                <div class="dots">
+                  <span class="active"></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-name">Товар Г</p>
+                <p class="product-price">800 ₽</p>
+              </div>
             </div>
           </div>
-          <div class="product-info">
-            <p class="product-name">Название товара</p>
-            <p class="product-price">Цена</p>
+
+          <div class="scroll-indicator">
+            <div class="scroll-indicator-thumb" id="thumb2"></div>
           </div>
         </div>
       </div>
-
-      <div class="scroll-indicator">
-        <div class="scroll-indicator-thumb" id="thumb1"></div>
-      </div>
+      
+      <div style="height: 20px;"></div>
     </div>
   </div>
-
-  <!-- БЛОК 2: СТАРАЯ КОЛЛЕКЦИЯ -->
-  <div class="catalog-section">
-    <div class="catalog-section-inner">
-      <h2 class="section-title">Старая коллекция</h2>
-
-      <div class="product-slider" id="slider2">
-        <div class="product-card">
-          <div class="product-photo" data-state="0">
-            <div class="dots">
-              <span class="active"></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-          <div class="product-info">
-            <p class="product-name">Название товара</p>
-            <p class="product-price">Цена</p>
-          </div>
-        </div>
-
-        <div class="product-card">
-          <div class="product-photo" data-state="0">
-            <div class="dots">
-              <span class="active"></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-          <div class="product-info">
-            <p class="product-name">Название товара</p>
-            <p class="product-price">Цена</p>
-          </div>
-        </div>
-
-        <div class="product-card">
-          <div class="product-photo" data-state="0">
-            <div class="dots">
-              <span class="active"></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-          <div class="product-info">
-            <p class="product-name">Название товара</p>
-            <p class="product-price">Цена</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="scroll-indicator">
-        <div class="scroll-indicator-thumb" id="thumb2"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="content"></div>
 </div>
 
 <!-- PROFILE -->
-<div id="profile" class="page" style="display:none;">
-  <div class="header">
-    <img src="logoredbox.png" class="logo">
-  </div>
-  <div class="content">
-    <h2>Профиль</h2>
+<div id="profile" class="page">
+  <div class="page-wrapper">
+    <div class="header">
+      <img src="logoredbox.png" class="logo">
+    </div>
+    <div class="page-content">
+      <div class="content" style="padding: 20px;">
+        <h2>Профиль</h2>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -598,8 +662,15 @@ function update(animate = true) {
   let x = current * tabWidth();
   setIndicator(x, 1);
 
-  pages[0].style.display = current === 0 ? "block" : "none";
-  pages[1].style.display = current === 1 ? "block" : "none";
+  pages.forEach((p, i) => {
+      if (i === current) {
+          p.classList.add('active-page');
+          p.style.display = 'flex'; // Восстанавливаем flex
+      } else {
+          p.classList.remove('active-page');
+          p.style.display = 'none';
+      }
+  });
 
   document.querySelectorAll(".nav-item").forEach((el, i) => {
     el.classList.toggle("active", i === current);
@@ -613,8 +684,6 @@ nav.addEventListener("touchstart", e => {
   startX = e.touches[0].clientX;
   dragging = true;
   basePos = current * tabWidth();
-  
-  body.classList.add("no-scroll");
   
   indicator.style.transition = 'none';
   setIndicator(basePos, 1.3);
@@ -637,8 +706,6 @@ nav.addEventListener("touchmove", e => {
 nav.addEventListener("touchend", () => {
   if (!dragging) return;
   dragging = false;
-
-  body.classList.remove("no-scroll");
 
   let pos = parseFloat(indicator.dataset.pos || 0);
   let threshold = tabWidth() / 2;
@@ -675,11 +742,7 @@ function initSlider(sliderId, thumbId) {
     const totalProducts = products.length;
     if (totalProducts === 0) return;
 
-    const cardWidth = products[0].offsetWidth;
-    const gap = 10; // из CSS gap: 10px
     const visibleWidth = slider.clientWidth;
-    
-    // Реальная ширина контента
     const scrollWidth = slider.scrollWidth;
     const maxScroll = scrollWidth - visibleWidth;
     
@@ -690,10 +753,7 @@ function initSlider(sliderId, thumbId) {
         thumb.style.display = 'block';
     }
 
-    // Ширина ползунка пропорциональна видимой области
     const thumbWidthPercent = (visibleWidth / scrollWidth) * 100;
-    
-    // Позиция ползунка
     const scrollLeft = slider.scrollLeft;
     const thumbLeftPercent = (scrollLeft / maxScroll) * (100 - thumbWidthPercent);
     
@@ -705,22 +765,14 @@ function initSlider(sliderId, thumbId) {
   
   function onThumbStart(e) {
     isDraggingThumb = true;
-    // Получаем X координату (мышь или тач)
     startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     startScrollLeft = slider.scrollLeft;
-    
-    // Отключаем плавную анимацию ползунка во время драга для мгновенного отклика
     thumb.style.transition = 'none';
-    
-    // Предотвращаем всплытие, чтобы не скроллилась страница, но позволяем работать логике слайдера
     e.stopPropagation(); 
-    // e.preventDefault() здесь не вызываем жестко, чтобы браузер понял, что это начало жеста
   }
 
   function onThumbMove(e) {
     if (!isDraggingThumb) return;
-    
-    // Важно: preventDefault, чтобы страница не скроллилась вверх/вниз пока мы тянем ползунок
     e.preventDefault(); 
     
     const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
@@ -729,22 +781,11 @@ function initSlider(sliderId, thumbId) {
     const indicatorContainer = thumb.parentElement;
     const containerWidth = indicatorContainer.offsetWidth;
     const thumbWidth = thumb.offsetWidth;
-    
-    // Насколько может двигаться ползунок внутри контейнера (в пикселях)
     const availableThumbMovePx = containerWidth - thumbWidth;
     
     if (availableThumbMovePx <= 0) return;
 
     const maxScroll = slider.scrollWidth - slider.clientWidth;
-    
-    // Преобразуем движение пальца в скролл
-    // Если палец прошел весь экран (например 300px), а ползунок может пройти только 50px,
-    // нам нужно масштабировать это отношение.
-    // Но лучше мапить движение пальца 1:1 на движение ползунка, а потом переводить в скролл.
-    
-    // Относительное смещение пальца относительно ширины контейнера индикатора? 
-    // Нет, лучше просто: сдвиг пальца * (максимальный скролл / доступное движение ползунка)
-    
     const scrollDelta = deltaX * (maxScroll / availableThumbMovePx);
     
     slider.scrollLeft = startScrollLeft + scrollDelta;
@@ -757,53 +798,87 @@ function initSlider(sliderId, thumbId) {
     }
   }
 
-  // Touch events
   thumb.addEventListener('touchstart', onThumbStart, { passive: false });
-  
-  // Mouse events (для десктопа)
   thumb.addEventListener('mousedown', onThumbStart);
 
-  // Глобальные обработчики движения и окончания, чтобы если палец ушел за пределы ползунка, скролл продолжался
   window.addEventListener('touchmove', onThumbMove, { passive: false });
   window.addEventListener('mousemove', onThumbMove);
   
   window.addEventListener('touchend', onThumbEnd);
   window.addEventListener('mouseup', onThumbEnd);
 
-  // Обновление ползунка при скролле (если скроллим пальцем по товарам)
   slider.addEventListener("scroll", updateThumb, { passive: true });
   
-  // Инициализация
-  // Ждем загрузки картинок/контента
   setTimeout(updateThumb, 100);
   window.addEventListener("resize", updateThumb);
 }
 
-// Запуск обоих слайдеров
 initSlider('slider1', 'thumb1');
 initSlider('slider2', 'thumb2');
 
-/* PRODUCT PHOTO SWITCHER */
-function initPhotoSwitcher(containerSelector, photoSelector, dotsSelector) {
+/* PHOTO SWIPE LOGIC & DOT CLICK */
+function initPhotoInteractions(containerSelector, photoSelector, dotsSelector) {
   document.querySelectorAll(containerSelector).forEach(card => {
     const photo = card.querySelector(photoSelector);
-    const dots = card.querySelectorAll(dotsSelector);
-
+    const dots = Array.from(card.querySelectorAll(dotsSelector));
+    const totalStates = dots.length;
+    
+    // Click on dots
     dots.forEach((dot, idx) => {
       dot.addEventListener('click', (e) => {
         e.stopPropagation();
-        dots.forEach(d => d.classList.remove('active'));
-        dot.classList.add('active');
-        photo.dataset.state = idx;
+        setActiveState(idx);
       });
     });
+
+    function setActiveState(idx) {
+        dots.forEach(d => d.classList.remove('active'));
+        dots[idx].classList.add('active');
+        photo.dataset.state = idx;
+    }
+
+    // Swipe Logic
+    let touchStartX = 0;
+    let touchEndX = 0;
+    let currentState = 0;
+
+    photo.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, {passive: true});
+
+    photo.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, {passive: true});
+
+    function handleSwipe() {
+        const threshold = 30; // Минимальное расстояние для свайпа
+        const diff = touchStartX - touchEndX;
+
+        // Получаем текущий индекс из dataset или активной точки
+        currentState = parseInt(photo.dataset.state) || 0;
+
+        if (Math.abs(diff) > threshold) {
+            if (diff > 0) {
+                // Свайп влево -> Следующее фото
+                let next = currentState + 1;
+                if (next >= totalStates) next = 0; // Циклично
+                setActiveState(next);
+            } else {
+                // Свайп вправо -> Предыдущее фото
+                let prev = currentState - 1;
+                if (prev < 0) prev = totalStates - 1; // Циклично
+                setActiveState(prev);
+            }
+        }
+    }
   });
 }
 
-initPhotoSwitcher('.featured-product', '.featured-photo', '.featured-photo .dots span');
-initPhotoSwitcher('.product-card', '.product-photo', '.product-photo .dots span');
+initPhotoInteractions('.featured-product', '.featured-photo', '.featured-photo .dots span');
+initPhotoInteractions('.product-card', '.product-photo', '.product-photo .dots span');
 
-// Предотвращение двойного тапа для зума
+// Prevent double tap zoom
 let lastTouchEnd = 0;
 document.addEventListener('touchend', (e) => {
   const now = Date.now();
@@ -812,13 +887,6 @@ document.addEventListener('touchend', (e) => {
   }
   lastTouchEnd = now;
 }, false);
-
-// Предотвращение жестов сворачивания приложения (pinch-zoom)
-document.addEventListener('touchmove', (e) => {
-  if (e.touches.length > 1) {
-    e.preventDefault();
-  }
-}, { passive: false });
 
 </script>
 
