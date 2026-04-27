@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
@@ -17,235 +16,85 @@
   --danger-color: #ff3b30;
 }
 
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-color); color: var(--text-primary); overflow: hidden; height: 100vh; width: 100vw; }
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background: var(--bg-color);
-  color: var(--text-primary);
-  -webkit-user-select: none;
-  user-select: none;
-  overflow: hidden;
-  overscroll-behavior: none;
-  touch-action: none;
-  height: 100vh;
-  width: 100vw;
-}
+/* --- SPLASH & LAYOUT --- */
+#splash-screen { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
+#splash-screen.hidden { opacity: 0; pointer-events: none; }
+.splash-logo { width: 80px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
 
-/* SPLASH SCREEN */
-#splash-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--bg-color);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.5s ease-out, visibility 0.5s;
-}
-#splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-.splash-logo { width: 80px; animation: pulseLogo 2s infinite ease-in-out; }
-@keyframes pulseLogo { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
+.page-wrapper { display: flex; flex-direction: column; height: 100%; position: absolute; inset: 0; }
+.fixed-top-area { flex-shrink: 0; background: #fff; z-index: 100; position: sticky; top: 0; padding-bottom: 10px; }
+.header { height: 100px; position: relative; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; }
+.logo-container { position: absolute; top: calc(50% + 7px); left: 50%; transform: translate(-50%,-50%); width: 60px; z-index: 3; cursor: pointer; }
+.logo-img { width: 100%; }
 
-/* LAYOUT */
-.page-wrapper { display: flex; flex-direction: column; height: 100%; width: 100%; position: absolute; top: 0; left: 0; }
+.search-bar { margin: 0 16px; background: #fff; border-radius: 100px; padding: 0 20px; height: 50px; display: flex; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+.search-bar input { border: none; outline: none; width: 100%; font-size: 17px; margin-left: 10px; }
 
-/* FIXED TOP */
-.fixed-top-area {
-  flex-shrink: 0;
-  background: var(--bg-color);
-  z-index: 100;
-  position: sticky;
-  top: 0;
-  width: 100%;
-  padding-bottom: 10px;
-}
-
-.header {
-  height: 100px;
-  position: relative;
-  overflow: hidden;
-  border-bottom-left-radius: 24px;
-  border-bottom-right-radius: 24px;
-  background: var(--bg-color);
-}
-
-/* ЛОГОТИП (КЛИКАБЕЛЬНЫЙ ДЛЯ АДМИНА) */
-.logo-container {
-  position: absolute;
-  top: calc(50% + 7px);
-  left: 50%;
-  transform: translate(-50%,-50%);
-  width: 60px;
-  z-index: 3;
-  cursor: pointer;
-}
-
-.logo-img {
-  width: 100%;
-  pointer-events: none;
-  -webkit-user-drag: none;
-}
-
-/* Эффект нажатия для админа */
-.logo-container:active .logo-img {
-  opacity: 0.7;
-  transform: scale(0.95);
-  transition: transform 0.1s;
-}
-
-.search-bar {
-  margin: 0 16px;
-  background: var(--surface-color);
-  border: none;
-  border-radius: 100px;
-  padding: 0 20px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-}
-.search-bar svg { width: 20px; height: 20px; fill: var(--text-secondary); }
-.search-bar input { border: none; outline: none; background: transparent; font-size: 17px; color: var(--text-primary); width: 100%; }
-
-/* CONTENT */
-.page-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 40px; width: 100%; touch-action: pan-y; background: var(--bg-color); }
-
-.catalog-section { margin: 0 0 20px 0; background: var(--banner-bg); padding: 20px 0; width: 100%; }
-.section-title { font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0 0 16px 0; text-align: center; text-transform: uppercase; }
-
-/* PRODUCTS */
-.featured-product { margin: 0 16px 16px 16px; background: var(--surface-color); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); }
-.featured-photo { width: 100%; aspect-ratio: 1 / 1.1; background: #eee; display: flex; align-items: center; justify-content: center; position: relative; }
-.featured-photo img { width: 100%; height: 100%; object-fit: cover; }
-.featured-info { padding: 14px 16px; }
-.featured-name { font-size: 18px; font-weight: 700; margin: 0 0 4px 0; }
-.featured-price { font-size: 15px; color: var(--accent-color); font-weight: 600; margin: 0; }
-
-.product-slider { display: flex; gap: 12px; overflow-x: auto; padding: 0 16px 8px 16px; scrollbar-width: none; }
-.product-slider::-webkit-scrollbar { display: none; }
-.product-card { flex: 0 0 calc(50% - 6px); background: var(--surface-color); border-radius: 18px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; }
-.product-photo { width: 100%; aspect-ratio: 1 / 1.1; background: #eee; position: relative; }
-.product-photo img { width: 100%; height: 100%; object-fit: cover; }
-.product-info { padding: 10px 12px; }
-.product-name { font-size: 14px; font-weight: 600; margin: 0 0 4px 0; }
-.product-price { font-size: 14px; color: var(--accent-color); font-weight: 600; margin: 0; }
-
-.scroll-indicator { height: 4px; background: rgba(0,0,0,0.1); border-radius: 100px; margin: 12px 20px 0 20px; position: relative; }
-.scroll-indicator-thumb { position: absolute; top: 0; left: 0; height: 100%; background: #000; border-radius: 100px; width: 50%; }
-
-/* ADMIN PANEL STYLES */
-.admin-panel {
-  padding: 20px;
-  display: none; /* Скрыто по умолчанию */
-}
-.admin-panel.active { display: block; }
-
-.admin-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-.admin-title { font-size: 24px; font-weight: 800; }
-.close-admin-btn {
-  background: #eee;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.add-product-form {
-  background: #fff;
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-  margin-bottom: 30px;
-  border: 1px solid #eee;
-}
-.form-group { margin-bottom: 15px; }
-.form-label { display: block; font-size: 14px; color: #888; margin-bottom: 5px; }
-.form-input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  font-size: 16px;
-  outline: none;
-}
-.form-input:focus { border-color: var(--accent-color); }
-
-.file-upload {
-  border: 2px dashed #ccc;
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
-  color: #888;
-  cursor: pointer;
-  margin-bottom: 15px;
-}
-.file-upload.has-image { border-color: var(--accent-color); color: var(--accent-color); }
-
-.btn-primary {
-  width: 100%;
-  background: var(--accent-color);
-  color: white;
-  border: none;
-  padding: 14px;
-  border-radius: 14px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.btn-primary:active { opacity: 0.8; }
-
-.admin-product-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.admin-product-item {
-  display: flex;
-  align-items: center;
-  background: #fff;
-  padding: 10px;
-  border-radius: 12px;
-  border: 1px solid #eee;
-}
-.admin-thumb {
-  width: 50px;
-  height: 50px;
-  border-radius: 8px;
-  object-fit: cover;
-  margin-right: 10px;
-  background: #eee;
-}
-.admin-info { flex: 1; }
-.admin-name { font-weight: 600; font-size: 14px; }
-.admin-price { font-size: 12px; color: #888; }
-.delete-btn {
-  background: rgba(255, 59, 48, 0.1);
-  color: var(--danger-color);
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* PAGES */
+.page-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 40px; background: #fff; }
 .page { position: absolute; inset: 0; display: none; }
 .page.active-page { display: flex; }
+
+/* --- CATALOG STYLES --- */
+.catalog-section { margin-bottom: 20px; background: var(--banner-bg); padding: 20px 0; }
+.section-title { font-size: 22px; font-weight: 800; text-align: center; text-transform: uppercase; margin-bottom: 16px; }
+
+/* Type 1: Featured (New Collection Style) */
+.featured-product { margin: 0 16px 16px; background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.featured-photo { width: 100%; aspect-ratio: 1/1.1; background: #eee; position: relative; }
+.featured-photo img { width: 100%; height: 100%; object-fit: cover; }
+.featured-info { padding: 14px; }
+.featured-name { font-weight: 700; font-size: 18px; margin: 0 0 4px; }
+.featured-price { color: var(--accent-color); font-weight: 600; margin: 0; }
+
+/* Type 2: Slider Only (Old Collection Style) */
+.product-slider { display: flex; gap: 12px; overflow-x: auto; padding: 0 16px 8px; scrollbar-width: none; }
+.product-slider::-webkit-scrollbar { display: none; }
+.product-card { flex: 0 0 calc(50% - 6px); background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.product-photo { width: 100%; aspect-ratio: 1/1.1; background: #eee; }
+.product-photo img { width: 100%; height: 100%; object-fit: cover; }
+.product-info { padding: 10px; }
+.product-name { font-weight: 600; font-size: 14px; margin: 0 0 4px; }
+.product-price { color: var(--accent-color); font-weight: 600; font-size: 14px; margin: 0; }
+
+.scroll-indicator { height: 4px; background: rgba(0,0,0,0.1); border-radius: 2px; margin: 10px 20px 0; position: relative; }
+.scroll-thumb { position: absolute; left: 0; top: 0; height: 100%; width: 30%; background: #000; border-radius: 2px; }
+
+/* --- ADMIN PANEL STYLES --- */
+.admin-panel { padding: 20px; display: none; }
+.admin-panel.active { display: block; }
+.admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.admin-title { font-size: 24px; font-weight: 800; }
+.btn-close { background: #eee; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 600; }
+
+.designer-block { background: #fff; border: 1px solid #eee; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+.designer-header { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
+.designer-type { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+
+.input-group { margin-bottom: 15px; }
+.input-label { display: block; font-size: 14px; color: #888; margin-bottom: 5px; }
+.input-field { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; }
+
+.mask-preview {
+  width: 100%;
+  background: var(--banner-bg); /* Серый фон как в каталоге */
+  padding: 20px 0;
+  margin-top: 15px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+.mask-label { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); color: white; padding: 2px 6px; font-size: 10px; border-radius: 4px; }
+
+.btn-action { width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 600; font-size: 16px; cursor: pointer; margin-top: 10px; }
+.btn-save { background: var(--accent-color); color: white; }
+.btn-delete { background: rgba(255,59,48,0.1); color: var(--danger-color); }
+.btn-add { background: #000; color: #fff; margin-bottom: 20px; }
+
+.file-btn { display: inline-block; padding: 8px 12px; background: #f0f0f0; border-radius: 8px; font-size: 14px; cursor: pointer; margin-top: 5px; }
 
 </style>
 </head>
@@ -253,103 +102,43 @@ body {
 <body>
 
 <!-- SPLASH -->
-<div id="splash-screen">
-  <img src="logoredbox.png" class="splash-logo">
-</div>
+<div id="splash-screen"><img src="logoredbox.png" class="splash-logo"></div>
 
-<!-- HOME / CATALOG -->
+<!-- HOME PAGE -->
 <div id="home" class="page active-page">
   <div class="page-wrapper">
     <div class="fixed-top-area">
       <div class="header">
-        <!-- Контейнер логотипа -->
-        <div class="logo-container" id="admin-trigger">
-          <img src="logoredbox.png" class="logo-img">
-        </div>
+        <div class="logo-container" id="admin-trigger"><img src="logoredbox.png" class="logo-img"></div>
       </div>
       <div class="search-bar">
-        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        <input type="text" placeholder="Поиск..." />
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="#999"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input type="text" placeholder="Поиск...">
       </div>
     </div>
-
-    <div class="page-content">
-      
-      <!-- БЛОК 1: НОВАЯ КОЛЛЕКЦИЯ -->
-      <div class="catalog-section">
-        <div class="catalog-section-inner">
-          <h2 class="section-title">Новая коллекция</h2>
-
-          <!-- Основной товар (берется из первого добавленного или заглушка) -->
-          <div class="featured-product" id="main-product-display">
-            <div class="featured-photo">
-               <img src="" alt="Main Product" id="main-img" style="display:none;">
-               <div style="color:#999;" id="main-placeholder">Нет товара</div>
-            </div>
-            <div class="featured-info">
-              <p class="featured-name" id="main-name">Название</p>
-              <p class="featured-price" id="main-price">Цена</p>
-            </div>
-          </div>
-
-          <!-- Слайдер остальных товаров -->
-          <div class="product-slider" id="dynamic-slider">
-             <!-- Сюда JS вставит товары -->
-          </div>
-
-          <div class="scroll-indicator"><div class="scroll-indicator-thumb"></div></div>
-        </div>
-      </div>
-
+    
+    <div class="page-content" id="catalog-container">
+      <!-- Сюда рендерится дизайн -->
     </div>
   </div>
 </div>
 
-<!-- ADMIN PANEL PAGE -->
-<div id="admin-panel" class="page">
+<!-- ADMIN PAGE -->
+<div id="admin" class="page">
   <div class="page-wrapper">
     <div class="fixed-top-area">
-      <div class="header">
-         <div class="logo-container">
-           <img src="logoredbox.png" class="logo-img">
-         </div>
-      </div>
+      <div class="header"><div class="logo-container"><img src="logoredbox.png" class="logo-img"></div></div>
     </div>
-    
     <div class="page-content admin-panel active">
       <div class="admin-header">
-        <div class="admin-title">Управление</div>
-        <button class="close-admin-btn" onclick="closeAdmin()">Закрыть</button>
+        <div class="admin-title">Конструктор</div>
+        <button class="btn-close" onclick="closeAdmin()">Закрыть</button>
       </div>
 
-      <!-- Форма добавления -->
-      <div class="add-product-form">
-        <h3 style="margin-top:0;">Добавить товар</h3>
-        
-        <div class="form-group">
-          <label class="form-label">Фотография</label>
-          <div class="file-upload" id="file-drop-zone" onclick="document.getElementById('file-input').click()">
-            Нажмите, чтобы выбрать фото
-          </div>
-          <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleFileSelect(this)">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Название</label>
-          <input type="text" class="form-input" id="prod-name" placeholder="Например: Hoodie Black">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Цена (₽)</label>
-          <input type="number" class="form-input" id="prod-price" placeholder="4500">
-        </div>
-
-        <button class="btn-primary" onclick="addProduct()">Добавить в каталог</button>
-      </div>
-
-      <h3 style="margin-bottom: 10px;">Список товаров</h3>
-      <div class="admin-product-list" id="admin-list">
-        <!-- Список для удаления -->
+      <button class="btn-action btn-add" onclick="addNewCollection()">+ Добавить коллекцию</button>
+      
+      <div id="collections-list">
+        <!-- Блоки редактирования коллекций -->
       </div>
     </div>
   </div>
@@ -359,233 +148,275 @@ body {
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// --- КОНФИГУРАЦИЯ ---
-const ADMIN_USERNAME = 'qvilxy'; // Имя пользователя, которому доступен вход
+const ADMIN_USER = 'qvilxy';
 let isAdmin = false;
-let products = [];
-let currentImageBase64 = null;
+let collections = []; // Структура данных дизайна
 
-// --- ИНИЦИАЛИЗАЦИЯ ---
+// --- INIT ---
 window.addEventListener('load', () => {
-  // 1. Проверка прав администратора
   const user = tg.initDataUnsafe?.user;
-  if (user && user.username && user.username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
-    isAdmin = true;
-    console.log("Admin access granted");
-    document.getElementById('admin-trigger').style.cursor = 'pointer';
-  } else {
-    isAdmin = false;
-    document.getElementById('admin-trigger').style.cursor = 'default';
-    // Убираем визуальный эффект нажатия для обычных юзеров
-    const style = document.createElement('style');
-    style.innerHTML = `.logo-container:active .logo-img { transform: none; opacity: 1; }`;
-    document.head.appendChild(style);
-  }
-
-  // 2. Загрузка товаров из LocalStorage
-  loadProductsFromStorage();
-
-  // 3. Скрытие сплеша
-  setTimeout(() => {
-    document.getElementById('splash-screen').classList.add('hidden');
-  }, 1000);
+  if (user && user.username?.toLowerCase() === ADMIN_USER) isAdmin = true;
+  
+  loadDesign();
+  setTimeout(() => document.getElementById('splash-screen').classList.add('hidden'), 800);
 });
 
-// --- ЛОГИКА НАВИГАЦИИ ---
+document.getElementById('admin-trigger').onclick = () => {
+  if (isAdmin) openAdmin();
+};
 
-// Клик по логотипу
-document.getElementById('admin-trigger').addEventListener('click', () => {
-  if (isAdmin) {
-    openAdminPanel();
-  }
-});
+// --- DATA MANAGEMENT ---
 
-function openAdminPanel() {
-  document.getElementById('home').classList.remove('active-page');
-  document.getElementById('admin-panel').classList.add('active-page');
-  renderAdminList();
-}
-
-function closeAdmin() {
-  document.getElementById('admin-panel').classList.remove('active-page');
-  document.getElementById('home').classList.add('active-page');
-  // Обновляем каталог при возврате
-  renderCatalog();
-}
-
-// --- ЛОГИКА ТОВАРОВ ---
-
-function loadProductsFromStorage() {
-  const stored = localStorage.getItem('skate_shop_products');
-  if (stored) {
-    products = JSON.parse(stored);
+function loadDesign() {
+  const saved = localStorage.getItem('shop_design_v2');
+  if (saved) {
+    collections = JSON.parse(saved);
   } else {
-    // Стартовые данные, если пусто
-    products = [
-      { id: 1, name: 'Skate Hoodie', price: '4500', image: '' },
-      { id: 2, name: 'Cargo Pants', price: '3800', image: '' }
+    // Дефолтный дизайн
+    collections = [
+      {
+        id: Date.now(),
+        title: "Новая коллекция",
+        type: "featured", // featured (с большим фото) или slider (просто шторка)
+        items: [
+          { name: "Hoodie Black", price: "4500", img: "" },
+          { name: "T-Shirt White", price: "2100", img: "" },
+          { name: "Cap", price: "1500", img: "" }
+        ]
+      }
     ];
   }
   renderCatalog();
 }
 
-function saveProductsToStorage() {
-  localStorage.setItem('skate_shop_products', JSON.stringify(products));
+function saveDesign() {
+  try {
+    localStorage.setItem('shop_design_v2', JSON.stringify(collections));
+    renderCatalog();
+    tg.showAlert("Дизайн сохранен!");
+  } catch (e) {
+    tg.showAlert("Ошибка: Слишком много картинок! Удалите старые.");
+  }
 }
 
-// Обработка выбора файла
-function handleFileSelect(input) {
+// --- RENDERING CATALOG (USER VIEW) ---
+
+function renderCatalog() {
+  const container = document.getElementById('catalog-container');
+  container.innerHTML = '';
+
+  collections.forEach(col => {
+    const section = document.createElement('div');
+    section.className = 'catalog-section';
+    
+    let innerHTML = `<h2 class="section-title">${col.title}</h2>`;
+
+    if (col.type === 'featured') {
+      // Стиль "Новая коллекция"
+      const mainItem = col.items[0] || {name:"Пусто", price:"", img:""};
+      innerHTML += `
+        <div class="featured-product">
+          <div class="featured-photo">
+            ${mainItem.img ? `<img src="${mainItem.img}">` : ''}
+          </div>
+          <div class="featured-info">
+            <p class="featured-name">${mainItem.name}</p>
+            <p class="featured-price">${mainItem.price} ₽</p>
+          </div>
+        </div>
+        <div class="product-slider">
+          ${col.items.slice(1).map(item => createCardHTML(item)).join('')}
+        </div>
+        <div class="scroll-indicator"><div class="scroll-thumb"></div></div>
+      `;
+    } else {
+      // Стиль "Предыдущая коллекция" (Только слайдер)
+      innerHTML += `
+        <div class="product-slider">
+          ${col.items.map(item => createCardHTML(item)).join('')}
+        </div>
+        <div class="scroll-indicator"><div class="scroll-thumb"></div></div>
+      `;
+    }
+
+    section.innerHTML = innerHTML;
+    container.appendChild(section);
+  });
+}
+
+function createCardHTML(item) {
+  return `
+    <div class="product-card">
+      <div class="product-photo">
+        ${item.img ? `<img src="${item.img}">` : ''}
+      </div>
+      <div class="product-info">
+        <p class="product-name">${item.name}</p>
+        <p class="product-price">${item.price} ₽</p>
+      </div>
+    </div>
+  `;
+}
+
+// --- ADMIN LOGIC ---
+
+function openAdmin() {
+  document.getElementById('home').classList.remove('active-page');
+  document.getElementById('admin').classList.add('active-page');
+  renderAdminCollections();
+}
+
+function closeAdmin() {
+  document.getElementById('admin').classList.remove('active-page');
+  document.getElementById('home').classList.add('active-page');
+}
+
+function renderAdminCollections() {
+  const list = document.getElementById('collections-list');
+  list.innerHTML = '';
+
+  collections.forEach((col, index) => {
+    const block = document.createElement('div');
+    block.className = 'designer-block';
+    
+    // Опции типа
+    const typeOptions = `
+      <option value="featured" ${col.type === 'featured' ? 'selected' : ''}>С заглавным фото (Новая)</option>
+      <option value="slider" ${col.type === 'slider' ? 'selected' : ''}>Только слайдер (Старая)</option>
+    `;
+
+    block.innerHTML = `
+      <div class="designer-header">
+        <span class="designer-type">Коллекция #${index + 1}</span>
+        <button style="color:red; border:none; background:none;" onclick="deleteCollection(${index})">Удалить блок</button>
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label">Название блока</label>
+        <input class="input-field" value="${col.title}" onchange="updateColTitle(${index}, this.value)">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Вид отображения</label>
+        <select class="input-field" onchange="updateColType(${index}, this.value)">
+          ${typeOptions}
+        </select>
+      </div>
+
+      <hr style="border:0; border-top:1px solid #eee; margin: 15px 0;">
+      <label class="input-label">Товары в блоке</label>
+      <div id="items-${col.id}"></div>
+      <button class="file-btn" onclick="addItemToCollection(${index})">+ Товар</button>
+
+      <!-- МАСКА ПРЕДПРОСМОТРА -->
+      <div class="mask-preview">
+        <div class="mask-label">PREVIEW</div>
+        <div style="padding: 0 16px; pointer-events: none;">
+           <h3 style="margin:0 0 10px; font-size:16px; text-align:center;">${col.title}</h3>
+           ${col.type === 'featured' ? getPreviewFeatured(col.items[0]) : ''}
+           <div style="display:flex; gap:5px; overflow:hidden;">
+              ${col.items.map(i => `<div style="flex:0 0 80px; height:80px; background:#ddd; border-radius:8px; overflow:hidden;">${i.img ? `<img src="${i.img}" style="width:100%;height:100%;object-fit:cover;">` : ''}</div>`).join('')}
+           </div>
+        </div>
+      </div>
+
+      <button class="btn-action btn-save" onclick="saveDesign()">Сохранить изменения</button>
+    `;
+    
+    list.appendChild(block);
+    renderAdminItems(index);
+  });
+}
+
+function getPreviewFeatured(item) {
+  if(!item) return '';
+  return `
+    <div style="background:#fff; border-radius:10px; margin-bottom:10px; overflow:hidden;">
+       <div style="height:120px; background:#eee;">${item.img ? `<img src="${item.img}" style="width:100%;height:100%;object-fit:cover;">` : ''}</div>
+       <div style="padding:5px;"><b>${item.name}</b><br><small>${item.price} ₽</small></div>
+    </div>
+  `;
+}
+
+// --- EDITING FUNCTIONS ---
+
+function addNewCollection() {
+  collections.push({
+    id: Date.now(),
+    title: "Новый блок",
+    type: "slider",
+    items: []
+  });
+  renderAdminCollections();
+}
+
+function deleteCollection(index) {
+  if(confirm('Удалить этот блок из дизайна?')) {
+    collections.splice(index, 1);
+    renderAdminCollections();
+    saveDesign();
+  }
+}
+
+function updateColTitle(index, val) { collections[index].title = val; }
+function updateColType(index, val) { collections[index].type = val; renderAdminCollections(); } // Re-render to show preview change
+
+function addItemToCollection(colIndex) {
+  collections[colIndex].items.push({ name: "Новый товар", price: "0", img: "" });
+  renderAdminCollections();
+}
+
+function removeItem(colIndex, itemIndex) {
+  collections[colIndex].items.splice(itemIndex, 1);
+  renderAdminCollections();
+}
+
+function updateItemName(colIndex, itemIndex, val) { collections[colIndex].items[itemIndex].name = val; }
+function updateItemPrice(colIndex, itemIndex, val) { collections[colIndex].items[itemIndex].price = val; }
+
+function handleImageUpload(colIndex, itemIndex, input) {
   if (input.files && input.files[0]) {
     const reader = new FileReader();
     reader.onload = function(e) {
-      currentImageBase64 = e.target.result;
-      const zone = document.getElementById('file-drop-zone');
-      zone.classList.add('has-image');
-      zone.innerText = 'Фото выбрано ✓';
-      zone.style.backgroundImage = `url(${currentImageBase64})`;
-      zone.style.backgroundSize = 'cover';
-      zone.style.color = 'transparent';
+      // Сжимаем картинку перед сохранением (простой ресайз через canvas был бы лучше, но пока так)
+      collections[colIndex].items[itemIndex].img = e.target.result;
+      renderAdminCollections();
     };
     reader.readAsDataURL(input.files[0]);
   }
 }
 
-// Добавление товара
-function addProduct() {
-  const name = document.getElementById('prod-name').value;
-  const price = document.getElementById('prod-price').value;
-
-  if (!name || !price) {
-    tg.showAlert("Заполните название и цену!");
-    return;
-  }
-
-  const newProduct = {
-    id: Date.now(),
-    name: name,
-    price: price,
-    image: currentImageBase64 || '' // Если фото нет, будет пустая строка
-  };
-
-  products.push(newProduct);
-  saveProductsToStorage();
-
-  // Очистка формы
-  document.getElementById('prod-name').value = '';
-  document.getElementById('prod-price').value = '';
-  document.getElementById('file-input').value = '';
-  currentImageBase64 = null;
-  const zone = document.getElementById('file-drop-zone');
-  zone.classList.remove('has-image');
-  zone.innerText = 'Нажмите, чтобы выбрать фото';
-  zone.style.backgroundImage = 'none';
-  zone.style.color = '#888';
-
-  tg.showAlert("Товар добавлен!");
-  renderAdminList();
-}
-
-// Удаление товара
-function deleteProduct(id) {
-  if(confirm('Удалить этот товар?')) {
-    products = products.filter(p => p.id !== id);
-    saveProductsToStorage();
-    renderAdminList();
-  }
-}
-
-// --- РЕНДЕРИНГ ---
-
-// Рендер каталога (Главная страница)
-function renderCatalog() {
-  const slider = document.getElementById('dynamic-slider');
-  const mainImg = document.getElementById('main-img');
-  const mainName = document.getElementById('main-name');
-  const mainPrice = document.getElementById('main-price');
-  const mainPlaceholder = document.getElementById('main-placeholder');
-
-  slider.innerHTML = '';
-
-  if (products.length > 0) {
-    // Первый товар - в главный блок
-    const mainProd = products[0];
-    mainName.innerText = mainProd.name;
-    mainPrice.innerText = mainProd.price + ' ₽';
-    
-    if (mainProd.image) {
-      mainImg.src = mainProd.image;
-      mainImg.style.display = 'block';
-      mainPlaceholder.style.display = 'none';
-    } else {
-      mainImg.style.display = 'none';
-      mainPlaceholder.style.display = 'block';
-    }
-
-    // Остальные - в слайдер
-    for (let i = 1; i < products.length; i++) {
-      const p = products[i];
-      const card = document.createElement('div');
-      card.className = 'product-card';
-      
-      // Если есть картинка - ставим img, иначе цветной фон
-      const imgHtml = p.image 
-        ? `<img src="${p.image}" alt="${p.name}">` 
-        : `<div style="width:100%;height:100%;background:#f0f0f0;"></div>`;
-
-      card.innerHTML = `
-        <div class="product-photo">${imgHtml}</div>
-        <div class="product-info">
-          <p class="product-name">${p.name}</p>
-          <p class="product-price">${p.price} ₽</p>
-        </div>
-      `;
-      slider.appendChild(card);
-    }
-  } else {
-    mainName.innerText = "Каталог пуст";
-    mainPrice.innerText = "";
-    mainImg.style.display = 'none';
-    mainPlaceholder.style.display = 'block';
-  }
-}
-
-// Рендер списка в админке
-function renderAdminList() {
-  const list = document.getElementById('admin-list');
-  list.innerHTML = '';
-
-  products.forEach(p => {
-    const item = document.createElement('div');
-    item.className = 'admin-product-item';
-    
-    const thumbSrc = p.image ? p.image : '';
-    const thumbStyle = thumbSrc ? `background-image: url(${thumbSrc}); background-size: cover;` : '';
-
-    item.innerHTML = `
-      <div class="admin-thumb" style="${thumbStyle}"></div>
-      <div class="admin-info">
-        <div class="admin-name">${p.name}</div>
-        <div class="admin-price">${p.price} ₽</div>
+function renderAdminItems(colIndex) {
+  const container = document.getElementById(`items-${collections[colIndex].id}`);
+  if (!container) return;
+  
+  container.innerHTML = '';
+  collections[colIndex].items.forEach((item, itemIndex) => {
+    const row = document.createElement('div');
+    row.style.cssText = "background:#f9f9f9; padding:10px; border-radius:8px; margin-bottom:8px;";
+    row.innerHTML = `
+      <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+        <b>Товар ${itemIndex + 1}</b>
+        <span style="color:red; cursor:pointer;" onclick="removeItem(${colIndex}, ${itemIndex})">✕</span>
       </div>
-      <button class="delete-btn" onclick="deleteProduct(${p.id})">Удалить</button>
+      <input class="input-field" style="margin-bottom:5px;" placeholder="Название" value="${item.name}" oninput="updateItemName(${colIndex}, ${itemIndex}, this.value)">
+      <input class="input-field" style="margin-bottom:5px;" placeholder="Цена" value="${item.price}" oninput="updateItemPrice(${colIndex}, ${itemIndex}, this.value)">
+      
+      <div style="display:flex; align-items:center; gap:10px;">
+         <div style="width:40px; height:40px; background:#ddd; border-radius:4px; overflow:hidden;">
+            ${item.img ? `<img src="${item.img}" style="width:100%;height:100%;object-fit:cover;">` : ''}
+         </div>
+         <label class="file-btn" style="margin:0; font-size:12px;">
+            Загрузить фото
+            <input type="file" accept="image/*" style="display:none;" onchange="handleImageUpload(${colIndex}, ${itemIndex}, this)">
+         </label>
+      </div>
     `;
-    list.appendChild(item);
+    container.appendChild(row);
   });
 }
 
-// Простой скрипт для скролл-индикатора (визуальный)
-const slider = document.getElementById('dynamic-slider');
-const thumb = document.querySelector('.scroll-indicator-thumb');
-if(slider && thumb) {
-    slider.addEventListener('scroll', () => {
-        const maxScroll = slider.scrollWidth - slider.clientWidth;
-        const percent = slider.scrollLeft / maxScroll;
-        thumb.style.left = (percent * 50) + '%'; // 50% ширина индикатора
-    });
-}
-
 </script>
-
 </body>
 </html>
 
