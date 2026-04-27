@@ -292,6 +292,9 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  /* Убираем выделение текста при перетаскивании */
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .product-name {
@@ -310,7 +313,7 @@ body {
 
 /* SCROLL INDICATOR */
 .scroll-indicator {
-  height: 3px;
+  height: 4px; /* Увеличено с 3px до 4px */
   background: rgba(0,0,0,0.15);
   border-radius: 100px;
   margin: 10px 16px 0 16px;
@@ -463,8 +466,8 @@ body {
                 </div>
               </div>
               <div class="product-info">
-                <p class="product-name">Название товара 1</p>
-                <p class="product-price">1000 ₽</p>
+                <p class="product-name">Название товара</p>
+                <p class="product-price">Цена</p>
               </div>
             </div>
 
@@ -477,8 +480,8 @@ body {
                 </div>
               </div>
               <div class="product-info">
-                <p class="product-name">Название товара 2</p>
-                <p class="product-price">2000 ₽</p>
+                <p class="product-name">Название товара</p>
+                <p class="product-price">Цена</p>
               </div>
             </div>
 
@@ -491,8 +494,8 @@ body {
                 </div>
               </div>
               <div class="product-info">
-                <p class="product-name">Название товара 3</p>
-                <p class="product-price">3000 ₽</p>
+                <p class="product-name">Название товара</p>
+                <p class="product-price">Цена</p>
               </div>
             </div>
             
@@ -505,8 +508,8 @@ body {
                 </div>
               </div>
               <div class="product-info">
-                <p class="product-name">Название товара 4</p>
-                <p class="product-price">4000 ₽</p>
+                <p class="product-name">Название товара</p>
+                <p class="product-price">Цена</p>
               </div>
             </div>
           </div>
@@ -532,8 +535,8 @@ body {
                 </div>
               </div>
               <div class="product-info">
-                <p class="product-name">Товар А</p>
-                <p class="product-price">500 ₽</p>
+                <p class="product-name">Название товара</p>
+                <p class="product-price">Цена</p>
               </div>
             </div>
 
@@ -546,8 +549,8 @@ body {
                 </div>
               </div>
               <div class="product-info">
-                <p class="product-name">Товар Б</p>
-                <p class="product-price">600 ₽</p>
+                <p class="product-name">Название товара</p>
+                <p class="product-price">Цена</p>
               </div>
             </div>
 
@@ -560,8 +563,8 @@ body {
                 </div>
               </div>
               <div class="product-info">
-                <p class="product-name">Товар В</p>
-                <p class="product-price">700 ₽</p>
+                <p class="product-name">Название товара</p>
+                <p class="product-price">Цена</p>
               </div>
             </div>
             
@@ -574,8 +577,8 @@ body {
                 </div>
               </div>
               <div class="product-info">
-                <p class="product-name">Товар Г</p>
-                <p class="product-price">800 ₽</p>
+                <p class="product-name">Название товара</p>
+                <p class="product-price">Цена</p>
               </div>
             </div>
           </div>
@@ -811,6 +814,40 @@ function initSlider(sliderId, thumbId) {
   
   setTimeout(updateThumb, 100);
   window.addEventListener("resize", updateThumb);
+
+  // --- Логика для скролла за название/цену (блок product-info) ---
+  let isDraggingInfo = false;
+  let infoStartX = 0;
+  let infoStartScroll = 0;
+
+  slider.addEventListener('touchstart', (e) => {
+    // Проверяем, что нажатие произошло внутри product-info
+    if (e.target.closest('.product-info')) {
+      isDraggingInfo = true;
+      infoStartX = e.touches[0].clientX;
+      infoStartScroll = slider.scrollLeft;
+      slider.style.scrollBehavior = 'auto'; // Отключаем плавность для мгновенной реакции
+    }
+  }, { passive: true });
+
+  slider.addEventListener('touchmove', (e) => {
+    if (!isDraggingInfo) return;
+    
+    const currentX = e.touches[0].clientX;
+    const diff = infoStartX - currentX;
+    
+    // Если движение преимущественно горизонтальное, предотвращаем скролл страницы
+    if (Math.abs(diff) > 5) {
+       // Мы не делаем e.preventDefault() здесь глобально, чтобы не ломать вертикальный скролл,
+       // но мы меняем scrollLeft слайдера.
+       slider.scrollLeft = infoStartScroll + diff;
+    }
+  }, { passive: true });
+
+  slider.addEventListener('touchend', () => {
+    isDraggingInfo = false;
+    slider.style.scrollBehavior = ''; // Возвращаем поведение по умолчанию
+  });
 }
 
 initSlider('slider1', 'thumb1');
