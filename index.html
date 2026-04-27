@@ -816,6 +816,7 @@ function initSlider(sliderId, thumbId) {
   window.addEventListener("resize", updateThumb);
 
   // --- Логика для скролла за название/цену (блок product-info) ---
+  // Исправлено: используем глобальные слушатели для плавности и предотвращения телепортации
   let isDraggingInfo = false;
   let infoStartX = 0;
   let infoStartScroll = 0;
@@ -830,21 +831,22 @@ function initSlider(sliderId, thumbId) {
     }
   }, { passive: true });
 
-  slider.addEventListener('touchmove', (e) => {
+  // Слушаем move на window, чтобы не терять фокус, если палец ушел с элемента
+  window.addEventListener('touchmove', (e) => {
     if (!isDraggingInfo) return;
     
     const currentX = e.touches[0].clientX;
     const diff = infoStartX - currentX;
     
     // Если движение преимущественно горизонтальное, предотвращаем скролл страницы
-    if (Math.abs(diff) > 5) {
-       // Мы не делаем e.preventDefault() здесь глобально, чтобы не ломать вертикальный скролл,
-       // но мы меняем scrollLeft слайдера.
+    // и двигаем слайдер
+    if (Math.abs(diff) > 2) {
+       e.preventDefault(); // Блокируем вертикальный скролл страницы во время горизонтального тяга
        slider.scrollLeft = infoStartScroll + diff;
     }
-  }, { passive: true });
+  }, { passive: false });
 
-  slider.addEventListener('touchend', () => {
+  window.addEventListener('touchend', () => {
     isDraggingInfo = false;
     slider.style.scrollBehavior = ''; // Возвращаем поведение по умолчанию
   });
