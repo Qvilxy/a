@@ -23,7 +23,7 @@ body {
   -webkit-user-select: none;
   user-select: none;
   overflow-x: hidden;
-  overscroll-behavior-y: none;
+  overscroll-behavior-y: none; /* Важно для предотвращения pull-to-refresh браузера */
   touch-action: manipulation;
 }
 
@@ -286,7 +286,7 @@ body {
   margin: 10px 16px 0 16px;
   position: relative;
   overflow: hidden;
-  touch-action: none;
+  touch-action: none; /* Отключаем стандартные жесты на индикаторе */
 }
 
 .scroll-indicator-thumb {
@@ -305,6 +305,7 @@ body {
 
 .scroll-indicator-thumb:active {
   cursor: grabbing;
+  background: #eee;
 }
 
 /* NAV */
@@ -325,6 +326,7 @@ body {
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  z-index: 100;
 }
 
 /* INDICATOR */
@@ -562,6 +564,12 @@ body.no-scroll {
 const tg = window.Telegram.WebApp;
 tg.expand();
 
+// --- ВАЖНО: Блокировка сворачивания приложения свайпом вниз ---
+if (tg.disableVerticalSwipes) {
+    tg.disableVerticalSwipes();
+}
+// -------------------------------------------------------------
+
 const nav = document.getElementById("nav");
 const indicator = document.getElementById("indicator");
 const body = document.body;
@@ -652,15 +660,15 @@ document.querySelectorAll(".nav-item").forEach((el, i) => {
   };
 });
 
-/* PRODUCT SLIDER WITH DRAGGABLE THUMB */
+/* PRODUCT SLIDER WITH IMPROVED DRAGGABLE THUMB */
 function initSlider(sliderId, thumbId) {
   const slider = document.getElementById(sliderId);
   const thumb = document.getElementById(thumbId);
   if (!slider || !thumb) return;
 
   let isDraggingThumb = false;
-  let thumbStartX = 0;
-  let scrollStartLeft = 0;
+  let startX = 0;
+  let startScrollLeft = 0;
 
   function updateThumb() {
     const products = slider.querySelectorAll('.product-card');
@@ -668,46 +676,78 @@ function initSlider(sliderId, thumbId) {
     if (totalProducts === 0) return;
 
     const cardWidth = products[0].offsetWidth;
-    const gap = 10;
+    const gap = 10; // из CSS gap: 10px
     const visibleWidth = slider.clientWidth;
-    const visibleProducts = visibleWidth / (cardWidth + gap);
     
-    const thumbWidthPercent = Math.min((visibleProducts / totalProducts) * 100, 100);
+    // Реальная ширина контента
+    const scrollWidth = slider.scrollWidth;
+    const maxScroll = scrollWidth - visibleWidth;
     
+    if (maxScroll <= 0) {
+        thumb.style.display = 'none';
+        return;
+    } else {
+        thumb.style.display = 'block';
+    }
+
+    // Ширина ползунка пропорциональна видимой области
+    const thumbWidthPercent = (visibleWidth / scrollWidth) * 100;
+    
+    // Позиция ползунка
     const scrollLeft = slider.scrollLeft;
-    const maxScroll = slider.scrollWidth - slider.clientWidth;
-    const thumbLeftPercent = maxScroll > 0 ? (scrollLeft / maxScroll) * (100 - thumbWidthPercent) : 0;
+    const thumbLeftPercent = (scrollLeft / maxScroll) * (100 - thumbWidthPercent);
     
     thumb.style.width = thumbWidthPercent + '%';
     thumb.style.left = thumbLeftPercent + '%';
   }
 
-  // Обработчики для перетаскивания ползунка
+  // --- Обработчики для перетаскивания ползунка ---
+  
   function onThumbStart(e) {
     isDraggingThumb = true;
-    thumbStartX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-    scrollStartLeft = slider.scrollLeft;
+    // Получаем X координату (мышь или тач)
+    startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    startScrollLeft = slider.scrollLeft;
+    
+    // Отключаем плавную анимацию ползунка во время драга для мгновенного отклика
     thumb.style.transition = 'none';
-    e.preventDefault();
-    e.stopPropagation();
+    
+    // Предотвращаем всплытие, чтобы не скроллилась страница, но позволяем работать логике слайдера
+    e.stopPropagation(); 
+    // e.preventDefault() здесь не вызываем жестко, чтобы браузер понял, что это начало жеста
   }
 
   function onThumbMove(e) {
     if (!isDraggingThumb) return;
     
+    // Важно: preventDefault, чтобы страница не скроллилась вверх/вниз пока мы тянем ползунок
+    e.preventDefault(); 
+    
     const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-    const deltaX = currentX - thumbStartX;
+    const deltaX = currentX - startX;
     
-    const maxScroll = slider.scrollWidth - slider.clientWidth;
+    const indicatorContainer = thumb.parentElement;
+    const containerWidth = indicatorContainer.offsetWidth;
     const thumbWidth = thumb.offsetWidth;
-    const indicatorWidth = thumb.parentElement.offsetWidth;
-    const availableThumbMove = indicatorWidth - thumbWidth;
     
-    const scrollDelta = (deltaX / availableThumbMove) * maxScroll;
-    slider.scrollLeft = scrollStartLeft + scrollDelta;
+    // Насколько может двигаться ползунок внутри контейнера (в пикселях)
+    const availableThumbMovePx = containerWidth - thumbWidth;
     
-    e.preventDefault();
-    e.stopPropagation();
+    if (availableThumbMovePx <= 0) return;
+
+    const maxScroll = slider.scrollWidth - slider.clientWidth;
+    
+    // Преобразуем движение пальца в скролл
+    // Если палец прошел весь экран (например 300px), а ползунок может пройти только 50px,
+    // нам нужно масштабировать это отношение.
+    // Но лучше мапить движение пальца 1:1 на движение ползунка, а потом переводить в скролл.
+    
+    // Относительное смещение пальца относительно ширины контейнера индикатора? 
+    // Нет, лучше просто: сдвиг пальца * (максимальный скролл / доступное движение ползунка)
+    
+    const scrollDelta = deltaX * (maxScroll / availableThumbMovePx);
+    
+    slider.scrollLeft = startScrollLeft + scrollDelta;
   }
 
   function onThumbEnd() {
@@ -717,20 +757,24 @@ function initSlider(sliderId, thumbId) {
     }
   }
 
-  // Touch events для ползунка
+  // Touch events
   thumb.addEventListener('touchstart', onThumbStart, { passive: false });
-  thumb.addEventListener('touchmove', onThumbMove, { passive: false });
-  thumb.addEventListener('touchend', onThumbEnd);
   
-  // Mouse events для ползунка (для десктопа)
+  // Mouse events (для десктопа)
   thumb.addEventListener('mousedown', onThumbStart);
-  document.addEventListener('mousemove', onThumbMove);
-  document.addEventListener('mouseup', onThumbEnd);
 
-  // Обновление ползунка при скролле
+  // Глобальные обработчики движения и окончания, чтобы если палец ушел за пределы ползунка, скролл продолжался
+  window.addEventListener('touchmove', onThumbMove, { passive: false });
+  window.addEventListener('mousemove', onThumbMove);
+  
+  window.addEventListener('touchend', onThumbEnd);
+  window.addEventListener('mouseup', onThumbEnd);
+
+  // Обновление ползунка при скролле (если скроллим пальцем по товарам)
   slider.addEventListener("scroll", updateThumb, { passive: true });
   
   // Инициализация
+  // Ждем загрузки картинок/контента
   setTimeout(updateThumb, 100);
   window.addEventListener("resize", updateThumb);
 }
@@ -769,7 +813,7 @@ document.addEventListener('touchend', (e) => {
   lastTouchEnd = now;
 }, false);
 
-// Предотвращение жестов сворачивания приложения
+// Предотвращение жестов сворачивания приложения (pinch-zoom)
 document.addEventListener('touchmove', (e) => {
   if (e.touches.length > 1) {
     e.preventDefault();
