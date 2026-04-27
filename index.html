@@ -24,7 +24,8 @@ body {
   user-select: none;
   overflow-x: hidden;
   overscroll-behavior-y: none;
-  touch-action: manipulation;
+  /* Изменено на manipulation, чтобы разрешить кастомные жесты */
+  touch-action: manipulation; 
 }
 
 /* HEADER */
@@ -142,7 +143,8 @@ body {
   justify-content: center;
   position: relative;
   transition: background-color 0.3s ease;
-  touch-action: pan-y;
+  /* Разрешаем все действия, логика свайпа будет в JS */
+  touch-action: none; 
 }
 
 .featured-photo[data-state="0"] { background-color: #e0f5d0; }
@@ -156,6 +158,8 @@ body {
   transform: translateX(-50%);
   display: flex;
   gap: 5px;
+  /* ВАЖНО: Поднимаем точки выше слоя свайпа */
+  z-index: 10;
   pointer-events: auto;
 }
 
@@ -165,7 +169,6 @@ body {
   border-radius: 50%;
   background: rgba(0,0,0,0.15);
   cursor: pointer;
-  touch-action: manipulation;
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
@@ -197,12 +200,13 @@ body {
 .product-slider {
   display: flex;
   gap: 10px;
-  overflow-x: auto;
+  overflow-x: auto; /* Оставляем для инерции и совместимости */
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding: 0 16px 4px 16px;
-  touch-action: pan-y;
+  /* Убрали pan-y, чтобы работал наш кастомный свайп */
+  touch-action: none; 
   -ms-overflow-style: none;
 }
 
@@ -216,7 +220,8 @@ body {
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  touch-action: pan-y;
+  /* Карточка теперь часть системы свайпа */
+  touch-action: none;
 }
 
 .product-photo {
@@ -227,7 +232,7 @@ body {
   justify-content: center;
   position: relative;
   transition: background-color 0.3s ease;
-  touch-action: pan-y;
+  touch-action: none;
 }
 
 .product-photo[data-state="0"] { background-color: #e0f5d0; }
@@ -241,6 +246,7 @@ body {
   transform: translateX(-50%);
   display: flex;
   gap: 5px;
+  z-index: 10;
   pointer-events: auto;
 }
 
@@ -250,7 +256,6 @@ body {
   border-radius: 50%;
   background: rgba(0,0,0,0.15);
   cursor: pointer;
-  touch-action: manipulation;
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
@@ -378,6 +383,8 @@ body {
   padding-bottom: 100px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  /* Разрешаем вертикальный скролл страницы */
+  touch-action: pan-y; 
 }
 
 body.no-scroll {
@@ -600,48 +607,73 @@ function update(animate = true) {
 
 update(true);
 
-/* NAV DRAG */
-nav.addEventListener("touchstart", e => {
+/* NAV DRAG (Global Swipe for Tabs) */
+// Теперь слушаем body, чтобы можно было тянуть в любом месте экрана
+let navStartY = 0;
+let navIsHorizontal = false;
+
+body.addEventListener("touchstart", e => {
+  // Игнорируем, если это клик по точкам или инпуту
+  if (e.target.closest('.dots') || e.target.closest('input')) return;
+
   startX = e.touches[0].clientX;
+  navStartY = e.touches[0].clientY;
   dragging = true;
+  navIsHorizontal = false;
   basePos = current * tabWidth();
   
-  body.classList.add("no-scroll");
-  
-  indicator.style.transition = 'none';
-  setIndicator(basePos, 1.3);
-}, { passive: false });
+  // Не блокируем скролл сразу, ждем направления
+}, { passive: true });
 
-nav.addEventListener("touchmove", e => {
+body.addEventListener("touchmove", e => {
   if (!dragging) return;
-  e.preventDefault();
 
-  let dx = e.touches[0].clientX - startX;
-  let pos = basePos + dx;
+  const dx = e.touches[0].clientX - startX;
+  const dy = e.touches[0].clientY - navStartY;
 
-  let max = tabWidth();
-  pos = Math.max(0, Math.min(max, pos));
+  // Определяем, горизонтальный это свайп или вертикальный
+  if (!navIsHorizontal) {
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+      navIsHorizontal = true;
+    } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 10) {
+      dragging = false; // Это вертикальный скролл, отключаем логику табов
+      return;
+    } else {
+      return; // Еще не ясно направление
+    }
+  }
 
-  setIndicator(pos, 1.3);
-  indicator.dataset.pos = pos;
+  if (navIsHorizontal) {
+    e.preventDefault(); // Блокируем только если свайп горизонтальный
+
+    let pos = basePos + dx;
+    let max = tabWidth();
+    pos = Math.max(0, Math.min(max, pos));
+
+    indicator.style.transition = 'none';
+    setIndicator(pos, 1.3);
+    indicator.dataset.pos = pos;
+  }
 }, { passive: false });
 
-nav.addEventListener("touchend", () => {
+body.addEventListener("touchend", () => {
   if (!dragging) return;
   dragging = false;
+  navIsHorizontal = false;
 
-  body.classList.remove("no-scroll");
-
-  let pos = parseFloat(indicator.dataset.pos || 0);
-  let threshold = tabWidth() / 2;
-  
-  const targetTab = pos > threshold ? 1 : 0;
-  
-  if (targetTab !== current) {
-    current = targetTab;
+  if (indicator.dataset.pos) {
+    let pos = parseFloat(indicator.dataset.pos);
+    let threshold = tabWidth() / 2;
+    
+    const targetTab = pos > threshold ? 1 : 0;
+    
+    if (targetTab !== current) {
+      current = targetTab;
+    }
+    
+    update(true);
+    delete indicator.dataset.pos;
   }
-  
-  update(true);
 });
 
 /* TAP */
@@ -652,105 +684,93 @@ document.querySelectorAll(".nav-item").forEach((el, i) => {
   };
 });
 
-/* PRODUCT SLIDER WITH DRAGGABLE THUMB */
-function initSlider(sliderId, thumbId) {
+/* CUSTOM TOUCH SLIDER LOGIC (Drag to scroll) */
+function initTouchSlider(sliderId, thumbId) {
   const slider = document.getElementById(sliderId);
   const thumb = document.getElementById(thumbId);
   if (!slider || !thumb) return;
 
-  let isDraggingThumb = false;
-  let thumbStartX = 0;
-  let scrollStartLeft = 0;
+  let isDragging = false;
+  let startX = 0;
+  let scrollLeft = 0;
 
+  // Обновление позиции ползунка
   function updateThumb() {
     const products = slider.querySelectorAll('.product-card');
     const totalProducts = products.length;
     if (totalProducts === 0) return;
 
     const cardWidth = products[0].offsetWidth;
-    const gap = 10;
+    const gap = 10; // из CSS
     const visibleWidth = slider.clientWidth;
     const visibleProducts = visibleWidth / (cardWidth + gap);
     
     const thumbWidthPercent = Math.min((visibleProducts / totalProducts) * 100, 100);
     
-    const scrollLeft = slider.scrollLeft;
     const maxScroll = slider.scrollWidth - slider.clientWidth;
-    const thumbLeftPercent = maxScroll > 0 ? (scrollLeft / maxScroll) * (100 - thumbWidthPercent) : 0;
+    const thumbLeftPercent = maxScroll > 0 ? (slider.scrollLeft / maxScroll) * (100 - thumbWidthPercent) : 0;
     
     thumb.style.width = thumbWidthPercent + '%';
     thumb.style.left = thumbLeftPercent + '%';
   }
 
-  // Обработчики для перетаскивания ползунка
-  function onThumbStart(e) {
-    isDraggingThumb = true;
-    thumbStartX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-    scrollStartLeft = slider.scrollLeft;
-    thumb.style.transition = 'none';
-    e.preventDefault();
-    e.stopPropagation();
-  }
+  // Начало касания
+  slider.addEventListener('touchstart', (e) => {
+    // Если коснулись точек - не начинаем свайп слайдера
+    if (e.target.closest('.dots')) return;
 
-  function onThumbMove(e) {
-    if (!isDraggingThumb) return;
-    
-    const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-    const deltaX = currentX - thumbStartX;
-    
-    const maxScroll = slider.scrollWidth - slider.clientWidth;
-    const thumbWidth = thumb.offsetWidth;
-    const indicatorWidth = thumb.parentElement.offsetWidth;
-    const availableThumbMove = indicatorWidth - thumbWidth;
-    
-    const scrollDelta = (deltaX / availableThumbMove) * maxScroll;
-    slider.scrollLeft = scrollStartLeft + scrollDelta;
-    
-    e.preventDefault();
-    e.stopPropagation();
-  }
+    isDragging = true;
+    startX = e.touches[0].pageX - slider.offsetLeft;
+    scrollLeft = slider.scrollLeft;
+    slider.style.scrollBehavior = 'auto'; // Отключаем плавность для мгновенной реакции
+  }, { passive: true });
 
-  function onThumbEnd() {
-    if (isDraggingThumb) {
-      isDraggingThumb = false;
-      thumb.style.transition = 'left 0.1s ease-out';
+  // Движение
+  slider.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    e.preventDefault(); // Предотвращаем скролл страницы при горизонтальном тяге
+    const x = e.touches[0].pageX - slider.offsetLeft;
+    const walk = (x - startX) * 1.5; // Скорость свайпа
+    slider.scrollLeft = scrollLeft - walk;
+  }, { passive: false });
+
+  // Конец касания
+  const endDrag = () => {
+    if (isDragging) {
+      isDragging = false;
+      slider.style.scrollBehavior = 'smooth'; // Возвращаем плавность
     }
-  }
+  };
+  slider.addEventListener('touchend', endDrag);
+  slider.addEventListener('touchcancel', endDrag);
 
-  // Touch events для ползунка
-  thumb.addEventListener('touchstart', onThumbStart, { passive: false });
-  thumb.addEventListener('touchmove', onThumbMove, { passive: false });
-  thumb.addEventListener('touchend', onThumbEnd);
-  
-  // Mouse events для ползунка (для десктопа)
-  thumb.addEventListener('mousedown', onThumbStart);
-  document.addEventListener('mousemove', onThumbMove);
-  document.addEventListener('mouseup', onThumbEnd);
-
-  // Обновление ползунка при скролле
+  // Слушаем скролл для обновления ползунка
   slider.addEventListener("scroll", updateThumb, { passive: true });
   
-  // Инициализация
+  // Init
   setTimeout(updateThumb, 100);
   window.addEventListener("resize", updateThumb);
 }
 
-// Запуск обоих слайдеров
-initSlider('slider1', 'thumb1');
-initSlider('slider2', 'thumb2');
+// Запуск логики свайпа для слайдеров
+initTouchSlider('slider1', 'thumb1');
+initTouchSlider('slider2', 'thumb2');
 
-/* PRODUCT PHOTO SWITCHER */
+/* PRODUCT PHOTO SWITCHER (Fixed) */
 function initPhotoSwitcher(containerSelector, photoSelector, dotsSelector) {
   document.querySelectorAll(containerSelector).forEach(card => {
     const photo = card.querySelector(photoSelector);
     const dots = card.querySelectorAll(dotsSelector);
 
     dots.forEach((dot, idx) => {
+      // Используем click, так как он надежнее после исправления pointer-events
       dot.addEventListener('click', (e) => {
-        e.stopPropagation();
+        e.stopPropagation(); // Чтобы не триггерить другие события
         dots.forEach(d => d.classList.remove('active'));
         dot.classList.add('active');
-        photo.dataset.state = idx;
+        if (photo) {
+            photo.dataset.state = idx;
+        }
       });
     });
   });
@@ -759,7 +779,7 @@ function initPhotoSwitcher(containerSelector, photoSelector, dotsSelector) {
 initPhotoSwitcher('.featured-product', '.featured-photo', '.featured-photo .dots span');
 initPhotoSwitcher('.product-card', '.product-photo', '.product-photo .dots span');
 
-// Предотвращение двойного тапа для зума
+// Prevent double tap zoom
 let lastTouchEnd = 0;
 document.addEventListener('touchend', (e) => {
   const now = Date.now();
@@ -769,14 +789,8 @@ document.addEventListener('touchend', (e) => {
   lastTouchEnd = now;
 }, false);
 
-// Предотвращение жестов сворачивания приложения
-document.addEventListener('touchmove', (e) => {
-  if (e.touches.length > 1) {
-    e.preventDefault();
-  }
-}, { passive: false });
-
 </script>
 
 </body>
 </html>
+
