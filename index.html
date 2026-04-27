@@ -8,12 +8,13 @@
 
 <style>
 :root {
-  --bg-color: #ffffff;       /* Белый фон приложения */
-  --banner-bg: #f2f2f7;      /* Светло-серый фон баннеров */
-  --surface-color: #ffffff;  /* Белые карточки */
+  --bg-color: #ffffff;
+  --banner-bg: #f2f2f7;
+  --surface-color: #ffffff;
   --text-primary: #000000;
   --text-secondary: #8e8e93;
   --accent-color: #007aff;
+  --danger-color: #ff3b30;
 }
 
 * {
@@ -49,46 +50,24 @@ body {
   justify-content: center;
   transition: opacity 0.5s ease-out, visibility 0.5s;
 }
+#splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.splash-logo { width: 80px; animation: pulseLogo 2s infinite ease-in-out; }
+@keyframes pulseLogo { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
 
-#splash-screen.hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
+/* LAYOUT */
+.page-wrapper { display: flex; flex-direction: column; height: 100%; width: 100%; position: absolute; top: 0; left: 0; }
 
-.splash-logo {
-  width: 80px;
-  animation: pulseLogo 2s infinite ease-in-out;
-}
-
-@keyframes pulseLogo {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.05); opacity: 0.8; }
-}
-
-/* LAYOUT WRAPPER */
-.page-wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-/* FIXED TOP AREA - Фиксируется сверху при скролле */
+/* FIXED TOP */
 .fixed-top-area {
   flex-shrink: 0;
   background: var(--bg-color);
-  z-index: 100; /* Высокий z-index, чтобы перекрывать контент при скролле */
-  position: sticky; /* Ключевое свойство для фиксации */
+  z-index: 100;
+  position: sticky;
   top: 0;
   width: 100%;
-  padding-bottom: 10px; /* Отступ от поиска до контента */
+  padding-bottom: 10px;
 }
 
-/* HEADER */
 .header {
   height: 100px;
   position: relative;
@@ -96,503 +75,281 @@ body {
   border-bottom-left-radius: 24px;
   border-bottom-right-radius: 24px;
   background: var(--bg-color);
-  box-shadow: none; 
-  border-bottom: none;
 }
 
-.logo {
+/* ЛОГОТИП (КЛИКАБЕЛЬНЫЙ ДЛЯ АДМИНА) */
+.logo-container {
   position: absolute;
   top: calc(50% + 7px);
   left: 50%;
   transform: translate(-50%,-50%);
   width: 60px;
-  pointer-events: none;
-  -webkit-user-drag: none;
   z-index: 3;
+  cursor: pointer;
 }
 
-/* SEARCH BAR - ТАБЛЕТКА С ТЕНЬЮ */
+.logo-img {
+  width: 100%;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+/* Эффект нажатия для админа */
+.logo-container:active .logo-img {
+  opacity: 0.7;
+  transform: scale(0.95);
+  transition: transform 0.1s;
+}
+
 .search-bar {
   margin: 0 16px;
   background: var(--surface-color);
-  border: none; /* УБРАН КОНТУР */
+  border: none;
   border-radius: 100px;
   padding: 0 20px;
   height: 50px;
   display: flex;
   align-items: center;
   gap: 10px;
-  /* ТЕНЬ ВОКРУГ ТАБЛЕТКИ */
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
-  transition: box-shadow 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
 }
+.search-bar svg { width: 20px; height: 20px; fill: var(--text-secondary); }
+.search-bar input { border: none; outline: none; background: transparent; font-size: 17px; color: var(--text-primary); width: 100%; }
 
-.search-bar svg {
-  width: 20px;
-  height: 20px;
-  fill: var(--text-secondary);
-  flex-shrink: 0;
-  pointer-events: none;
+/* CONTENT */
+.page-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 40px; width: 100%; touch-action: pan-y; background: var(--bg-color); }
+
+.catalog-section { margin: 0 0 20px 0; background: var(--banner-bg); padding: 20px 0; width: 100%; }
+.section-title { font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0 0 16px 0; text-align: center; text-transform: uppercase; }
+
+/* PRODUCTS */
+.featured-product { margin: 0 16px 16px 16px; background: var(--surface-color); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); }
+.featured-photo { width: 100%; aspect-ratio: 1 / 1.1; background: #eee; display: flex; align-items: center; justify-content: center; position: relative; }
+.featured-photo img { width: 100%; height: 100%; object-fit: cover; }
+.featured-info { padding: 14px 16px; }
+.featured-name { font-size: 18px; font-weight: 700; margin: 0 0 4px 0; }
+.featured-price { font-size: 15px; color: var(--accent-color); font-weight: 600; margin: 0; }
+
+.product-slider { display: flex; gap: 12px; overflow-x: auto; padding: 0 16px 8px 16px; scrollbar-width: none; }
+.product-slider::-webkit-scrollbar { display: none; }
+.product-card { flex: 0 0 calc(50% - 6px); background: var(--surface-color); border-radius: 18px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+.product-photo { width: 100%; aspect-ratio: 1 / 1.1; background: #eee; position: relative; }
+.product-photo img { width: 100%; height: 100%; object-fit: cover; }
+.product-info { padding: 10px 12px; }
+.product-name { font-size: 14px; font-weight: 600; margin: 0 0 4px 0; }
+.product-price { font-size: 14px; color: var(--accent-color); font-weight: 600; margin: 0; }
+
+.scroll-indicator { height: 4px; background: rgba(0,0,0,0.1); border-radius: 100px; margin: 12px 20px 0 20px; position: relative; }
+.scroll-indicator-thumb { position: absolute; top: 0; left: 0; height: 100%; background: #000; border-radius: 100px; width: 50%; }
+
+/* ADMIN PANEL STYLES */
+.admin-panel {
+  padding: 20px;
+  display: none; /* Скрыто по умолчанию */
 }
+.admin-panel.active { display: block; }
 
-.search-bar input {
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.admin-title { font-size: 24px; font-weight: 800; }
+.close-admin-btn {
+  background: #eee;
   border: none;
-  outline: none;
-  background: transparent;
-  font-size: 17px;
-  color: var(--text-primary);
-  width: 100%;
-  font-family: inherit;
-  -webkit-user-select: text;
-  user-select: text;
-}
-
-.search-bar input::placeholder {
-  color: var(--text-secondary);
-}
-
-/* SCROLLABLE CONTENT AREA */
-.page-content {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 40px;
-  width: 100%;
-  touch-action: pan-y;
-  /* Важно: фон контента белый, но секции будут серыми */
-  background: var(--bg-color);
-}
-
-/* COLLECTION SECTIONS - Серые баннеры */
-.catalog-section {
-  margin: 0 0 20px 0;
-  background: var(--banner-bg); /* СЕРЫЙ ФОН */
-  padding: 20px 0;
-  width: 100%;
-}
-
-.section-title {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin: 0 0 16px 0;
-  text-align: center;
-  letter-spacing: -0.5px;
-  pointer-events: none;
-  text-transform: uppercase;
-}
-
-/* FEATURED PRODUCT */
-.featured-product {
-  margin: 0 16px 16px 16px;
-  background: var(--surface-color);
+  padding: 8px 16px;
   border-radius: 20px;
-  overflow: hidden;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-product-form {
+  background: #fff;
+  padding: 20px;
+  border-radius: 20px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-  /* Легкая рамка для белого на сером */
-  border: 1px solid rgba(0,0,0,0.05); 
+  margin-bottom: 30px;
+  border: 1px solid #eee;
 }
-
-.featured-photo {
+.form-group { margin-bottom: 15px; }
+.form-label { display: block; font-size: 14px; color: #888; margin-bottom: 5px; }
+.form-input {
   width: 100%;
-  aspect-ratio: 1 / 1.1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  transition: background-color 0.3s ease;
-  touch-action: pan-y;
-}
-
-.featured-photo[data-state="0"] { background: linear-gradient(45deg, #e0f7fa, #b2ebf2); }
-.featured-photo[data-state="1"] { background: linear-gradient(45deg, #fce4ec, #f8bbd0); }
-.featured-photo[data-state="2"] { background: linear-gradient(45deg, #e8eaf6, #c5cae9); }
-
-.featured-photo .dots {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 6px;
-  pointer-events: auto;
-  background: rgba(255,255,255,0.6);
-  padding: 4px 8px;
+  padding: 12px;
+  border: 1px solid #ddd;
   border-radius: 12px;
-  backdrop-filter: blur(4px);
+  font-size: 16px;
+  outline: none;
 }
+.form-input:focus { border-color: var(--accent-color); }
 
-.featured-photo .dots span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(0,0,0,0.2);
+.file-upload {
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  color: #888;
   cursor: pointer;
-  transition: all 0.2s ease;
+  margin-bottom: 15px;
 }
+.file-upload.has-image { border-color: var(--accent-color); color: var(--accent-color); }
 
-.featured-photo .dots span.active {
-  background: #000;
-  transform: scale(1.2);
-}
-
-.featured-info {
-  padding: 14px 16px 16px 16px;
-  pointer-events: none;
-}
-
-.featured-name {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0 0 4px 0;
-}
-
-.featured-price {
-  font-size: 15px;
-  color: var(--accent-color);
-  margin: 0;
+.btn-primary {
+  width: 100%;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 16px;
   font-weight: 600;
+  cursor: pointer;
 }
+.btn-primary:active { opacity: 0.8; }
 
-/* PRODUCT SLIDER */
-.product-slider {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding: 0 16px 8px 16px;
-  touch-action: pan-y;
-  -ms-overflow-style: none;
-}
-
-.product-slider::-webkit-scrollbar {
-  display: none;
-}
-
-.product-card {
-  flex: 0 0 calc(50% - 6px);
-  background: var(--surface-color);
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+.admin-product-list {
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(0,0,0,0.05);
+  gap: 10px;
 }
-
-.product-photo {
-  width: 100%;
-  aspect-ratio: 1 / 1.1;
+.admin-product-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
-  transition: background-color 0.3s ease;
-  touch-action: pan-y; 
+  background: #fff;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #eee;
 }
-
-.product-photo[data-state="0"] { background: linear-gradient(45deg, #e0f7fa, #b2ebf2); }
-.product-photo[data-state="1"] { background: linear-gradient(45deg, #fce4ec, #f8bbd0); }
-.product-photo[data-state="2"] { background: linear-gradient(45deg, #e8eaf6, #c5cae9); }
-
-.product-photo .dots {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 5px;
-  pointer-events: auto;
-  background: rgba(255,255,255,0.6);
-  padding: 3px 6px;
-  border-radius: 10px;
-  backdrop-filter: blur(2px);
+.admin-thumb {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-right: 10px;
+  background: #eee;
 }
-
-.product-photo .dots span {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: rgba(0,0,0,0.2);
+.admin-info { flex: 1; }
+.admin-name { font-weight: 600; font-size: 14px; }
+.admin-price { font-size: 12px; color: #888; }
+.delete-btn {
+  background: rgba(255, 59, 48, 0.1);
+  color: var(--danger-color);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.product-photo .dots span.active {
-  background: #000;
-  transform: scale(1.2);
-}
-
-.product-info {
-  padding: 10px 12px 12px 12px;
-  pointer-events: auto;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-.product-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0 0 4px 0;
-  line-height: 1.2;
-}
-
-.product-price {
-  font-size: 14px;
-  color: var(--accent-color);
-  margin: 0;
-  font-weight: 600;
-}
-
-/* SCROLL INDICATOR */
-.scroll-indicator {
-  height: 4px;
-  background: rgba(0,0,0,0.1);
-  border-radius: 100px;
-  margin: 12px 20px 0 20px;
-  position: relative;
-  overflow: hidden;
-  touch-action: none;
-}
-
-.scroll-indicator-thumb {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background: #000;
-  border-radius: 100px;
-  transition: left 0.1s ease-out;
-  box-shadow: 0 0 4px rgba(0,0,0,0.2);
-  will-change: left, width;
-  cursor: grab;
-  touch-action: none;
-}
-
-.scroll-indicator-thumb:active {
-  cursor: grabbing;
-  background: #333;
 }
 
 /* PAGES */
-.page {
-  position: absolute;
-  inset: 0;
-  display: none;
-}
-
-.page.active-page {
-  display: flex;
-}
+.page { position: absolute; inset: 0; display: none; }
+.page.active-page { display: flex; }
 
 </style>
 </head>
 
 <body>
 
-<!-- SPLASH SCREEN -->
+<!-- SPLASH -->
 <div id="splash-screen">
-  <img src="logoredbox.png" class="splash-logo" alt="Loading...">
+  <img src="logoredbox.png" class="splash-logo">
 </div>
 
-<!-- HOME -->
+<!-- HOME / CATALOG -->
 <div id="home" class="page active-page">
   <div class="page-wrapper">
-    
-    <!-- FIXED TOP AREA: Header + Search (Залипает сверху) -->
     <div class="fixed-top-area">
       <div class="header">
-        <img src="logoredbox.png" class="logo">
+        <!-- Контейнер логотипа -->
+        <div class="logo-container" id="admin-trigger">
+          <img src="logoredbox.png" class="logo-img">
+        </div>
       </div>
-
       <div class="search-bar">
-        <svg viewBox="0 0 24 24">
-          <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-        </svg>
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
         <input type="text" placeholder="Поиск..." />
       </div>
     </div>
 
-    <!-- SCROLLABLE CONTENT -->
     <div class="page-content">
       
-      <!-- БЛОК 1 -->
+      <!-- БЛОК 1: НОВАЯ КОЛЛЕКЦИЯ -->
       <div class="catalog-section">
         <div class="catalog-section-inner">
           <h2 class="section-title">Новая коллекция</h2>
 
-          <div class="featured-product">
-            <div class="featured-photo" data-state="0">
-              <div class="dots">
-                <span class="active"></span>
-                <span></span>
-                <span></span>
-              </div>
+          <!-- Основной товар (берется из первого добавленного или заглушка) -->
+          <div class="featured-product" id="main-product-display">
+            <div class="featured-photo">
+               <img src="" alt="Main Product" id="main-img" style="display:none;">
+               <div style="color:#999;" id="main-placeholder">Нет товара</div>
             </div>
             <div class="featured-info">
-              <p class="featured-name">Название товара</p>
-              <p class="featured-price">Цена</p>
+              <p class="featured-name" id="main-name">Название</p>
+              <p class="featured-price" id="main-price">Цена</p>
             </div>
           </div>
 
-          <div class="product-slider" id="slider1">
-            <div class="product-card">
-              <div class="product-photo" data-state="0">
-                <div class="dots">
-                  <span class="active"></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </div>
-              <div class="product-info">
-                <p class="product-name">Название товара</p>
-                <p class="product-price">Цена</p>
-              </div>
-            </div>
-
-            <div class="product-card">
-              <div class="product-photo" data-state="1">
-                <div class="dots">
-                  <span class="active"></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </div>
-              <div class="product-info">
-                <p class="product-name">Название товара</p>
-                <p class="product-price">Цена</p>
-              </div>
-            </div>
-
-            <div class="product-card">
-              <div class="product-photo" data-state="2">
-                <div class="dots">
-                  <span class="active"></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </div>
-              <div class="product-info">
-                <p class="product-name">Название товара</p>
-                <p class="product-price">Цена</p>
-              </div>
-            </div>
-            
-             <div class="product-card">
-              <div class="product-photo" data-state="0">
-                <div class="dots">
-                  <span class="active"></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </div>
-              <div class="product-info">
-                <p class="product-name">Название товара</p>
-                <p class="product-price">Цена</p>
-              </div>
-            </div>
+          <!-- Слайдер остальных товаров -->
+          <div class="product-slider" id="dynamic-slider">
+             <!-- Сюда JS вставит товары -->
           </div>
 
-          <div class="scroll-indicator">
-            <div class="scroll-indicator-thumb" id="thumb1"></div>
-          </div>
+          <div class="scroll-indicator"><div class="scroll-indicator-thumb"></div></div>
         </div>
       </div>
 
-      <!-- БЛОК 2 -->
-      <div class="catalog-section">
-        <div class="catalog-section-inner">
-          <h2 class="section-title">Предыдущая коллекция</h2>
-
-          <div class="product-slider" id="slider2">
-            <div class="product-card">
-              <div class="product-photo" data-state="0">
-                <div class="dots">
-                  <span class="active"></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </div>
-              <div class="product-info">
-                <p class="product-name">Название товара</p>
-                <p class="product-price">Цена</p>
-              </div>
-            </div>
-
-            <div class="product-card">
-              <div class="product-photo" data-state="1">
-                <div class="dots">
-                  <span class="active"></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </div>
-              <div class="product-info">
-                <p class="product-name">Название товара</p>
-                <p class="product-price">Цена</p>
-              </div>
-            </div>
-
-            <div class="product-card">
-              <div class="product-photo" data-state="2">
-                <div class="dots">
-                  <span class="active"></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </div>
-              <div class="product-info">
-                <p class="product-name">Название товара</p>
-                <p class="product-price">Цена</p>
-              </div>
-            </div>
-            
-            <div class="product-card">
-              <div class="product-photo" data-state="0">
-                <div class="dots">
-                  <span class="active"></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </div>
-              <div class="product-info">
-                <p class="product-name">Название товара</p>
-                <p class="product-price">Цена</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="scroll-indicator">
-            <div class="scroll-indicator-thumb" id="thumb2"></div>
-          </div>
-        </div>
-      </div>
-      
-      <div style="height: 20px;"></div>
     </div>
   </div>
 </div>
 
-<!-- PROFILE -->
-<div id="profile" class="page">
+<!-- ADMIN PANEL PAGE -->
+<div id="admin-panel" class="page">
   <div class="page-wrapper">
     <div class="fixed-top-area">
       <div class="header">
-        <img src="logoredbox.png" class="logo">
+         <div class="logo-container">
+           <img src="logoredbox.png" class="logo-img">
+         </div>
       </div>
     </div>
-    <div class="page-content">
-      <div class="content" style="padding: 20px;">
-        <h2 style="color: black;">Профиль</h2>
-        <p style="color: #888;">Здесь будет информация о пользователе...</p>
+    
+    <div class="page-content admin-panel active">
+      <div class="admin-header">
+        <div class="admin-title">Управление</div>
+        <button class="close-admin-btn" onclick="closeAdmin()">Закрыть</button>
+      </div>
+
+      <!-- Форма добавления -->
+      <div class="add-product-form">
+        <h3 style="margin-top:0;">Добавить товар</h3>
+        
+        <div class="form-group">
+          <label class="form-label">Фотография</label>
+          <div class="file-upload" id="file-drop-zone" onclick="document.getElementById('file-input').click()">
+            Нажмите, чтобы выбрать фото
+          </div>
+          <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleFileSelect(this)">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Название</label>
+          <input type="text" class="form-input" id="prod-name" placeholder="Например: Hoodie Black">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Цена (₽)</label>
+          <input type="number" class="form-input" id="prod-price" placeholder="4500">
+        </div>
+
+        <button class="btn-primary" onclick="addProduct()">Добавить в каталог</button>
+      </div>
+
+      <h3 style="margin-bottom: 10px;">Список товаров</h3>
+      <div class="admin-product-list" id="admin-list">
+        <!-- Список для удаления -->
       </div>
     </div>
   </div>
@@ -602,227 +359,230 @@ body {
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-if (tg.setHeaderColor) {
-    tg.setHeaderColor('#ffffff');
-    tg.setBackgroundColor('#ffffff');
-}
+// --- КОНФИГУРАЦИЯ ---
+const ADMIN_USERNAME = 'qvilxy'; // Имя пользователя, которому доступен вход
+let isAdmin = false;
+let products = [];
+let currentImageBase64 = null;
 
-if (tg.disableVerticalSwipes) {
-    tg.disableVerticalSwipes();
-}
-
-// ЛОГИКА ЭКРАНА ЗАГРУЗКИ
+// --- ИНИЦИАЛИЗАЦИЯ ---
 window.addEventListener('load', () => {
-  const splash = document.getElementById('splash-screen');
+  // 1. Проверка прав администратора
+  const user = tg.initDataUnsafe?.user;
+  if (user && user.username && user.username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
+    isAdmin = true;
+    console.log("Admin access granted");
+    document.getElementById('admin-trigger').style.cursor = 'pointer';
+  } else {
+    isAdmin = false;
+    document.getElementById('admin-trigger').style.cursor = 'default';
+    // Убираем визуальный эффект нажатия для обычных юзеров
+    const style = document.createElement('style');
+    style.innerHTML = `.logo-container:active .logo-img { transform: none; opacity: 1; }`;
+    document.head.appendChild(style);
+  }
+
+  // 2. Загрузка товаров из LocalStorage
+  loadProductsFromStorage();
+
+  // 3. Скрытие сплеша
   setTimeout(() => {
-    splash.classList.add('hidden');
-  }, 1500);
+    document.getElementById('splash-screen').classList.add('hidden');
+  }, 1000);
 });
 
-const body = document.body;
-const pages = [
-  document.getElementById("home"),
-  document.getElementById("profile")
-];
+// --- ЛОГИКА НАВИГАЦИИ ---
 
-let current = 0;
+// Клик по логотипу
+document.getElementById('admin-trigger').addEventListener('click', () => {
+  if (isAdmin) {
+    openAdminPanel();
+  }
+});
 
-function updatePages() {
-  pages.forEach((p, i) => {
-      if (i === current) {
-          p.classList.add('active-page');
-          p.style.display = 'flex';
-      } else {
-          p.classList.remove('active-page');
-          p.style.display = 'none';
-      }
-  });
+function openAdminPanel() {
+  document.getElementById('home').classList.remove('active-page');
+  document.getElementById('admin-panel').classList.add('active-page');
+  renderAdminList();
 }
 
-updatePages();
+function closeAdmin() {
+  document.getElementById('admin-panel').classList.remove('active-page');
+  document.getElementById('home').classList.add('active-page');
+  // Обновляем каталог при возврате
+  renderCatalog();
+}
 
-/* PRODUCT SLIDER WITH IMPROVED DRAGGABLE THUMB */
-function initSlider(sliderId, thumbId) {
-  const slider = document.getElementById(sliderId);
-  const thumb = document.getElementById(thumbId);
-  if (!slider || !thumb) return;
+// --- ЛОГИКА ТОВАРОВ ---
 
-  let isDraggingThumb = false;
-  let startX = 0;
-  let startScrollLeft = 0;
+function loadProductsFromStorage() {
+  const stored = localStorage.getItem('skate_shop_products');
+  if (stored) {
+    products = JSON.parse(stored);
+  } else {
+    // Стартовые данные, если пусто
+    products = [
+      { id: 1, name: 'Skate Hoodie', price: '4500', image: '' },
+      { id: 2, name: 'Cargo Pants', price: '3800', image: '' }
+    ];
+  }
+  renderCatalog();
+}
 
-  function updateThumb() {
-    const products = slider.querySelectorAll('.product-card');
-    const totalProducts = products.length;
-    if (totalProducts === 0) return;
+function saveProductsToStorage() {
+  localStorage.setItem('skate_shop_products', JSON.stringify(products));
+}
 
-    const visibleWidth = slider.clientWidth;
-    const scrollWidth = slider.scrollWidth;
-    const maxScroll = scrollWidth - visibleWidth;
+// Обработка выбора файла
+function handleFileSelect(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      currentImageBase64 = e.target.result;
+      const zone = document.getElementById('file-drop-zone');
+      zone.classList.add('has-image');
+      zone.innerText = 'Фото выбрано ✓';
+      zone.style.backgroundImage = `url(${currentImageBase64})`;
+      zone.style.backgroundSize = 'cover';
+      zone.style.color = 'transparent';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+// Добавление товара
+function addProduct() {
+  const name = document.getElementById('prod-name').value;
+  const price = document.getElementById('prod-price').value;
+
+  if (!name || !price) {
+    tg.showAlert("Заполните название и цену!");
+    return;
+  }
+
+  const newProduct = {
+    id: Date.now(),
+    name: name,
+    price: price,
+    image: currentImageBase64 || '' // Если фото нет, будет пустая строка
+  };
+
+  products.push(newProduct);
+  saveProductsToStorage();
+
+  // Очистка формы
+  document.getElementById('prod-name').value = '';
+  document.getElementById('prod-price').value = '';
+  document.getElementById('file-input').value = '';
+  currentImageBase64 = null;
+  const zone = document.getElementById('file-drop-zone');
+  zone.classList.remove('has-image');
+  zone.innerText = 'Нажмите, чтобы выбрать фото';
+  zone.style.backgroundImage = 'none';
+  zone.style.color = '#888';
+
+  tg.showAlert("Товар добавлен!");
+  renderAdminList();
+}
+
+// Удаление товара
+function deleteProduct(id) {
+  if(confirm('Удалить этот товар?')) {
+    products = products.filter(p => p.id !== id);
+    saveProductsToStorage();
+    renderAdminList();
+  }
+}
+
+// --- РЕНДЕРИНГ ---
+
+// Рендер каталога (Главная страница)
+function renderCatalog() {
+  const slider = document.getElementById('dynamic-slider');
+  const mainImg = document.getElementById('main-img');
+  const mainName = document.getElementById('main-name');
+  const mainPrice = document.getElementById('main-price');
+  const mainPlaceholder = document.getElementById('main-placeholder');
+
+  slider.innerHTML = '';
+
+  if (products.length > 0) {
+    // Первый товар - в главный блок
+    const mainProd = products[0];
+    mainName.innerText = mainProd.name;
+    mainPrice.innerText = mainProd.price + ' ₽';
     
-    if (maxScroll <= 0) {
-        thumb.style.display = 'none';
-        return;
+    if (mainProd.image) {
+      mainImg.src = mainProd.image;
+      mainImg.style.display = 'block';
+      mainPlaceholder.style.display = 'none';
     } else {
-        thumb.style.display = 'block';
+      mainImg.style.display = 'none';
+      mainPlaceholder.style.display = 'block';
     }
 
-    const thumbWidthPercent = (visibleWidth / scrollWidth) * 100;
-    const scrollLeft = slider.scrollLeft;
-    const thumbLeftPercent = (scrollLeft / maxScroll) * (100 - thumbWidthPercent);
-    
-    thumb.style.width = thumbWidthPercent + '%';
-    thumb.style.left = thumbLeftPercent + '%';
-  }
+    // Остальные - в слайдер
+    for (let i = 1; i < products.length; i++) {
+      const p = products[i];
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      
+      // Если есть картинка - ставим img, иначе цветной фон
+      const imgHtml = p.image 
+        ? `<img src="${p.image}" alt="${p.name}">` 
+        : `<div style="width:100%;height:100%;background:#f0f0f0;"></div>`;
 
-  function onThumbStart(e) {
-    isDraggingThumb = true;
-    startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-    startScrollLeft = slider.scrollLeft;
-    thumb.style.transition = 'none';
-    e.stopPropagation(); 
-  }
-
-  function onThumbMove(e) {
-    if (!isDraggingThumb) return;
-    e.preventDefault(); 
-    
-    const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-    const deltaX = currentX - startX;
-    
-    const indicatorContainer = thumb.parentElement;
-    const containerWidth = indicatorContainer.offsetWidth;
-    const thumbWidth = thumb.offsetWidth;
-    const availableThumbMovePx = containerWidth - thumbWidth;
-    
-    if (availableThumbMovePx <= 0) return;
-
-    const maxScroll = slider.scrollWidth - slider.clientWidth;
-    const scrollDelta = deltaX * (maxScroll / availableThumbMovePx);
-    
-    slider.scrollLeft = startScrollLeft + scrollDelta;
-  }
-
-  function onThumbEnd() {
-    if (isDraggingThumb) {
-      isDraggingThumb = false;
-      thumb.style.transition = 'left 0.1s ease-out';
+      card.innerHTML = `
+        <div class="product-photo">${imgHtml}</div>
+        <div class="product-info">
+          <p class="product-name">${p.name}</p>
+          <p class="product-price">${p.price} ₽</p>
+        </div>
+      `;
+      slider.appendChild(card);
     }
+  } else {
+    mainName.innerText = "Каталог пуст";
+    mainPrice.innerText = "";
+    mainImg.style.display = 'none';
+    mainPlaceholder.style.display = 'block';
   }
+}
 
-  thumb.addEventListener('touchstart', onThumbStart, { passive: false });
-  thumb.addEventListener('mousedown', onThumbStart);
+// Рендер списка в админке
+function renderAdminList() {
+  const list = document.getElementById('admin-list');
+  list.innerHTML = '';
 
-  window.addEventListener('touchmove', onThumbMove, { passive: false });
-  window.addEventListener('mousemove', onThumbMove);
-  
-  window.addEventListener('touchend', onThumbEnd);
-  window.addEventListener('mouseup', onThumbEnd);
-
-  slider.addEventListener("scroll", updateThumb, { passive: true });
-  
-  setTimeout(updateThumb, 100);
-  window.addEventListener("resize", updateThumb);
-
-  let isDraggingInfo = false;
-  let infoStartX = 0;
-  let infoStartScroll = 0;
-
-  slider.addEventListener('touchstart', (e) => {
-    if (e.target.closest('.product-info')) {
-      isDraggingInfo = true;
-      infoStartX = e.touches[0].clientX;
-      infoStartScroll = slider.scrollLeft;
-      slider.style.scrollBehavior = 'auto';
-    }
-  }, { passive: true });
-
-  window.addEventListener('touchmove', (e) => {
-    if (!isDraggingInfo) return;
+  products.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'admin-product-item';
     
-    const currentX = e.touches[0].clientX;
-    const diff = infoStartX - currentX;
-    
-    if (Math.abs(diff) > 2) {
-       e.preventDefault();
-       slider.scrollLeft = infoStartScroll + diff;
-    }
-  }, { passive: false });
+    const thumbSrc = p.image ? p.image : '';
+    const thumbStyle = thumbSrc ? `background-image: url(${thumbSrc}); background-size: cover;` : '';
 
-  window.addEventListener('touchend', () => {
-    isDraggingInfo = false;
-    slider.style.scrollBehavior = '';
+    item.innerHTML = `
+      <div class="admin-thumb" style="${thumbStyle}"></div>
+      <div class="admin-info">
+        <div class="admin-name">${p.name}</div>
+        <div class="admin-price">${p.price} ₽</div>
+      </div>
+      <button class="delete-btn" onclick="deleteProduct(${p.id})">Удалить</button>
+    `;
+    list.appendChild(item);
   });
 }
 
-initSlider('slider1', 'thumb1');
-initSlider('slider2', 'thumb2');
-
-/* PHOTO SWIPE LOGIC & DOT CLICK */
-function initPhotoInteractions(containerSelector, photoSelector, dotsSelector) {
-  document.querySelectorAll(containerSelector).forEach(card => {
-    const photo = card.querySelector(photoSelector);
-    const dots = Array.from(card.querySelectorAll(dotsSelector));
-    const totalStates = dots.length;
-    
-    dots.forEach((dot, idx) => {
-      dot.addEventListener('click', (e) => {
-        e.stopPropagation();
-        setActiveState(idx);
-      });
+// Простой скрипт для скролл-индикатора (визуальный)
+const slider = document.getElementById('dynamic-slider');
+const thumb = document.querySelector('.scroll-indicator-thumb');
+if(slider && thumb) {
+    slider.addEventListener('scroll', () => {
+        const maxScroll = slider.scrollWidth - slider.clientWidth;
+        const percent = slider.scrollLeft / maxScroll;
+        thumb.style.left = (percent * 50) + '%'; // 50% ширина индикатора
     });
-
-    function setActiveState(idx) {
-        dots.forEach(d => d.classList.remove('active'));
-        dots[idx].classList.add('active');
-        photo.dataset.state = idx;
-    }
-
-    let touchStartX = 0;
-    let touchEndX = 0;
-    let currentState = 0;
-
-    photo.addEventListener('touchstart', e => {
-        touchStartX = e.changedTouches[0].screenX;
-    }, {passive: true});
-
-    photo.addEventListener('touchend', e => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    }, {passive: true});
-
-    function handleSwipe() {
-        const threshold = 30;
-        const diff = touchStartX - touchEndX;
-
-        currentState = parseInt(photo.dataset.state) || 0;
-
-        if (Math.abs(diff) > threshold) {
-            if (diff > 0) {
-                let next = currentState + 1;
-                if (next >= totalStates) next = 0;
-                setActiveState(next);
-            } else {
-                let prev = currentState - 1;
-                if (prev < 0) prev = totalStates - 1;
-                setActiveState(prev);
-            }
-        }
-    }
-  });
 }
-
-initPhotoInteractions('.featured-product', '.featured-photo', '.featured-photo .dots span');
-initPhotoInteractions('.product-card', '.product-photo', '.product-photo .dots span');
-
-let lastTouchEnd = 0;
-document.addEventListener('touchend', (e) => {
-  const now = Date.now();
-  if (now - lastTouchEnd <= 300) {
-    e.preventDefault();
-  }
-  lastTouchEnd = now;
-}, false);
 
 </script>
 
