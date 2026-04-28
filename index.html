@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<!-- Скрипт телеграма. Если он не загрузится (ошибка сети), код ниже сработает без него -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
@@ -29,7 +28,7 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
   height: 100%;
   background: #ffffff;
   z-index: 10000;
-  display: none; /* Скрыто по умолчанию */
+  display: none;
   align-items: center;
   justify-content: center;
   overflow: hidden;
@@ -132,6 +131,78 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
 .btn-add { background: #000; color: #fff; margin-bottom: 20px; }
 
 .file-btn { display: inline-block; padding: 8px 12px; background: #f0f0f0; border-radius: 8px; font-size: 14px; cursor: pointer; margin-top: 5px; }
+
+/* === WHITE LIST STYLES === */
+.whitelist-section { 
+  background: #fff; 
+  border: 1px solid #eee; 
+  border-radius: 20px; 
+  padding: 20px; 
+  margin-bottom: 20px; 
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
+}
+.whitelist-header { 
+  font-size: 18px; 
+  font-weight: 700; 
+  margin-bottom: 15px; 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+}
+.whitelist-input-row { 
+  display: flex; 
+  gap: 10px; 
+  margin-bottom: 15px; 
+}
+.whitelist-input-row .input-field { 
+  flex: 1; 
+  margin-bottom: 0; 
+}
+.btn-add-user { 
+  background: var(--accent-color); 
+  color: white; 
+  padding: 12px 20px; 
+  border-radius: 12px; 
+  border: none; 
+  font-weight: 600; 
+  cursor: pointer; 
+  white-space: nowrap; 
+}
+.whitelist-list { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px; 
+  max-height: 200px; 
+  overflow-y: auto; 
+}
+.whitelist-item { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  padding: 10px 14px; 
+  background: #f9f9f9; 
+  border-radius: 10px; 
+  font-size: 15px; 
+}
+.whitelist-item .username { 
+  font-weight: 500; 
+}
+.whitelist-item .btn-remove { 
+  background: rgba(255,59,48,0.1); 
+  color: var(--danger-color); 
+  border: none; 
+  padding: 6px 12px; 
+  border-radius: 8px; 
+  font-size: 12px; 
+  font-weight: 600; 
+  cursor: pointer; 
+}
+.whitelist-empty { 
+  color: var(--text-secondary); 
+  font-size: 14px; 
+  text-align: center; 
+  padding: 10px; 
+}
 </style>
 </head>
 
@@ -146,7 +217,6 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
 <div id="app-interface">
   <!-- SPLASH -->
   <div id="splash-screen">
-    <!-- Если нет логотипа, будет просто пустой квадрат, можно убрать src -->
     <div style="width:80px; height:80px; background:red; border-radius:10px;"></div> 
   </div>
 
@@ -185,6 +255,21 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
           <button class="btn-close" onclick="closeAdmin()">Закрыть</button>
         </div>
 
+        <!-- === WHITE LIST SECTION === -->
+        <div class="whitelist-section">
+          <div class="whitelist-header">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="#007aff"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+            Белый список пользователей
+          </div>
+          <div class="whitelist-input-row">
+            <input type="text" class="input-field" id="whitelist-username" placeholder="Введите юзернейм (без @)">
+            <button class="btn-add-user" onclick="addUserToWhitelist()">Добавить</button>
+          </div>
+          <div class="whitelist-list" id="whitelist-list">
+            <!-- Список пользователей -->
+          </div>
+        </div>
+
         <button class="btn-action btn-add" onclick="addNewCollection()">+ Добавить коллекцию</button>
         
         <div id="collections-list">
@@ -197,7 +282,6 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
 
 <script>
 // --- БЕЗОПАСНАЯ ИНИЦИАЛИЗАЦИЯ ---
-// Если Telegram SDK не загрузился (ошибка сети), создаем фейковый объект, чтобы сайт не падал
 var tg = {
     ready: function(){},
     expand: function(){},
@@ -207,7 +291,6 @@ var tg = {
     themeParams: {}
 };
 
-// Если SDK загрузился успешно, используем настоящий объект
 if (window.Telegram && window.Telegram.WebApp) {
     tg = window.Telegram.WebApp;
     tg.ready();
@@ -215,15 +298,24 @@ if (window.Telegram && window.Telegram.WebApp) {
 tg.expand();
 
 const ADMIN_USER = 'qvilxy';
+const WHITELIST_KEY = 'shop_whitelist_v1';
 let isAdmin = false;
 let collections = []; 
+let whitelist = [];
 
 window.addEventListener('load', () => {
   const user = tg.initDataUnsafe?.user;
+  loadWhitelist();
   
-  if (user && user.username && user.username.toLowerCase() === ADMIN_USER.toLowerCase()) {
-    isAdmin = true;
-    initApp(); 
+  // Проверяем доступ: админ ИЛИ пользователь из белого списка
+  if (user && user.username) {
+    const username = user.username.toLowerCase();
+    if (username === ADMIN_USER.toLowerCase() || whitelist.includes(username)) {
+      isAdmin = true;
+      initApp(); 
+    } else {
+      initDeniedScreen(); 
+    }
   } else {
     initDeniedScreen(); 
   }
@@ -259,6 +351,72 @@ function initApp() {
   };
 }
 
+// === WHITE LIST FUNCTIONS ===
+function loadWhitelist() {
+  try {
+    const saved = localStorage.getItem(WHITELIST_KEY);
+    if (saved) {
+      whitelist = JSON.parse(saved);
+    }
+  } catch (e) {
+    whitelist = [];
+  }
+}
+
+function saveWhitelist() {
+  localStorage.setItem(WHITELIST_KEY, JSON.stringify(whitelist));
+  renderWhitelist();
+}
+
+function addUserToWhitelist() {
+  const input = document.getElementById('whitelist-username');
+  let username = input.value.trim().toLowerCase();
+  
+  // Убираем @ если пользователь ввёл с ним
+  if (username.startsWith('@')) {
+    username = username.slice(1);
+  }
+  
+  if (!username) {
+    tg.showAlert('Введите юзернейм');
+    return;
+  }
+  
+  if (whitelist.includes(username)) {
+    tg.showAlert('Пользователь уже в белом списке');
+    input.value = '';
+    return;
+  }
+  
+  whitelist.push(username);
+  saveWhitelist();
+  input.value = '';
+  tg.showAlert(`@${username} добавлен в белый список`);
+}
+
+function removeUserFromWhitelist(username) {
+  whitelist = whitelist.filter(u => u !== username);
+  saveWhitelist();
+  tg.showAlert(`@${username} удалён из белого списка`);
+}
+
+function renderWhitelist() {
+  const list = document.getElementById('whitelist-list');
+  
+  if (whitelist.length === 0) {
+    list.innerHTML = '<div class="whitelist-empty">Список пуст</div>';
+    return;
+  }
+  
+  list.innerHTML = whitelist.map(username => `
+    <div class="whitelist-item">
+      <span class="username">@${username}</span>
+      <button class="btn-remove" onclick="removeUserFromWhitelist('${username}')">Удалить</button>
+    </div>
+  `).join('');
+}
+
+// === DESIGN FUNCTIONS ===
 function loadDesign() {
   const saved = localStorage.getItem('shop_design_v2');
   if (saved) {
@@ -349,6 +507,7 @@ function openAdmin() {
   document.getElementById('home').classList.remove('active-page');
   document.getElementById('admin').classList.add('active-page');
   renderAdminCollections();
+  renderWhitelist(); // Рендерим белый список при открытии админки
 }
 
 function closeAdmin() {
