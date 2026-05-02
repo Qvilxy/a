@@ -14,6 +14,7 @@
   --text-secondary: #8e8e93;
   --accent-color: #007aff;
   --danger-color: #ff3b30;
+  --ruby-red: #e91e63;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -73,8 +74,115 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
 
 .page-wrapper { display: flex; flex-direction: column; height: 100%; position: absolute; inset: 0; }
 .fixed-top-area { flex-shrink: 0; background: #fff; z-index: 100; position: sticky; top: 0; padding-bottom: 10px; }
-.header { height: 100px; position: relative; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; }
-.logo-container { position: absolute; top: calc(50% + 7px); left: 50%; transform: translate(-50%,-50%); width: 60px; z-index: 3; cursor: pointer; }
+
+/* === ROTATING BANNER HEADER === */
+.header { 
+  height: 120px; 
+  position: relative; 
+  border-bottom-left-radius: 24px; 
+  border-bottom-right-radius: 24px; 
+  background: #fff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.rotating-banner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.banner-row {
+  position: relative;
+  height: 36px;
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.banner-row.top,
+.banner-row.bottom {
+  animation: scrollLeft 8s linear infinite;
+}
+
+.banner-row.middle {
+  animation: scrollRight 8s linear infinite;
+}
+
+.banner-text {
+  display: inline-flex;
+  align-items: center;
+  font-size: 28px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.banner-text.red {
+  color: var(--ruby-red);
+}
+
+.banner-text.black {
+  color: #000;
+}
+
+.banner-text span {
+  display: inline-block;
+  padding: 0 8px;
+}
+
+/* Logo in banner */
+.banner-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--ruby-red);
+  border: 10px solid #fff;
+  border-radius: 8px;
+  margin: 0 8px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.banner-logo svg {
+  width: 20px;
+  height: 20px;
+  fill: #fff;
+}
+
+@keyframes scrollLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes scrollRight {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+/* Logo container for admin trigger */
+.logo-container { 
+  position: absolute; 
+  top: calc(50% + 7px); 
+  left: 50%; 
+  transform: translate(-50%,-50%); 
+  width: 60px; 
+  z-index: 10; 
+  cursor: pointer; 
+  display: none; /* Hidden by default, shown on hover if needed */
+}
+
 .logo-img { width: 100%; }
 
 .search-bar { margin: 0 16px; background: #fff; border-radius: 100px; padding: 0 20px; height: 50px; display: flex; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
@@ -217,7 +325,7 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
 <div id="app-interface">
   <!-- SPLASH -->
   <div id="splash-screen">
-    <div style="width:80px; height:80px; background:red; border-radius:10px;"></div> 
+    <div style="width:80px; height:80px; background:var(--ruby-red); border-radius:10px;"></div> 
   </div>
 
   <!-- HOME PAGE -->
@@ -225,8 +333,35 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
     <div class="page-wrapper">
       <div class="fixed-top-area">
         <div class="header">
+          <!-- Rotating Banner -->
+          <div class="rotating-banner">
+            <!-- Top Row - Left to Right -->
+            <div class="banner-row top">
+              <div class="banner-text red">
+                <span>RUBY</span><span>ROSE</span><span>RUBY</span><span>ROSE</span><span>RUBY</span><span>ROSE</span><span>RUBY</span><span>ROSE</span>
+              </div>
+            </div>
+            <!-- Middle Row - Right to Left -->
+            <div class="banner-row middle">
+              <div class="banner-text black">
+                <span>ROSE</span><span>RUBY</span>
+                <div class="banner-logo">
+                  <svg viewBox="0 0 24 24"><path d="M12 2C8.5 2 6 4.5 6 7.5c0 2 1 3.5 2.5 4.5C7 13 6 14.5 6 16.5c0 3 2.5 5.5 6 5.5s6-2.5 6-5.5c0-2-1-3.5-2.5-4.5 1.5-1 2.5-2.5 2.5-4.5C18 4.5 15.5 2 12 2z"/></svg>
+                </div>
+                <span>RUBY</span><span>ROSE</span><span>RUBY</span><span>ROSE</span><span>RUBY</span>
+              </div>
+            </div>
+            <!-- Bottom Row - Left to Right -->
+            <div class="banner-row bottom">
+              <div class="banner-text red">
+                <span>RUBY</span><span>ROSE</span><span>RUBY</span><span>ROSE</span><span>RUBY</span><span>ROSE</span><span>RUBY</span><span>ROSE</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Hidden logo container for admin trigger -->
           <div class="logo-container" id="admin-trigger">
-            <div style="width:60px; height:60px; background:red; border-radius:10px;"></div>
+            <div style="width:60px; height:60px; background:var(--ruby-red); border-radius:10px;"></div>
           </div>
         </div>
         <div class="search-bar">
@@ -246,7 +381,7 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
     <div class="page-wrapper">
       <div class="fixed-top-area">
         <div class="header">
-            <div class="logo-container"><div style="width:60px; height:60px; background:red; border-radius:10px;"></div></div>
+            <div class="logo-container"><div style="width:60px; height:60px; background:var(--ruby-red); border-radius:10px;"></div></div>
         </div>
       </div>
       <div class="page-content admin-panel active">
