@@ -14,7 +14,6 @@
   --text-secondary: #8e8e93;
   --accent-color: #007aff;
   --danger-color: #ff3b30;
-  --ruby-red: #e91e63;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -74,94 +73,8 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
 
 .page-wrapper { display: flex; flex-direction: column; height: 100%; position: absolute; inset: 0; }
 .fixed-top-area { flex-shrink: 0; background: #fff; z-index: 100; position: sticky; top: 0; padding-bottom: 10px; }
-
-/* === ROTATING BANNER HEADER === */
-.header { 
-  height: 120px; 
-  position: relative; 
-  border-bottom-left-radius: 24px; 
-  border-bottom-right-radius: 24px; 
-  background: #fff;
-  overflow: hidden;
-}
-
-.rotating-banner {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-}
-
-.banner-row {
-  position: absolute;
-  width: 100%;
-  height: 36px;
-  overflow: hidden;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-}
-
-.banner-row:nth-child(1) { top: 8px; animation: scrollLeft 10s linear infinite; }
-.banner-row:nth-child(2) { top: 42px; animation: scrollRight 10s linear infinite; }
-.banner-row:nth-child(3) { top: 76px; animation: scrollLeft 10s linear infinite; }
-
-.banner-text {
-  display: inline-flex;
-  align-items: center;
-  font-size: 28px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  white-space: nowrap;
-}
-
-.banner-text.red { color: var(--ruby-red); }
-.banner-text.black { color: #000; }
-
-.banner-item {
-  display: inline-flex;
-  align-items: center;
-  margin: 0 4px;
-}
-
-.banner-logo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 28px;
-  width: 28px;
-  margin: 0 6px;
-  flex-shrink: 0;
-}
-
-.banner-logo svg {
-  width: 100%;
-  height: 100%;
-  fill: var(--ruby-red);
-}
-
-@keyframes scrollLeft {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-@keyframes scrollRight {
-  0% { transform: translateX(-50%); }
-  100% { transform: translateX(0); }
-}
-
-.logo-container { 
-  position: absolute; 
-  top: 50%; 
-  left: 50%; 
-  transform: translate(-50%,-50%); 
-  width: 60px; 
-  z-index: 10; 
-  cursor: pointer; 
-  display: none;
-}
-
+.header { height: 100px; position: relative; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; }
+.logo-container { position: absolute; top: calc(50% + 7px); left: 50%; transform: translate(-50%,-50%); width: 60px; z-index: 3; cursor: pointer; }
 .logo-img { width: 100%; }
 
 .search-bar { margin: 0 16px; background: #fff; border-radius: 100px; padding: 0 20px; height: 50px; display: flex; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
@@ -304,7 +217,7 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
 <div id="app-interface">
   <!-- SPLASH -->
   <div id="splash-screen">
-    <div style="width:80px; height:80px; background:var(--ruby-red); border-radius:10px;"></div> 
+    <div style="width:80px; height:80px; background:red; border-radius:10px;"></div> 
   </div>
 
   <!-- HOME PAGE -->
@@ -312,88 +225,8 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
     <div class="page-wrapper">
       <div class="fixed-top-area">
         <div class="header">
-          <!-- Rotating Banner -->
-          <div class="rotating-banner">
-            <!-- Top Row - Left to Right -->
-            <div class="banner-row">
-              <div class="banner-text red">
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-logo"><svg viewBox="0 0 24 24"><path d="M12 2C8.5 2 6 4.5 6 7.5c0 2 1 3.5 2.5 4.5C7 13 6 14.5 6 16.5c0 3 2.5 5.5 6 5.5s6-2.5 6-5.5c0-2-1-3.5-2.5-4.5 1.5-1 2.5-2.5 2.5-4.5C18 4.5 15.5 2 12 2z"/></svg></span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-logo"><svg viewBox="0 0 24 24"><path d="M12 2C8.5 2 6 4.5 6 7.5c0 2 1 3.5 2.5 4.5C7 13 6 14.5 6 16.5c0 3 2.5 5.5 6 5.5s6-2.5 6-5.5c0-2-1-3.5-2.5-4.5 1.5-1 2.5-2.5 2.5-4.5C18 4.5 15.5 2 12 2z"/></svg></span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-logo"><svg viewBox="0 0 24 24"><path d="M12 2C8.5 2 6 4.5 6 7.5c0 2 1 3.5 2.5 4.5C7 13 6 14.5 6 16.5c0 3 2.5 5.5 6 5.5s6-2.5 6-5.5c0-2-1-3.5-2.5-4.5 1.5-1 2.5-2.5 2.5-4.5C18 4.5 15.5 2 12 2z"/></svg></span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-logo"><svg viewBox="0 0 24 24"><path d="M12 2C8.5 2 6 4.5 6 7.5c0 2 1 3.5 2.5 4.5C7 13 6 14.5 6 16.5c0 3 2.5 5.5 6 5.5s6-2.5 6-5.5c0-2-1-3.5-2.5-4.5 1.5-1 2.5-2.5 2.5-4.5C18 4.5 15.5 2 12 2z"/></svg></span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-              </div>
-            </div>
-            <!-- Middle Row - Right to Left -->
-            <div class="banner-row">
-              <div class="banner-text black">
-                <span class="banner-item">ROSE</span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-logo"><svg viewBox="0 0 24 24"><path d="M12 2C8.5 2 6 4.5 6 7.5c0 2 1 3.5 2.5 4.5C7 13 6 14.5 6 16.5c0 3 2.5 5.5 6 5.5s6-2.5 6-5.5c0-2-1-3.5-2.5-4.5 1.5-1 2.5-2.5 2.5-4.5C18 4.5 15.5 2 12 2z"/></svg></span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-logo"><svg viewBox="0 0 24 24"><path d="M12 2C8.5 2 6 4.5 6 7.5c0 2 1 3.5 2.5 4.5C7 13 6 14.5 6 16.5c0 3 2.5 5.5 6 5.5s6-2.5 6-5.5c0-2-1-3.5-2.5-4.5 1.5-1 2.5-2.5 2.5-4.5C18 4.5 15.5 2 12 2z"/></svg></span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-logo"><svg viewBox="0 0 24 24"><path d="M12 2C8.5 2 6 4.5 6 7.5c0 2 1 3.5 2.5 4.5C7 13 6 14.5 6 16.5c0 3 2.5 5.5 6 5.5s6-2.5 6-5.5c0-2-1-3.5-2.5-4.5 1.5-1 2.5-2.5 2.5-4.5C18 4.5 15.5 2 12 2z"/></svg></span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-logo"><svg viewBox="0 0 24 24"><path d="M12 2C8.5 2 6 4.5 6 7.5c0 2 1 3.5 2.5 4.5C7 13 6 14.5 6 16.5c0 3 2.5 5.5 6 5.5s6-2.5 6-5.5c0-2-1-3.5-2.5-4.5 1.5-1 2.5-2.5 2.5-4.5C18 4.5 15.5 2 12 2z"/></svg></span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-item">RUBY</span>
-              </div>
-            </div>
-            <!-- Bottom Row - Left to Right -->
-            <div class="banner-row">
-              <div class="banner-text red">
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-logo"><svg viewBox="0 0 24 24"><path d="M12 2C8.5 2 6 4.5 6 7.5c0 2 1 3.5 2.5 4.5C7 13 6 14.5 6 16.5c0 3 2.5 5.5 6 5.5s6-2.5 6-5.5c0-2-1-3.5-2.5-4.5 1.5-1 2.5-2.5 2.5-4.5C18 4.5 15.5 2 12 2z"/></svg></span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-logo"><svg viewBox="0 0 24 24"><path d="M12 2C8.5 2 6 4.5 6 7.5c0 2 1 3.5 2.5 4.5C7 13 6 14.5 6 16.5c0 3 2.5 5.5 6 5.5s6-2.5 6-5.5c0-2-1-3.5-2.5-4.5 1.5-1 2.5-2.5 2.5-4.5C18 4.5 15.5 2 12 2z"/></svg></span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-logo"><svg viewBox="0 0 24 24"><path d="M12 2C8.5 2 6 4.5 6 7.5c0 2 1 3.5 2.5 4.5C7 13 6 14.5 6 16.5c0 3 2.5 5.5 6 5.5s6-2.5 6-5.5c0-2-1-3.5-2.5-4.5 1.5-1 2.5-2.5 2.5-4.5C18 4.5 15.5 2 12 2z"/></svg></span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-                <span class="banner-logo"><svg viewBox="0 0 24 24"><path d="M12 2C8.5 2 6 4.5 6 7.5c0 2 1 3.5 2.5 4.5C7 13 6 14.5 6 16.5c0 3 2.5 5.5 6 5.5s6-2.5 6-5.5c0-2-1-3.5-2.5-4.5 1.5-1 2.5-2.5 2.5-4.5C18 4.5 15.5 2 12 2z"/></svg></span>
-                <span class="banner-item">RUBY</span>
-                <span class="banner-item">ROSE</span>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Hidden logo container for admin trigger -->
           <div class="logo-container" id="admin-trigger">
-            <div style="width:60px; height:60px; background:var(--ruby-red); border-radius:10px;"></div>
+            <div style="width:60px; height:60px; background:red; border-radius:10px;"></div>
           </div>
         </div>
         <div class="search-bar">
@@ -413,7 +246,7 @@ body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg-c
     <div class="page-wrapper">
       <div class="fixed-top-area">
         <div class="header">
-            <div class="logo-container"><div style="width:60px; height:60px; background:var(--ruby-red); border-radius:10px;"></div></div>
+            <div class="logo-container"><div style="width:60px; height:60px; background:red; border-radius:10px;"></div></div>
         </div>
       </div>
       <div class="page-content admin-panel active">
