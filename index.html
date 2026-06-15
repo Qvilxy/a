@@ -11,6 +11,7 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
@@ -33,13 +34,10 @@
             transition: opacity 0.5s, visibility 0.5s;
         }
         #loading-screen.hidden { opacity: 0; visibility: hidden; }
+
+        /* Убрана анимация pulse */
         #loading-screen img {
             width: 160px;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-        @keyframes pulse {
-            0%,100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.08); opacity: 0.85; }
         }
 
         #app-container {
@@ -79,12 +77,18 @@
             align-items: center;
             justify-content: center;
         }
+
+        /* Иконки не пиксельные — плавное масштабирование */
         .icon-btn img {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             object-fit: contain;
+            image-rendering: auto;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
         }
 
+        /* Убрано белое свечение */
         .logo-wrapper {
             position: absolute;
             bottom: -27px;
@@ -103,9 +107,10 @@
             width: 85%;
             height: 85%;
             object-fit: contain;
+            image-rendering: auto;
+            image-rendering: -webkit-optimize-contrast;
         }
 
-        /* Цвет полоски изменён на #101421 */
         .text-bar {
             display: flex;
             justify-content: space-between;
@@ -246,7 +251,7 @@
                 <img src="sadtree.png" class="banner" alt="Banner">
             </div>
             <div class="page dev-page" id="page-korzina">
-                <h2> Корзина</h2>
+                <h2>🛒 Корзина</h2>
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-profile">
@@ -260,7 +265,7 @@
         </div>
 
         <div class="catalog-widget" id="catalog-widget">
-            <p>📦 Товаров ещё нет</p>
+            <p> Товаров ещё нет</p>
             <button onclick="closeCatalog()">Понятно</button>
         </div>
     </div>
