@@ -63,12 +63,13 @@
 
         .header-native-space { height: 52px; }
 
-        /* Иконки на шапке — отдельные кнопки */
+        /* Иконки на шапке — опущены на 10px */
         .header-icons {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0 40px;
+            margin-top: 10px;
             position: relative;
             z-index: 10;
         }
@@ -88,7 +89,7 @@
             object-fit: contain;
         }
 
-        /* ЛОГОТИП — по центру, выступает вниз */
+        /* ЛОГОТИП */
         .logo-wrapper {
             position: absolute;
             bottom: -45px;
@@ -110,13 +111,13 @@
             object-fit: contain;
         }
 
-        /* ===== НИЖНЯЯ ПОЛОСА С ТЕКСТОМ ===== */
+        /* ===== НИЖНЯЯ ПОЛОСА — уменьшена на 20px ===== */
         .text-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #1a1a1a;
-            padding: 55px 30px 14px;
+            padding: 35px 30px 14px;
             flex-shrink: 0;
         }
 
@@ -218,11 +219,9 @@
 
     <div id="app-container">
 
-        <!-- ШАПКА -->
         <div class="header">
             <div class="header-native-space"></div>
 
-            <!-- Иконки — отдельные кнопки по бокам -->
             <div class="header-icons">
                 <button class="icon-btn" onclick="openPage('korzina')">
                     <img src="korzina.png" alt="Корзина">
@@ -232,13 +231,11 @@
                 </button>
             </div>
 
-            <!-- Логотип по центру, выступает вниз -->
             <div class="logo-wrapper">
                 <img src="logo.png" alt="Pear Skate Clo.">
             </div>
         </div>
 
-        <!-- НИЖНЯЯ ПОЛОСА — текст кнопки отдельно -->
         <div class="text-bar">
             <button class="text-btn" onclick="openCatalog()">
                 <span>Каталог</span>
@@ -249,7 +246,6 @@
             </button>
         </div>
 
-        <!-- КОНТЕНТ -->
         <div class="content">
             <div class="page active" id="page-home">
                 <img src="sadtree.png" class="banner" alt="Banner">
@@ -259,7 +255,7 @@
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-profile">
-                <h2> Профиль</h2>
+                <h2>👤 Профиль</h2>
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-faq">
