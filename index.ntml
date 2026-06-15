@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pear Skate Clo.</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #1a1a2e;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ===== ЗАГРУЗОЧНЫЙ ЭКРАН ===== */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        #loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #loading-screen img {
+            max-width: 60%;
+            max-height: 40%;
+            object-fit: contain;
+        }
+
+        /* ===== ГЛАВНАЯ СТРАНИЦА ===== */
+        #main-page {
+            display: none;
+            min-height: 100vh;
+            background: #1a1a2e;
+        }
+
+        /* Шапка */
+        .header {
+            background-color: #2b4a7e;
+            padding: 12px 16px 0 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 8px;
+        }
+
+        .header-icon {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .header-icon:active {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .header-icon img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+
+        .logo-container {
+            width: 72px;
+            height: 72px;
+            background: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #2b4a7e;
+            margin-top: -20px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .logo-container img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        /* Кнопки навигации */
+        .nav-buttons {
+            display: flex;
+            background: #1a1a2e;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 12px 0;
+            text-align: center;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            border: none;
+            background: none;
+            font-family: inherit;
+        }
+
+        .nav-btn:active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-btn.catalog-btn {
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Виджет каталога */
+        #catalog-widget {
+            display: none;
+            background: #2a2a3e;
+            padding: 16px;
+            text-align: center;
+            color: #cccccc;
+            font-size: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Баннер */
+        .banner {
+            width: 100%;
+            height: calc(100vh - 130px);
+            min-height: 400px;
+            overflow: hidden;
+        }
+
+        .banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* ===== СТРАНИЦА "В РАЗРАБОТКЕ" ===== */
+        #dev-page {
+            display: none;
+            min-height: 100vh;
+            background: #ffffff;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        #dev-page .dev-text {
+            font-size: 22px;
+            color: #333333;
+            font-weight: 500;
+            user-select: none;
+            transition: opacity 0.2s;
+        }
+
+        #dev-page .dev-text:active {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ЗАГРУЗОЧНЫЙ ЭКРАН -->
+    <div id="loading-screen">
+        <img src="vetka.png" alt="Ветка с грушей">
+    </div>
+
+    <!-- ГЛАВНАЯ СТРАНИЦА -->
+    <div id="main-page">
+        <!-- Шапка -->
+        <div class="header">
+            <div class="header-top">
+                <div class="header-icon" id="btn-cart" onclick="openDevPage()">
+                    <img src="korzina.png" alt="Корзина">
+                </div>
+                <div class="logo-container" onclick="goHome()">
+                    <img src="logo.png" alt="Pear Skate Clo.">
+                </div>
+                <div class="header-icon" id="btn-profile" onclick="openDevPage()">
+                    <img src="profile.png" alt="Профиль">
+                </div>
+            </div>
+        </div>
+
+        <!-- Кнопки навигации -->
+        <div class="nav-buttons">
+            <button class="nav-btn catalog-btn" id="btn-catalog" onclick="toggleCatalog()">Каталог</button>
+            <button class="nav-btn" id="btn-faq" onclick="openDevPage()">F.A.Q.</button>
+        </div>
+
+        <!-- Виджет каталога -->
+        <div id="catalog-widget">
+            Товаров нет
+        </div>
+
+        <!-- Баннер -->
+        <div class="banner">
+            <img src="sadtree.png" alt="Баннер">
+        </div>
+    </div>
+
+    <!-- СТРАНИЦА "В РАЗРАБОТКЕ" -->
+    <div id="dev-page" onclick="goHome()">
+        <span class="dev-text">В разработке</span>
+    </div>
+
+    <script>
+        // Инициализация Telegram Web App
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+
+        // Загрузочный экран — 5 секунд
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loading-screen');
+                loadingScreen.classList.add('fade-out');
+
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    document.getElementById('main-page').style.display = 'block';
+                }, 500);
+            }, 5000);
+        });
+
+        // Открыть страницу "В разработке"
+        function openDevPage() {
+            document.getElementById('main-page').style.display = 'none';
+            document.getElementById('dev-page').style.display = 'flex';
+            // Скрыть виджет каталога при переходе
+            document.getElementById('catalog-widget').style.display = 'none';
+        }
+
+        // Вернуться на главную
+        function goHome() {
+            document.getElementById('dev-page').style.display = 'none';
+            document.getElementById('main-page').style.display = 'block';
+            document.getElementById('catalog-widget').style.display = 'none';
+        }
+
+        // Переключить виджет каталога
+        function toggleCatalog() {
+            const widget = document.getElementById('catalog-widget');
+            if (widget.style.display === 'block') {
+                widget.style.display = 'none';
+            } else {
+                widget.style.display = 'block';
+            }
+        }
+    </script>
+
+</body>
+</html>
