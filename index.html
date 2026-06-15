@@ -52,31 +52,30 @@
             background: #1a1a2e;
         }
 
-        /* Шапка */
+        /* ===== ШАПКА ===== */
         .header {
             background-color: #2b4a7e;
-            padding: 12px 16px 0 16px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            position: relative;
+            padding-top: 16px;
+            padding-bottom: 28px;
         }
 
         .header-top {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding-bottom: 8px;
+            padding: 0 20px;
         }
 
         .header-icon {
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             border-radius: 8px;
-            transition: background 0.2s;
+            flex-shrink: 0;
         }
 
         .header-icon:active {
@@ -84,42 +83,36 @@
         }
 
         .header-icon img {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             object-fit: contain;
-            filter: brightness(0) invert(1);
         }
 
         .logo-container {
-            width: 72px;
-            height: 72px;
-            background: #ffffff;
-            border-radius: 50%;
+            width: 76px;
+            height: 76px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 3px solid #2b4a7e;
-            margin-top: -20px;
             cursor: pointer;
-            overflow: hidden;
+            flex-shrink: 0;
         }
 
         .logo-container img {
-            width: 60px;
-            height: 60px;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
         }
 
-        /* Кнопки навигации */
+        /* ===== КНОПКИ НАВИГАЦИИ ===== */
         .nav-buttons {
             display: flex;
-            background: #1a1a2e;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: #111111;
         }
 
         .nav-btn {
             flex: 1;
-            padding: 12px 0;
+            padding: 14px 0;
             text-align: center;
             color: #ffffff;
             font-size: 15px;
@@ -129,6 +122,7 @@
             border: none;
             background: none;
             font-family: inherit;
+            letter-spacing: 0.5px;
         }
 
         .nav-btn:active {
@@ -136,10 +130,10 @@
         }
 
         .nav-btn.catalog-btn {
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Виджет каталога */
+        /* ===== ВИДЖЕТ КАТАЛОГА ===== */
         #catalog-widget {
             display: none;
             background: #2a2a3e;
@@ -162,10 +156,10 @@
             }
         }
 
-        /* Баннер */
+        /* ===== БАННЕР ===== */
         .banner {
             width: 100%;
-            height: calc(100vh - 130px);
+            height: calc(100vh - 140px);
             min-height: 400px;
             overflow: hidden;
         }
@@ -209,6 +203,7 @@
 
     <!-- ГЛАВНАЯ СТРАНИЦА -->
     <div id="main-page">
+        
         <!-- Шапка -->
         <div class="header">
             <div class="header-top">
@@ -226,7 +221,7 @@
 
         <!-- Кнопки навигации -->
         <div class="nav-buttons">
-            <button class="nav-btn catalog-btn" id="btn-catalog" onclick="toggleCatalog()">Каталог</button>
+            <button class="nav-btn catalog-btn" id="btn-catalog" onclick="toggleCatalog()">Katanor</button>
             <button class="nav-btn" id="btn-faq" onclick="openDevPage()">F.A.Q.</button>
         </div>
 
@@ -247,8 +242,6 @@
     </div>
 
     <script>
-        console.log('🚀 Mini App starting...');
-        
         // Инициализация Telegram Web App
         let tg = null;
         try {
@@ -256,51 +249,26 @@
                 tg = window.Telegram.WebApp;
                 tg.ready();
                 tg.expand();
-                console.log('✅ Telegram Web App initialized');
             }
         } catch (e) {
-            console.error('❌ Telegram Web App error:', e);
+            console.error('Telegram Web App error:', e);
         }
 
-        // Функция перехода на главную
-        function showMainPage() {
-            console.log('📱 Showing main page');
-            const loadingScreen = document.getElementById('loading-screen');
-            const mainPage = document.getElementById('main-page');
-            
-            loadingScreen.classList.add('fade-out');
-            
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
-                mainPage.style.display = 'block';
-            }, 500);
-        }
-
-        // Запускаем таймер сразу при загрузке DOM
+        // Загрузочный экран — 5 секунд
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('📄 DOM Content Loaded');
-            
-            // Запускаем 5-секундный таймер
             setTimeout(() => {
-                console.log('⏰ 5 seconds passed, showing main page');
-                showMainPage();
+                const loadingScreen = document.getElementById('loading-screen');
+                loadingScreen.classList.add('fade-out');
+
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    document.getElementById('main-page').style.display = 'block';
+                }, 500);
             }, 5000);
-        });
-
-        // Также пробуем при полной загрузке страницы
-        window.addEventListener('load', () => {
-            console.log('🖼️ Window loaded');
-        });
-
-        // Обработка ошибок загрузки изображений
-        document.getElementById('loading-image').addEventListener('error', (e) => {
-            console.error('❌ Loading image error:', e);
-            console.log('⚠️ Image vetka.png not found or failed to load');
         });
 
         // Открыть страницу "В разработке"
         function openDevPage() {
-            console.log('🔧 Opening dev page');
             document.getElementById('main-page').style.display = 'none';
             document.getElementById('dev-page').style.display = 'flex';
             document.getElementById('catalog-widget').style.display = 'none';
@@ -308,7 +276,6 @@
 
         // Вернуться на главную
         function goHome() {
-            console.log('🏠 Going home');
             document.getElementById('dev-page').style.display = 'none';
             document.getElementById('main-page').style.display = 'block';
             document.getElementById('catalog-widget').style.display = 'none';
@@ -327,4 +294,3 @@
 
 </body>
 </html>
-
