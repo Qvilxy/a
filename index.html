@@ -54,11 +54,12 @@
 
         .header-native-space { height: 52px; }
 
+        /* Иконки симметрично между краем и логотипом */
         .header-icons {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            padding: 0 40px;
+            padding: 0 calc(25% - 47px);
             margin-top: 37px;
             position: relative;
             z-index: 10;
@@ -83,7 +84,6 @@
             display: block;
         }
 
-        /* Логотип опущен — нижний край совпадает с нижним краем полоски */
         .logo-wrapper {
             position: absolute;
             bottom: -27px;
@@ -104,13 +104,13 @@
             object-fit: contain;
         }
 
-        /* Полоска начинается сразу после шапки */
+        /* Текст симметрично между краем и логотипом */
         .text-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #101421;
-            padding: 0 40px;
+            padding: 0 calc(25% - 47px);
             flex-shrink: 0;
             height: 27px;
             margin-top: 0;
@@ -274,7 +274,7 @@
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-faq">
-                <h2>❓ F.A.Q.</h2>
+                <h2> F.A.Q.</h2>
                 <p>В разработке</p>
             </div>
 
