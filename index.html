@@ -57,22 +57,20 @@
         .header {
             position: relative;
             background-color: #245484;
-            padding-bottom: 12px;
+            padding-bottom: 10px;
         }
 
         .header-top {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
-            /* Отступ сверху чтобы нативные кнопки Telegram не перекрывали иконки */
-            padding-top: 52px;
-            padding-bottom: 20px;
+            padding: 0 28px;
+            padding-bottom: 18px;
         }
 
         .header-icon {
-            width: 44px;
-            height: 44px;
+            width: 42px;
+            height: 42px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -86,19 +84,19 @@
         }
 
         .header-icon img {
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             object-fit: contain;
         }
 
         /* Логотип перекрывает границу шапки и кнопок */
         .logo-container {
             position: absolute;
-            bottom: -46px;
+            bottom: -44px;
             left: 50%;
             transform: translateX(-50%);
-            width: 96px;
-            height: 96px;
+            width: 92px;
+            height: 92px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -116,22 +114,22 @@
         .nav-buttons {
             display: flex;
             background: #111111;
-            padding-top: 50px; /* место под выступающий логотип */
+            padding-top: 48px;
         }
 
         .nav-btn {
             flex: 1;
-            padding: 10px 0 12px 0;
+            padding: 5px 0 6px 0;
             text-align: center;
             color: #ffffff;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
             border: none;
             background: none;
             font-family: inherit;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         .nav-btn:active {
@@ -168,7 +166,7 @@
         /* ===== БАННЕР ===== */
         .banner {
             width: 100%;
-            height: calc(100vh - 150px);
+            height: calc(100vh - 144px);
             min-height: 400px;
             overflow: hidden;
         }
@@ -188,7 +186,6 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
         }
 
@@ -216,7 +213,7 @@
     <div id="main-page">
         
         <!-- Шапка -->
-        <div class="header">
+        <div class="header" id="header">
             <div class="header-top">
                 <div class="header-icon" id="btn-cart" onclick="openDevPage()">
                     <img src="korzina.png" alt="Корзина">
@@ -225,7 +222,6 @@
                     <img src="profile.png" alt="Профиль">
                 </div>
             </div>
-            <!-- Логотип по центру, перекрывает границу -->
             <div class="logo-container" onclick="goHome()">
                 <img src="logo.png" alt="Pear Skate Clo.">
             </div>
@@ -239,70 +235,3 @@
 
         <!-- Виджет каталога -->
         <div id="catalog-widget">
-            Товаров нет
-        </div>
-
-        <!-- Баннер -->
-        <div class="banner">
-            <img src="sadtree.png" alt="Баннер">
-        </div>
-    </div>
-
-    <!-- СТРАНИЦА "В РАЗРАБОТКЕ" -->
-    <div id="dev-page" onclick="goHome()">
-        <span class="dev-text">В разработке</span>
-    </div>
-
-    <script>
-        // Инициализация Telegram Web App
-        let tg = null;
-        try {
-            if (window.Telegram && window.Telegram.WebApp) {
-                tg = window.Telegram.WebApp;
-                tg.ready();
-                tg.expand();
-                // Устанавливаем цвет шапки Telegram
-                tg.setHeaderColor('#245484');
-                tg.setBackgroundColor('#1a1a2e');
-            }
-        } catch (e) {
-            console.error('Telegram Web App error:', e);
-        }
-
-        // Загрузочный экран — 5 секунд
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const loadingScreen = document.getElementById('loading-screen');
-                loadingScreen.classList.add('fade-out');
-
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                    document.getElementById('main-page').style.display = 'block';
-                }, 500);
-            }, 5000);
-        });
-
-        function openDevPage() {
-            document.getElementById('main-page').style.display = 'none';
-            document.getElementById('dev-page').style.display = 'flex';
-            document.getElementById('catalog-widget').style.display = 'none';
-        }
-
-        function goHome() {
-            document.getElementById('dev-page').style.display = 'none';
-            document.getElementById('main-page').style.display = 'block';
-            document.getElementById('catalog-widget').style.display = 'none';
-        }
-
-        function toggleCatalog() {
-            const widget = document.getElementById('catalog-widget');
-            if (widget.style.display === 'block') {
-                widget.style.display = 'none';
-            } else {
-                widget.style.display = 'block';
-            }
-        }
-    </script>
-
-</body>
-</html>
