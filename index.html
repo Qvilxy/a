@@ -57,8 +57,7 @@
         .header {
             position: relative;
             background-color: #245484;
-            padding-top: calc(env(safe-area-inset-top) + 16px);
-            padding-bottom: 16px;
+            padding-bottom: 12px;
         }
 
         .header-top {
@@ -66,11 +65,14 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 24px;
+            /* Отступ сверху чтобы нативные кнопки Telegram не перекрывали иконки */
+            padding-top: 52px;
+            padding-bottom: 20px;
         }
 
         .header-icon {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -84,19 +86,19 @@
         }
 
         .header-icon img {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             object-fit: contain;
         }
 
         /* Логотип перекрывает границу шапки и кнопок */
         .logo-container {
             position: absolute;
-            bottom: -40px;
+            bottom: -46px;
             left: 50%;
             transform: translateX(-50%);
-            width: 80px;
-            height: 80px;
+            width: 96px;
+            height: 96px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -114,12 +116,12 @@
         .nav-buttons {
             display: flex;
             background: #111111;
-            padding-top: 44px; /* место под выступающий логотип */
+            padding-top: 50px; /* место под выступающий логотип */
         }
 
         .nav-btn {
             flex: 1;
-            padding: 12px 0 14px 0;
+            padding: 10px 0 12px 0;
             text-align: center;
             color: #ffffff;
             font-size: 15px;
@@ -166,7 +168,7 @@
         /* ===== БАННЕР ===== */
         .banner {
             width: 100%;
-            height: calc(100vh - 140px);
+            height: calc(100vh - 150px);
             min-height: 400px;
             overflow: hidden;
         }
@@ -259,6 +261,9 @@
                 tg = window.Telegram.WebApp;
                 tg.ready();
                 tg.expand();
+                // Устанавливаем цвет шапки Telegram
+                tg.setHeaderColor('#245484');
+                tg.setBackgroundColor('#1a1a2e');
             }
         } catch (e) {
             console.error('Telegram Web App error:', e);
