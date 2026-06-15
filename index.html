@@ -83,7 +83,6 @@
             display: block;
         }
 
-        /* Логотип поднят вместе с полоской */
         .logo-wrapper {
             position: absolute;
             bottom: -13px;
@@ -104,7 +103,6 @@
             object-fit: contain;
         }
 
-        /* Полоска поднята на красную линию */
         .text-bar {
             display: flex;
             justify-content: space-between;
@@ -166,41 +164,62 @@
         .dev-page h2 { font-size: 24px; color: #333; }
         .dev-page p { color: #888; font-size: 16px; }
 
+        /* ===== ВИДЖЕТ КАТАЛОГА С КАТЕГОРИЯМИ ===== */
         .catalog-widget {
             position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-120%);
-            width: 90%;
-            max-width: 340px;
+            top: 13px;
+            left: 10px;
+            width: 58%;
+            max-width: 260px;
             background: #fff;
-            border-radius: 16px;
-            padding: 24px 20px;
-            text-align: center;
+            border-radius: 8px 8px 28px 8px;
+            padding: 18px 20px 22px;
             z-index: 30;
-            transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+            transform: translateY(-10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.25s, visibility 0.25s;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.2);
         }
-        .catalog-widget.show { transform: translateX(-50%) translateY(0); }
-        .catalog-widget p { font-size: 17px; color: #444; margin-bottom: 18px; }
-        .catalog-widget button {
-            background: #245484;
-            color: #fff;
-            border: none;
-            padding: 11px 32px;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
+        .catalog-widget.show {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .catalog-widget ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .catalog-widget li {
+            padding: 10px 4px;
+            font-size: 16px;
+            color: #999;
+            font-weight: 500;
             cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .catalog-widget li:active {
+            background: #f0f0f0;
+            color: #555;
+        }
+
+        .catalog-widget li + li {
+            border-top: 1px solid #f0f0f0;
         }
 
         .overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.35);
             z-index: 25;
-            opacity: 0; visibility: hidden;
+            opacity: 0;
+            visibility: hidden;
             transition: opacity 0.3s, visibility 0.3s;
         }
         .overlay.show { opacity: 1; visibility: visible; }
@@ -250,7 +269,7 @@
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-profile">
-                <h2> Профиль</h2>
+                <h2>👤 Профиль</h2>
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-faq">
@@ -259,9 +278,15 @@
             </div>
         </div>
 
+        <!-- Виджет категорий -->
         <div class="catalog-widget" id="catalog-widget">
-            <p>📦 Товаров ещё нет</p>
-            <button onclick="closeCatalog()">Понятно</button>
+            <ul>
+                <li>Худи / Худи на молнии</li>
+                <li>Футболки / Лонгсливы</li>
+                <li>Низ</li>
+                <li>Верхняя одежда</li>
+                <li>Аксессуары</li>
+            </ul>
         </div>
     </div>
 
@@ -306,10 +331,18 @@
             document.getElementById('catalog-widget').classList.add('show');
             document.getElementById('overlay').classList.add('show');
         }
+
         function closeCatalog() {
             document.getElementById('catalog-widget').classList.remove('show');
             document.getElementById('overlay').classList.remove('show');
         }
+
+        // Закрытие по клику на категорию
+        document.querySelectorAll('.catalog-widget li').forEach(li => {
+            li.addEventListener('click', () => {
+                closeCatalog();
+            });
+        });
 
         window.addEventListener('load', () => {
             setTimeout(() => {
