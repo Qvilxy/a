@@ -15,210 +15,180 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #1a1a2e;
+            background: #000;
             overflow: hidden;
             height: 100vh;
             width: 100vw;
         }
 
-        /* ===== ЭКРАН ЗАГРУЗКИ ===== */
+        /* ===== ЗАГРУЗКА ===== */
         #loading-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #ffffff;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            transition: opacity 0.5s, visibility 0.5s;
         }
-
-        #loading-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
+        #loading-screen.hidden { opacity: 0; visibility: hidden; }
         #loading-screen img {
             width: 160px;
-            height: auto;
-            animation: loadingPulse 1.5s ease-in-out infinite;
+            animation: pulse 1.5s ease-in-out infinite;
         }
-
-        @keyframes loadingPulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
+        @keyframes pulse {
+            0%,100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.08); opacity: 0.85; }
         }
 
-        /* ===== ОСНОВНОЙ КОНТЕЙНЕР ===== */
+        /* ===== APP ===== */
         #app-container {
             display: none;
             flex-direction: column;
             height: 100vh;
-            width: 100vw;
             overflow: hidden;
         }
-
-        #app-container.visible {
-            display: flex;
-        }
+        #app-container.visible { display: flex; }
 
         /* ===== ШАПКА ===== */
         .header {
             position: relative;
+            background: #245484;
+            padding-top: var(--safe-top, 20px);
+            height: 140px;
+            flex-shrink: 0;
+        }
+
+        .header-native-space { height: 52px; }
+
+        /* Иконки на шапке — отдельные кнопки */
+        .header-icons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            position: relative;
             z-index: 10;
-            background: #2b5ea7;
-            /* Safe area сверху — отступ под нативные кнопки Telegram */
-            padding-top: var(--tg-safe-area-top, 0px);
-            padding-bottom: 20px;
         }
 
-        /* Пустое пространство под нативную панель Telegram */
-        .header-spacer {
-            height: 56px; /* место под кнопку Закрыть и иконки */
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
         }
 
-        /* ===== ЛОГОТИП ===== */
+        /* ЛОГОТИП — по центру, выступает вниз */
         .logo-wrapper {
             position: absolute;
-            bottom: -30px;
+            bottom: -45px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 20;
-            width: 110px;
-            height: 110px;
+            width: 115px;
+            height: 115px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-
         .logo-wrapper img {
-            width: 100%;
-            height: 100%;
+            width: 85%;
+            height: 85%;
             object-fit: contain;
-            filter: drop-shadow(0 3px 10px rgba(0,0,0,0.35));
         }
 
-        /* ===== МЕНЮ ===== */
-        .menu-bar {
+        /* ===== НИЖНЯЯ ПОЛОСА С ТЕКСТОМ ===== */
+        .text-bar {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            padding: 40px 30px 10px;
-            background: #2b5ea7;
-            position: relative;
-            z-index: 5;
+            align-items: center;
+            background: #1a1a1a;
+            padding: 55px 30px 14px;
+            flex-shrink: 0;
         }
 
-        .menu-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
+        .text-btn {
+            background: none;
+            border: none;
             cursor: pointer;
-            padding: 8px 20px;
-            border-radius: 12px;
+            padding: 8px 16px;
+            border-radius: 8px;
             transition: background 0.2s;
         }
-
-        .menu-item:active {
-            background: rgba(255,255,255,0.12);
-        }
-
-        .menu-item img {
-            width: 30px;
-            height: 30px;
-            object-fit: contain;
-            filter: brightness(0) invert(1);
-        }
-
-        .menu-item span {
+        .text-btn:active { background: rgba(255,255,255,0.1); }
+        .text-btn span {
             color: #fff;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
         }
 
-        .menu-center-spacer {
-            width: 120px;
-            flex-shrink: 0;
-        }
+        .text-center-spacer { width: 100px; }
 
         /* ===== КОНТЕНТ ===== */
         .content {
             flex: 1;
             position: relative;
             overflow: hidden;
-            background: #111;
         }
 
         .page {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             display: none;
-            flex-direction: column;
         }
-
-        .page.active {
-            display: flex;
-        }
+        .page.active { display: block; }
 
         .banner {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             object-fit: cover;
         }
 
-        /* Страница "В разработке" */
         .dev-page {
             background: #f0f0f0;
+            display: none;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 16px;
         }
+        .dev-page.active { display: flex; }
+        .dev-page h2 { font-size: 24px; color: #333; }
+        .dev-page p { color: #888; font-size: 16px; }
 
-        .dev-page h2 {
-            font-size: 24px;
-            color: #333;
-            font-weight: 700;
-        }
-
-        .dev-page p {
-            color: #888;
-            font-size: 16px;
-        }
-
-        /* ===== ВИДЖЕТ КАТАЛОГА ===== */
+        /* ===== ВИДЖЕТ ===== */
         .catalog-widget {
             position: absolute;
-            top: 0;
+            top: 10px;
             left: 50%;
-            transform: translateX(-50%) translateY(-110%);
+            transform: translateX(-50%) translateY(-120%);
             width: 90%;
-            max-width: 360px;
+            max-width: 340px;
             background: #fff;
             border-radius: 16px;
             padding: 24px 20px;
             text-align: center;
             z-index: 30;
-            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
         }
-
-        .catalog-widget.show {
-            transform: translateX(-50%) translateY(10px);
-        }
-
-        .catalog-widget p {
-            font-size: 17px;
-            color: #444;
-            margin-bottom: 18px;
-            font-weight: 500;
-        }
-
-        .catalog-widget .btn-close-widget {
-            background: #2b5ea7;
+        .catalog-widget.show { transform: translateX(-50%) translateY(0); }
+        .catalog-widget p { font-size: 17px; color: #444; margin-bottom: 18px; }
+        .catalog-widget button {
+            background: #245484;
             color: #fff;
             border: none;
             padding: 11px 32px;
@@ -230,54 +200,53 @@
 
         .overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.35);
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
             z-index: 25;
-            opacity: 0;
-            visibility: hidden;
+            opacity: 0; visibility: hidden;
             transition: opacity 0.3s, visibility 0.3s;
         }
-
-        .overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
+        .overlay.show { opacity: 1; visibility: visible; }
     </style>
 </head>
 <body>
 
-    <!-- ЭКРАН ЗАГРУЗКИ -->
     <div id="loading-screen">
-        <img src="vetka.png" alt="Loading...">
+        <img src="vetka.png" alt="Loading">
     </div>
 
-    <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
     <div id="app-container">
 
         <!-- ШАПКА -->
         <div class="header">
-            <div class="header-spacer"></div>
+            <div class="header-native-space"></div>
 
-            <!-- ЛОГОТИП -->
+            <!-- Иконки — отдельные кнопки по бокам -->
+            <div class="header-icons">
+                <button class="icon-btn" onclick="openPage('korzina')">
+                    <img src="korzina.png" alt="Корзина">
+                </button>
+                <button class="icon-btn" onclick="openPage('profile')">
+                    <img src="profile.png" alt="Профиль">
+                </button>
+            </div>
+
+            <!-- Логотип по центру, выступает вниз -->
             <div class="logo-wrapper">
                 <img src="logo.png" alt="Pear Skate Clo.">
             </div>
         </div>
 
-        <!-- МЕНЮ -->
-        <div class="menu-bar">
-            <div class="menu-item" onclick="openCatalog()">
-                <img src="korzina.png" alt="Каталог">
+        <!-- НИЖНЯЯ ПОЛОСА — текст кнопки отдельно -->
+        <div class="text-bar">
+            <button class="text-btn" onclick="openCatalog()">
                 <span>Каталог</span>
-            </div>
-            <div class="menu-center-spacer"></div>
-            <div class="menu-item" onclick="openPage('faq')">
-                <img src="profile.png" alt="F.A.Q.">
+            </button>
+            <div class="text-center-spacer"></div>
+            <button class="text-btn" onclick="openPage('faq')">
                 <span>F.A.Q.</span>
-            </div>
+            </button>
         </div>
 
         <!-- КОНТЕНТ -->
@@ -285,27 +254,23 @@
             <div class="page active" id="page-home">
                 <img src="sadtree.png" class="banner" alt="Banner">
             </div>
-
             <div class="page dev-page" id="page-korzina">
                 <h2>🛒 Корзина</h2>
                 <p>В разработке</p>
             </div>
-
             <div class="page dev-page" id="page-profile">
-                <h2>👤 Профиль</h2>
+                <h2> Профиль</h2>
                 <p>В разработке</p>
             </div>
-
             <div class="page dev-page" id="page-faq">
                 <h2>❓ F.A.Q.</h2>
                 <p>В разработке</p>
             </div>
         </div>
 
-        <!-- Виджет каталога -->
         <div class="catalog-widget" id="catalog-widget">
             <p>📦 Товаров ещё нет</p>
-            <button class="btn-close-widget" onclick="closeCatalog()">Понятно</button>
+            <button onclick="closeCatalog()">Понятно</button>
         </div>
     </div>
 
@@ -314,69 +279,47 @@
     <script>
         const tg = window.Telegram?.WebApp;
 
-        // Safe area
         function applySafeArea() {
             if (tg && tg.safeAreaInset) {
-                document.documentElement.style.setProperty(
-                    '--tg-safe-area-top',
-                    tg.safeAreaInset.top + 'px'
-                );
+                document.documentElement.style.setProperty('--safe-top', tg.safeAreaInset.top + 'px');
             }
         }
         applySafeArea();
-        if (tg) tg.ready();
+        if (tg) { tg.ready(); tg.expand(); }
 
-        // ===== НАВИГАЦИЯ =====
         let history = ['home'];
-        let currentPage = 'home';
 
-        function showPage(pageId) {
+        function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            const page = document.getElementById('page-' + pageId);
-            if (page) {
-                page.classList.add('active');
-                currentPage = pageId;
-            }
+            const page = document.getElementById('page-' + id);
+            if (page) page.classList.add('active');
         }
 
-        function openPage(pageId) {
-            history.push(pageId);
-            showPage(pageId);
-            if (tg && tg.BackButton) {
-                tg.BackButton.show();
-            }
+        function openPage(id) {
+            history.push(id);
+            showPage(id);
+            if (tg?.BackButton) tg.BackButton.show();
         }
 
         function goBack() {
             if (history.length > 1) {
                 history.pop();
-                const prevPage = history[history.length - 1];
-                showPage(prevPage);
+                showPage(history[history.length - 1]);
             }
-            if (history.length === 1 && tg && tg.BackButton) {
-                tg.BackButton.hide();
-            }
+            if (history.length === 1 && tg?.BackButton) tg.BackButton.hide();
         }
 
-        // Кнопка Назад от Telegram
-        if (tg && tg.BackButton) {
-            tg.BackButton.onClick(() => {
-                goBack();
-            });
-        }
+        tg?.BackButton?.onClick(goBack);
 
-        // ===== КАТАЛОГ =====
         function openCatalog() {
             document.getElementById('catalog-widget').classList.add('show');
             document.getElementById('overlay').classList.add('show');
         }
-
         function closeCatalog() {
             document.getElementById('catalog-widget').classList.remove('show');
             document.getElementById('overlay').classList.remove('show');
         }
 
-        // ===== ЗАГРУЗКА =====
         window.addEventListener('load', () => {
             setTimeout(() => {
                 document.getElementById('loading-screen').classList.add('hidden');
