@@ -170,27 +170,40 @@
         .dev-page h2 { font-size: 24px; color: #333; }
         .dev-page p { color: #888; font-size: 16px; }
 
-        /* Виджет центрирован под кнопкой Каталог, уже по ширине */
+        /* Мобильные устройства — виджет от левого края */
         .catalog-widget {
             position: absolute;
             top: 0;
-            left: calc(25% - 47px + 18px);
-            transform: translateX(-50%) translateY(-10px);
-            width: 42%;
-            max-width: 190px;
+            left: 10px;
+            width: 60%;
+            max-width: none;
             background: #fff;
             border-radius: 0 0 30px 30px;
             padding: 18px 20px 22px;
             z-index: 30;
+            transform: translateY(-10px);
             opacity: 0;
             visibility: hidden;
             transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.25s, visibility 0.25s;
             box-shadow: 0 6px 24px rgba(0,0,0,0.2);
         }
         .catalog-widget.show {
-            transform: translateX(-50%) translateY(0);
+            transform: translateY(0);
             opacity: 1;
             visibility: visible;
+        }
+
+        /* Широкие экраны — виджет по центру под кнопкой Каталог */
+        @media (min-width: 600px) {
+            .catalog-widget {
+                left: calc(25% - 47px + 18px);
+                transform: translateX(-50%) translateY(-10px);
+                width: 42%;
+                max-width: 220px;
+            }
+            .catalog-widget.show {
+                transform: translateX(-50%) translateY(0);
+            }
         }
 
         .catalog-widget ul {
@@ -270,7 +283,7 @@
                 <img src="sadtree.png" class="banner" alt="Banner">
             </div>
             <div class="page dev-page" id="page-korzina">
-                <h2> Корзина</h2>
+                <h2>🛒 Корзина</h2>
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-profile">
