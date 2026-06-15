@@ -70,22 +70,21 @@
             background: none;
             border: none;
             cursor: pointer;
-            padding: 8px;
+            padding: 0;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
 
-        /* SVG через object */
-        .icon-btn object {
+        /* SVG через img */
+        .icon-btn img {
             width: 36px;
             height: 36px;
-            pointer-events: none;
-        }
-
-        .icon-btn object svg {
-            width: 100%;
-            height: 100%;
+            object-fit: contain;
+            display: block;
         }
 
         .logo-wrapper {
@@ -221,10 +220,10 @@
 
             <div class="header-icons">
                 <button class="icon-btn" onclick="openPage('korzina')">
-                    <object type="image/svg+xml" data="Korzina.svg"></object>
+                    <img src="Korzina.svg" alt="Корзина" onerror="this.style.display='none'; console.error('Korzina.svg не загрузился')">
                 </button>
                 <button class="icon-btn" onclick="openPage('profile')">
-                    <object type="image/svg+xml" data="profile.svg"></object>
+                    <img src="profile.svg" alt="Профиль" onerror="this.style.display='none'; console.error('profile.svg не загрузился')">
                 </button>
             </div>
 
@@ -256,13 +255,13 @@
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-faq">
-                <h2> F.A.Q.</h2>
+                <h2>❓ F.A.Q.</h2>
                 <p>В разработке</p>
             </div>
         </div>
 
         <div class="catalog-widget" id="catalog-widget">
-            <p> Товаров ещё нет</p>
+            <p>📦 Товаров ещё нет</p>
             <button onclick="closeCatalog()">Понятно</button>
         </div>
     </div>
