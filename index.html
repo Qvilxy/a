@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Pear Skate Clo.</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -17,6 +17,7 @@
             background-color: #1a1a2e;
             overflow-x: hidden;
             min-height: 100vh;
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         /* ===== ЗАГРУЗОЧНЫЙ ЭКРАН ===== */
@@ -54,17 +55,17 @@
 
         /* ===== ШАПКА ===== */
         .header {
-            background-color: #2b4a7e;
             position: relative;
-            padding-top: 16px;
-            padding-bottom: 28px;
+            background-color: #245484;
+            padding-top: calc(env(safe-area-inset-top) + 16px);
+            padding-bottom: 16px;
         }
 
         .header-top {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 24px;
         }
 
         .header-icon {
@@ -88,14 +89,19 @@
             object-fit: contain;
         }
 
+        /* Логотип перекрывает границу шапки и кнопок */
         .logo-container {
-            width: 76px;
-            height: 76px;
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            flex-shrink: 0;
+            z-index: 10;
         }
 
         .logo-container img {
@@ -108,11 +114,12 @@
         .nav-buttons {
             display: flex;
             background: #111111;
+            padding-top: 44px; /* место под выступающий логотип */
         }
 
         .nav-btn {
             flex: 1;
-            padding: 14px 0;
+            padding: 12px 0 14px 0;
             text-align: center;
             color: #ffffff;
             font-size: 15px;
@@ -179,6 +186,8 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         #dev-page .dev-text {
@@ -210,18 +219,19 @@
                 <div class="header-icon" id="btn-cart" onclick="openDevPage()">
                     <img src="korzina.png" alt="Корзина">
                 </div>
-                <div class="logo-container" onclick="goHome()">
-                    <img src="logo.png" alt="Pear Skate Clo.">
-                </div>
                 <div class="header-icon" id="btn-profile" onclick="openDevPage()">
                     <img src="profile.png" alt="Профиль">
                 </div>
+            </div>
+            <!-- Логотип по центру, перекрывает границу -->
+            <div class="logo-container" onclick="goHome()">
+                <img src="logo.png" alt="Pear Skate Clo.">
             </div>
         </div>
 
         <!-- Кнопки навигации -->
         <div class="nav-buttons">
-            <button class="nav-btn catalog-btn" id="btn-catalog" onclick="toggleCatalog()">Katanor</button>
+            <button class="nav-btn catalog-btn" id="btn-catalog" onclick="toggleCatalog()">Каталог</button>
             <button class="nav-btn" id="btn-faq" onclick="openDevPage()">F.A.Q.</button>
         </div>
 
@@ -267,21 +277,18 @@
             }, 5000);
         });
 
-        // Открыть страницу "В разработке"
         function openDevPage() {
             document.getElementById('main-page').style.display = 'none';
             document.getElementById('dev-page').style.display = 'flex';
             document.getElementById('catalog-widget').style.display = 'none';
         }
 
-        // Вернуться на главную
         function goHome() {
             document.getElementById('dev-page').style.display = 'none';
             document.getElementById('main-page').style.display = 'block';
             document.getElementById('catalog-widget').style.display = 'none';
         }
 
-        // Переключить виджет каталога
         function toggleCatalog() {
             const widget = document.getElementById('catalog-widget');
             if (widget.style.display === 'block') {
