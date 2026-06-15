@@ -76,15 +76,10 @@
             justify-content: center;
         }
 
-        /* SVG иконки — всегда чёткие */
-        .icon-btn svg {
+        .icon-btn img {
             width: 36px;
             height: 36px;
-            stroke: #fff;
-            fill: none;
-            stroke-width: 1.8;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+            object-fit: contain;
         }
 
         .logo-wrapper {
@@ -219,21 +214,11 @@
             <div class="header-native-space"></div>
 
             <div class="header-icons">
-                <!-- Иконка корзины (SVG) -->
                 <button class="icon-btn" onclick="openPage('korzina')">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                        <line x1="3" y1="6" x2="21" y2="6"/>
-                        <path d="M16 10a4 4 0 0 1-8 0"/>
-                    </svg>
+                    <img src="Korzina.svg" alt="Корзина">
                 </button>
-
-                <!-- Иконка профиля (SVG) -->
                 <button class="icon-btn" onclick="openPage('profile')">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                    </svg>
+                    <img src="profile.svg" alt="Профиль">
                 </button>
             </div>
 
@@ -257,7 +242,7 @@
                 <img src="sadtree.png" class="banner" alt="Banner">
             </div>
             <div class="page dev-page" id="page-korzina">
-                <h2> Корзина</h2>
+                <h2>🛒 Корзина</h2>
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-profile">
@@ -271,7 +256,7 @@
         </div>
 
         <div class="catalog-widget" id="catalog-widget">
-            <p>📦 Товаров ещё нет</p>
+            <p> Товаров ещё нет</p>
             <button onclick="closeCatalog()">Понятно</button>
         </div>
     </div>
