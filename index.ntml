@@ -204,7 +204,7 @@
 
     <!-- ЗАГРУЗОЧНЫЙ ЭКРАН -->
     <div id="loading-screen">
-        <img src="vetka.png" alt="Ветка с грушей">
+        <img src="vetka.png" alt="Ветка с грушей" id="loading-image">
     </div>
 
     <!-- ГЛАВНАЯ СТРАНИЦА -->
@@ -247,36 +247,68 @@
     </div>
 
     <script>
+        console.log('🚀 Mini App starting...');
+        
         // Инициализация Telegram Web App
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.ready();
-            tg.expand();
+        let tg = null;
+        try {
+            if (window.Telegram && window.Telegram.WebApp) {
+                tg = window.Telegram.WebApp;
+                tg.ready();
+                tg.expand();
+                console.log('✅ Telegram Web App initialized');
+            }
+        } catch (e) {
+            console.error('❌ Telegram Web App error:', e);
         }
 
-        // Загрузочный экран — 5 секунд
-        window.addEventListener('load', () => {
+        // Функция перехода на главную
+        function showMainPage() {
+            console.log('📱 Showing main page');
+            const loadingScreen = document.getElementById('loading-screen');
+            const mainPage = document.getElementById('main-page');
+            
+            loadingScreen.classList.add('fade-out');
+            
             setTimeout(() => {
-                const loadingScreen = document.getElementById('loading-screen');
-                loadingScreen.classList.add('fade-out');
+                loadingScreen.style.display = 'none';
+                mainPage.style.display = 'block';
+            }, 500);
+        }
 
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                    document.getElementById('main-page').style.display = 'block';
-                }, 500);
+        // Запускаем таймер сразу при загрузке DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('📄 DOM Content Loaded');
+            
+            // Запускаем 5-секундный таймер
+            setTimeout(() => {
+                console.log('⏰ 5 seconds passed, showing main page');
+                showMainPage();
             }, 5000);
+        });
+
+        // Также пробуем при полной загрузке страницы
+        window.addEventListener('load', () => {
+            console.log('🖼️ Window loaded');
+        });
+
+        // Обработка ошибок загрузки изображений
+        document.getElementById('loading-image').addEventListener('error', (e) => {
+            console.error('❌ Loading image error:', e);
+            console.log('⚠️ Image vetka.png not found or failed to load');
         });
 
         // Открыть страницу "В разработке"
         function openDevPage() {
+            console.log('🔧 Opening dev page');
             document.getElementById('main-page').style.display = 'none';
             document.getElementById('dev-page').style.display = 'flex';
-            // Скрыть виджет каталога при переходе
             document.getElementById('catalog-widget').style.display = 'none';
         }
 
         // Вернуться на главную
         function goHome() {
+            console.log('🏠 Going home');
             document.getElementById('dev-page').style.display = 'none';
             document.getElementById('main-page').style.display = 'block';
             document.getElementById('catalog-widget').style.display = 'none';
@@ -295,3 +327,4 @@
 
 </body>
 </html>
+
