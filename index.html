@@ -49,23 +49,24 @@
             position: relative;
             flex-shrink: 0;
             z-index: 15;
+            /* Отступ сверху под нативные кнопки Telegram */
+            padding-top: env(safe-area-inset-top, 20px);
         }
 
         .header-top {
             background: #7388A3;
-            padding-top: var(--safe-top, 20px);
-            height: 90px;
+            height: 95px;
             display: flex;
             align-items: center;
             position: relative;
         }
 
-        /* Кнопка меню слева */
+        /* Кнопка меню-бургер слева */
         .menu-btn {
             position: absolute;
-            left: 16px;
+            left: 18px;
             top: 50%;
-            transform: translateY(-30%);
+            transform: translateY(-20%);
             background: none;
             border: none;
             cursor: pointer;
@@ -77,21 +78,21 @@
         }
 
         .menu-btn img {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             object-fit: contain;
             display: block;
         }
 
-        /* Логотип овальный, большой, с выступом вниз */
+        /* Логотип СМЕЩЁН ВЛЕВО от центра */
         .logo-wrapper {
             position: absolute;
             top: 50%;
-            left: 50%;
-            transform: translate(-50%, -40%);
+            left: 44%;
+            transform: translate(-50%, -35%);
             z-index: 20;
-            width: 160px;
-            height: 100px;
+            width: 150px;
+            height: 95px;
         }
 
         .logo-wrapper img {
@@ -101,15 +102,15 @@
             filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
         }
 
-        /* Иконки справа */
+        /* Иконки справа — БОЛЬШИЕ */
         .header-right {
             position: absolute;
-            right: 16px;
+            right: 14px;
             top: 50%;
-            transform: translateY(-30%);
+            transform: translateY(-20%);
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             z-index: 10;
         }
 
@@ -124,16 +125,16 @@
         }
 
         .icon-btn img {
-            width: 30px;
-            height: 30px;
+            width: 42px;
+            height: 42px;
             object-fit: contain;
             display: block;
         }
 
-        /* Тёмная полоса снизу шапки */
+        /* Тёмная полоска — ТОЛЩЕ */
         .header-bottom {
             background: #15355B;
-            height: 12px;
+            height: 22px;
         }
 
         /* ===== БОКОВОЕ МЕНЮ ===== */
@@ -177,9 +178,7 @@
             margin-bottom: 12px;
             margin-top: 20px;
         }
-        .side-menu h3:first-child {
-            margin-top: 0;
-        }
+        .side-menu h3:first-child { margin-top: 0; }
 
         .side-menu ul {
             list-style: none;
@@ -196,9 +195,7 @@
             transition: background 0.15s;
         }
 
-        .side-menu li:active {
-            background: #f0f0f0;
-        }
+        .side-menu li:active { background: #f0f0f0; }
 
         /* ===== КОНТЕНТ ===== */
         .content {
@@ -231,7 +228,6 @@
             height: 100%;
             transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         .slideshow-track.no-transition { transition: none; }
         .slideshow-track.dragging { transition: none; }
 
@@ -268,16 +264,8 @@
             border-radius: 2px;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .indicator.active {
-            width: 32px;
-            background: #fff;
-        }
-
-        .indicator.inactive {
-            width: 16px;
-            background: rgba(255, 255, 255, 0.5);
-        }
+        .indicator.active { width: 32px; background: #fff; }
+        .indicator.inactive { width: 16px; background: rgba(255,255,255,0.5); }
 
         .dev-page {
             background: #f0f0f0;
@@ -300,20 +288,16 @@
 
     <div id="app-container">
 
-        <!-- ШАПКА -->
         <div class="header">
             <div class="header-top">
-                <!-- Меню-бургер слева -->
                 <button class="menu-btn" onclick="toggleMenu()">
                     <img src="menu.png" alt="Меню">
                 </button>
 
-                <!-- Логотип по центру, чуть влево, овальный, с выступом вниз -->
                 <div class="logo-wrapper">
                     <img src="sticker.png" alt="Pear Skate Clo.">
                 </div>
 
-                <!-- Иконки справа -->
                 <div class="header-right">
                     <button class="icon-btn" onclick="openPage('korzina')">
                         <img src="iconkorzina.png" alt="Корзина">
@@ -326,7 +310,6 @@
             <div class="header-bottom"></div>
         </div>
 
-        <!-- КОНТЕНТ -->
         <div class="content">
             <div class="page active" id="page-home">
                 <div class="slideshow" id="slideshow">
@@ -343,7 +326,7 @@
             </div>
 
             <div class="page dev-page" id="page-korzina">
-                <h2> Корзина</h2>
+                <h2>🛒 Корзина</h2>
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-profile">
@@ -357,7 +340,6 @@
         </div>
     </div>
 
-    <!-- Боковое меню -->
     <div class="side-menu-overlay" id="menu-overlay" onclick="toggleMenu()"></div>
     <div class="side-menu" id="side-menu">
         <h3>Каталог:</h3>
@@ -368,7 +350,6 @@
             <li onclick="closeMenu()">Шляпы</li>
             <li onclick="closeMenu()">Аксессуары</li>
         </ul>
-
         <h3>Разделы:</h3>
         <ul>
             <li onclick="goHome()">Главная</li>
@@ -380,13 +361,25 @@
     <script>
         const tg = window.Telegram?.WebApp;
 
+        // Применяем safe area
         function applySafeArea() {
-            if (tg && tg.safeAreaInset) {
-                document.documentElement.style.setProperty('--safe-top', tg.safeAreaInset.top + 'px');
+            if (tg && tg.safeAreaInset && tg.safeAreaInset.top) {
+                document.documentElement.style.setProperty('--tg-safe-top', tg.safeAreaInset.top + 'px');
+                document.querySelector('.header').style.paddingTop = tg.safeAreaInset.top + 'px';
+            } else {
+                // Fallback если safeAreaInset не доступен
+                document.querySelector('.header').style.paddingTop = '20px';
             }
         }
-        applySafeArea();
-        if (tg) { tg.ready(); tg.expand(); }
+
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            // Применяем после ready
+            setTimeout(applySafeArea, 100);
+        } else {
+            applySafeArea();
+        }
 
         let history = ['home'];
 
@@ -439,9 +432,7 @@
         let isDragging = false;
         let startX = 0;
 
-        function getTranslatePercent(pos) {
-            return -(pos * 33.3333);
-        }
+        function getTranslatePercent(pos) { return -(pos * 33.3333); }
 
         function updateIndicators(realIndex) {
             indicators.forEach((ind, i) => {
@@ -451,15 +442,10 @@
 
         function moveTo(pos, animate = true) {
             currentPos = pos;
-            if (!animate) {
-                track.classList.add('no-transition');
-            } else {
-                track.classList.remove('no-transition');
-            }
+            if (!animate) track.classList.add('no-transition');
+            else track.classList.remove('no-transition');
             track.style.transform = `translateX(${getTranslatePercent(pos)}%)`;
-
-            let realIndex = pos;
-            if (pos === 2) realIndex = 0;
+            let realIndex = pos === 2 ? 0 : pos;
             updateIndicators(realIndex);
         }
 
@@ -511,7 +497,6 @@
             const endX = e.changedTouches[0].clientX;
             const diff = endX - startX;
             const threshold = slideshow.offsetWidth * 0.2;
-
             if (diff < -threshold) nextSlide();
             else if (diff > threshold) prevSlide();
             else moveTo(currentPos, true);
