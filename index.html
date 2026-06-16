@@ -16,7 +16,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #000;
+            background: #f0f0f0;
             overflow: hidden;
             height: 100vh;
             width: 100vw;
@@ -44,105 +44,162 @@
         }
         #app-container.visible { display: flex; }
 
+        /* ===== ШАПКА ===== */
         .header {
             position: relative;
-            background: #245484;
+            flex-shrink: 0;
+            z-index: 15;
+        }
+
+        /* Верхняя светло-серо-голубая часть */
+        .header-top {
+            background: #9aa8b8;
             padding-top: var(--safe-top, 20px);
-            height: 130px;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+
+        /* Нижняя тёмно-синяя полоса */
+        .header-bottom {
+            background: #1e3550;
+            height: 14px;
+        }
+
+        /* Кнопка меню (три полоски) */
+        .menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             flex-shrink: 0;
         }
 
-        .header-native-space { height: 52px; }
+        .menu-btn img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            display: block;
+        }
 
-        .header-icons {
+        /* Логотип — смещён чуть влево от центра */
+        .logo-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 42%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            width: 110px;
+            height: 70px;
+        }
+
+        .logo-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Иконки корзины и профиля — справа, рядом */
+        .header-right {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 0 calc(25% - 47px);
-            margin-top: 37px;
-            position: relative;
-            z-index: 10;
+            align-items: center;
+            gap: 8px;
+            padding-right: 16px;
+            flex-shrink: 0;
         }
 
         .icon-btn {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 0;
-            width: 36px;
-            height: 36px;
+            padding: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .icon-btn img {
-            width: 36px;
-            height: 36px;
+            width: 28px;
+            height: 28px;
             object-fit: contain;
             display: block;
         }
 
-        .logo-wrapper {
-            position: absolute;
-            bottom: -27px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 20;
-            width: 115px;
-            height: 115px;
-            background: #245484;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* ===== БОКОВОЕ МЕНЮ ===== */
+        .side-menu-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
         }
-        .logo-wrapper img {
-            width: 85%;
-            height: 85%;
-            object-fit: contain;
+        .side-menu-overlay.show {
+            opacity: 1;
+            visibility: visible;
         }
 
-        .text-bar {
-            position: relative;
-            background: #101421;
-            flex-shrink: 0;
-            height: 27px;
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 260px;
+            max-width: 80%;
+            height: 100%;
+            background: #fff;
+            z-index: 60;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 40px 24px 24px;
+            overflow-y: auto;
+        }
+        .side-menu.show {
+            transform: translateX(0);
+        }
+
+        .side-menu h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 12px;
+            margin-top: 20px;
+        }
+        .side-menu h3:first-child {
             margin-top: 0;
         }
 
-        .text-btn {
-            position: absolute;
-            top: 50%;
-            background: none;
-            border: none;
+        .side-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 8px 0;
+        }
+
+        .side-menu li {
+            padding: 8px 4px;
+            font-size: 16px;
+            color: #333;
             cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 8px;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-        .text-btn:active { background: rgba(255,255,255,0.1); }
-        .text-btn span {
-            color: #fff;
-            font-size: 15px;
-            font-weight: 700;
+            border-radius: 6px;
+            transition: background 0.15s;
         }
 
-        .text-btn-catalog {
-            left: calc(25% - 47px + 18px);
-            transform: translate(-50%, -50%);
+        .side-menu li:active {
+            background: #f0f0f0;
         }
 
-        .text-btn-faq {
-            right: calc(25% - 47px + 18px);
-            transform: translate(50%, -50%);
-        }
-
+        /* ===== КОНТЕНТ ===== */
         .content {
             flex: 1;
             position: relative;
             overflow: hidden;
+            background: #f0f0f0;
         }
 
         .page {
@@ -183,7 +240,6 @@
             flex-shrink: 0;
         }
 
-        /* Максимальное качество для JPG изображений */
         .slide img {
             width: 100%;
             height: 100%;
@@ -196,10 +252,9 @@
             backface-visibility: hidden;
         }
 
-        /* Индикаторы */
         .slideshow-indicators {
             position: absolute;
-            bottom: 16px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -208,8 +263,8 @@
         }
 
         .indicator {
-            height: 6px;
-            border-radius: 3px;
+            height: 4px;
+            border-radius: 2px;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -220,9 +275,10 @@
 
         .indicator.inactive {
             width: 16px;
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.5);
         }
 
+        /* Страницы "В разработке" */
         .dev-page {
             background: #f0f0f0;
             display: none;
@@ -234,77 +290,6 @@
         .dev-page.active { display: flex; }
         .dev-page h2 { font-size: 24px; color: #333; }
         .dev-page p { color: #888; font-size: 16px; }
-
-        .catalog-widget {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 60%;
-            max-width: none;
-            background: #fff;
-            border-radius: 0 0 30px 30px;
-            padding: 18px 20px 22px;
-            z-index: 30;
-            transform: translateY(-10px);
-            opacity: 0;
-            visibility: hidden;
-            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.25s, visibility 0.25s;
-            box-shadow: 0 6px 24px rgba(0,0,0,0.2);
-        }
-        .catalog-widget.show {
-            transform: translateY(0);
-            opacity: 1;
-            visibility: visible;
-        }
-
-        @media (min-width: 600px) {
-            .catalog-widget {
-                left: calc(25% - 47px + 18px);
-                transform: translateX(-50%) translateY(-10px);
-                width: 42%;
-                max-width: 220px;
-            }
-            .catalog-widget.show {
-                transform: translateX(-50%) translateY(0);
-            }
-        }
-
-        .catalog-widget ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .catalog-widget li {
-            padding: 10px 4px;
-            font-size: 16px;
-            color: #999;
-            font-weight: 500;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: background 0.15s, color 0.15s;
-        }
-
-        .catalog-widget li:active {
-            background: #f0f0f0;
-            color: #555;
-        }
-
-        .catalog-widget li + li {
-            border-top: 1px solid #f0f0f0;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.35);
-            z-index: 25;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-        }
-        .overlay.show { opacity: 1; visibility: visible; }
     </style>
 </head>
 <body>
@@ -315,39 +300,41 @@
 
     <div id="app-container">
 
+        <!-- ШАПКА -->
         <div class="header">
-            <div class="header-native-space"></div>
-
-            <div class="header-icons">
-                <button class="icon-btn" onclick="openPage('korzina')">
-                    <img src="korzina.png" alt="Корзина">
+            <div class="header-top">
+                <!-- Кнопка меню -->
+                <button class="menu-btn" onclick="toggleMenu()">
+                    <img src="menu.png" alt="Меню">
                 </button>
-                <button class="icon-btn" onclick="openPage('profile')">
-                    <img src="profile.png" alt="Профиль">
-                </button>
-            </div>
 
-            <div class="logo-wrapper">
-                <img src="logo.png" alt="Pear Skate Clo.">
+                <!-- Логотип (смещён влево) -->
+                <div class="logo-wrapper">
+                    <img src="logo.png" alt="Pear Skate Clo.">
+                </div>
+
+                <!-- Иконки справа -->
+                <div class="header-right">
+                    <button class="icon-btn" onclick="openPage('korzina')">
+                        <img src="korzina.png" alt="Корзина">
+                    </button>
+                    <button class="icon-btn" onclick="openPage('profile')">
+                        <img src="profile.png" alt="Профиль">
+                    </button>
+                </div>
             </div>
+            <div class="header-bottom"></div>
         </div>
 
-        <div class="text-bar">
-            <button class="text-btn text-btn-catalog" onclick="openCatalog()">
-                <span>Каталог</span>
-            </button>
-            <button class="text-btn text-btn-faq" onclick="openPage('faq')">
-                <span>F.A.Q.</span>
-            </button>
-        </div>
-
+        <!-- КОНТЕНТ -->
         <div class="content">
+            <!-- Главная со слайд-шоу -->
             <div class="page active" id="page-home">
                 <div class="slideshow" id="slideshow">
                     <div class="slideshow-track" id="slideshow-track">
-                        <div class="slide"><img src="sadtree.jpg" alt="Slide 1"></div>
-                        <div class="slide"><img src="voda.jpg" alt="Slide 2"></div>
-                        <div class="slide"><img src="sadtree.jpg" alt="Slide 1 clone"></div>
+                        <div class="slide"><img src="sadtree.png" alt="Slide 1"></div>
+                        <div class="slide"><img src="voda.png" alt="Slide 2"></div>
+                        <div class="slide"><img src="sadtree.png" alt="Slide 1 clone"></div>
                     </div>
                     <div class="slideshow-indicators">
                         <div class="indicator active" id="ind-0"></div>
@@ -361,27 +348,35 @@
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-profile">
-                <h2> Профиль</h2>
+                <h2>👤 Профиль</h2>
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-faq">
                 <h2>❓ F.A.Q.</h2>
                 <p>В разработке</p>
             </div>
-
-            <div class="catalog-widget" id="catalog-widget">
-                <ul>
-                    <li>Худи / Худи на молнии</li>
-                    <li>Футболки / Лонгсливы</li>
-                    <li>Низ</li>
-                    <li>Верхняя одежда</li>
-                    <li>Аксессуары</li>
-                </ul>
-            </div>
         </div>
     </div>
 
-    <div class="overlay" id="overlay" onclick="closeCatalog()"></div>
+    <!-- Боковое меню -->
+    <div class="side-menu-overlay" id="menu-overlay" onclick="toggleMenu()"></div>
+    <div class="side-menu" id="side-menu">
+        <h3>Каталог:</h3>
+        <ul>
+            <li onclick="closeMenu()">Худи</li>
+            <li onclick="closeMenu()">Футболки</li>
+            <li onclick="closeMenu()">Штаны</li>
+            <li onclick="closeMenu()">Шляпы</li>
+            <li onclick="closeMenu()">Аксессуары</li>
+        </ul>
+
+        <h3>Разделы:</h3>
+        <ul>
+            <li onclick="goHome()">Главная</li>
+            <li onclick="closeMenu()">Сертификаты</li>
+            <li onclick="closeMenu()">Контакты</li>
+        </ul>
+    </div>
 
     <script>
         const tg = window.Telegram?.WebApp;
@@ -418,28 +413,29 @@
 
         tg?.BackButton?.onClick(goBack);
 
-        function openCatalog() {
-            document.getElementById('catalog-widget').classList.add('show');
-            document.getElementById('overlay').classList.add('show');
+        // ===== БОКОВОЕ МЕНЮ =====
+        function toggleMenu() {
+            document.getElementById('side-menu').classList.toggle('show');
+            document.getElementById('menu-overlay').classList.toggle('show');
         }
 
-        function closeCatalog() {
-            document.getElementById('catalog-widget').classList.remove('show');
-            document.getElementById('overlay').classList.remove('show');
+        function closeMenu() {
+            document.getElementById('side-menu').classList.remove('show');
+            document.getElementById('menu-overlay').classList.remove('show');
         }
 
-        document.querySelectorAll('.catalog-widget li').forEach(li => {
-            li.addEventListener('click', () => {
-                closeCatalog();
-            });
-        });
+        function goHome() {
+            closeMenu();
+            history = ['home'];
+            showPage('home');
+            if (tg?.BackButton) tg.BackButton.hide();
+        }
 
         // ===== СЛАЙД-ШОУ =====
         const track = document.getElementById('slideshow-track');
         const slideshow = document.getElementById('slideshow');
         const indicators = [document.getElementById('ind-0'), document.getElementById('ind-1')];
 
-        const realSlides = 2;
         let currentPos = 0;
         let autoplayTimer;
         let isDragging = false;
