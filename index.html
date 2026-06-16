@@ -164,9 +164,13 @@
 
         .slideshow-track {
             display: flex;
-            width: 200%;
+            width: 300%;
             height: 100%;
             transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slideshow-track.no-transition {
+            transition: none;
         }
 
         .slideshow-track.dragging {
@@ -174,7 +178,7 @@
         }
 
         .slide {
-            width: 50%;
+            width: 33.3333%;
             height: 100%;
             flex-shrink: 0;
         }
@@ -214,7 +218,6 @@
             background: rgba(255, 255, 255, 0.4);
         }
 
-        /* Страницы "В разработке" */
         .dev-page {
             background: #f0f0f0;
             display: none;
@@ -227,7 +230,6 @@
         .dev-page h2 { font-size: 24px; color: #333; }
         .dev-page p { color: #888; font-size: 16px; }
 
-        /* Виджет каталога */
         .catalog-widget {
             position: absolute;
             top: 0;
@@ -335,12 +337,12 @@
         </div>
 
         <div class="content">
-            <!-- Главная страница со слайд-шоу -->
             <div class="page active" id="page-home">
                 <div class="slideshow" id="slideshow">
                     <div class="slideshow-track" id="slideshow-track">
                         <div class="slide"><img src="sadtree.png" alt="Slide 1"></div>
                         <div class="slide"><img src="voda.png" alt="Slide 2"></div>
+                        <div class="slide"><img src="sadtree.png" alt="Slide 1 clone"></div>
                     </div>
                     <div class="slideshow-indicators">
                         <div class="indicator active" id="ind-0"></div>
@@ -354,7 +356,7 @@
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-profile">
-                <h2>👤 Профиль</h2>
+                <h2> Профиль</h2>
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-faq">
@@ -427,39 +429,72 @@
             });
         });
 
-        // ===== СЛАЙД-ШОУ =====
+        // ===== СЛАЙД-ШОУ С КЛОНОМ ДЛЯ ПЛАВНОГО ЦИКЛА =====
         const track = document.getElementById('slideshow-track');
+        const slideshow = document.getElementById('slideshow');
         const indicators = [document.getElementById('ind-0'), document.getElementById('ind-1')];
-        const totalSlides = 2;
-        let currentSlide = 0;
+
+        // 3 слайда в треке: [sadtree] [voda] [sadtree-clone]
+        // Реальные индексы: 0 и 1. Клон на позиции 2 = визуальный 0.
+        const realSlides = 2;
+        let currentPos = 0; // позиция в треке (0, 1 или 2)
         let autoplayTimer;
         let isDragging = false;
         let startX = 0;
-        let currentTranslate = 0;
 
-        function goToSlide(index) {
-            currentSlide = index;
-            const offset = -index * 50; // 50% потому что track = 200%, каждый слайд = 50%
-            track.style.transform = `translateX(${offset}%)`;
+        function getTranslatePercent(pos) {
+            return -(pos * 33.3333);
+        }
 
-            // Обновляем индикаторы
+        function updateIndicators(realIndex) {
             indicators.forEach((ind, i) => {
-                if (i === index) {
-                    ind.className = 'indicator active';
-                } else {
-                    ind.className = 'indicator inactive';
-                }
+                ind.className = i === realIndex ? 'indicator active' : 'indicator inactive';
             });
+        }
 
-            resetAutoplay();
+        function moveTo(pos, animate = true) {
+            currentPos = pos;
+            if (!animate) {
+                track.classList.add('no-transition');
+            } else {
+                track.classList.remove('no-transition');
+            }
+            track.style.transform = `translateX(${getTranslatePercent(pos)}%)`;
+
+            // Реальный индекс для индикаторов
+            let realIndex = pos;
+            if (pos === 2) realIndex = 0; // клон = первый слайд
+            updateIndicators(realIndex);
         }
 
         function nextSlide() {
-            goToSlide((currentSlide + 1) % totalSlides);
+            if (currentPos === 1) {
+                // С последнего реального слайда (voda) едем вправо на клон (sadtree)
+                moveTo(2, true);
+                // После анимации мгновенно прыгаем на реальный первый слайд (позиция 0)
+                setTimeout(() => {
+                    moveTo(0, false);
+                }, 500);
+            } else {
+                moveTo(currentPos + 1, true);
+            }
+            resetAutoplay();
         }
 
         function prevSlide() {
-            goToSlide((currentSlide - 1 + totalSlides) % totalSlides);
+            if (currentPos === 0) {
+                // С первого слайда едем влево — сначала прыгаем на клон (позиция 2) без анимации
+                moveTo(2, false);
+                // Потом анимируем назад на позицию 1 (voda)
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        moveTo(1, true);
+                    });
+                });
+            } else {
+                moveTo(currentPos - 1, true);
+            }
+            resetAutoplay();
         }
 
         function resetAutoplay() {
@@ -468,8 +503,6 @@
         }
 
         // Свайп
-        const slideshow = document.getElementById('slideshow');
-
         slideshow.addEventListener('touchstart', (e) => {
             isDragging = true;
             startX = e.touches[0].clientX;
@@ -479,10 +512,9 @@
         slideshow.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
             const diff = e.touches[0].clientX - startX;
-            const baseOffset = -currentSlide * 50;
-            // Конвертируем пиксели в проценты от ширины трека
+            const baseOffset = getTranslatePercent(currentPos);
             const percentDiff = (diff / slideshow.offsetWidth) * 100;
-            track.style.transform = `translateX(${baseOffset + percentDiff / 2}%)`;
+            track.style.transform = `translateX(${baseOffset + percentDiff / 3}%)`;
         }, { passive: true });
 
         slideshow.addEventListener('touchend', (e) => {
@@ -498,11 +530,12 @@
             } else if (diff > threshold) {
                 prevSlide();
             } else {
-                goToSlide(currentSlide);
+                moveTo(currentPos, true);
             }
         }, { passive: true });
 
-        // Запуск автоплея
+        // Инициализация
+        moveTo(0, false);
         resetAutoplay();
 
         window.addEventListener('load', () => {
