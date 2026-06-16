@@ -153,11 +153,68 @@
         }
         .page.active { display: block; }
 
-        .banner {
-            width: 100%; height: 100%;
-            object-fit: cover;
+        /* ===== СЛАЙД-ШОУ ===== */
+        .slideshow {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            touch-action: pan-y;
         }
 
+        .slideshow-track {
+            display: flex;
+            width: 200%;
+            height: 100%;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slideshow-track.dragging {
+            transition: none;
+        }
+
+        .slide {
+            width: 50%;
+            height: 100%;
+            flex-shrink: 0;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            -webkit-user-drag: none;
+        }
+
+        /* Индикаторы */
+        .slideshow-indicators {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .indicator {
+            height: 6px;
+            border-radius: 3px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .indicator.active {
+            width: 32px;
+            background: #fff;
+        }
+
+        .indicator.inactive {
+            width: 16px;
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Страницы "В разработке" */
         .dev-page {
             background: #f0f0f0;
             display: none;
@@ -170,7 +227,7 @@
         .dev-page h2 { font-size: 24px; color: #333; }
         .dev-page p { color: #888; font-size: 16px; }
 
-        /* Мобильные — виджет прижат к левому краю */
+        /* Виджет каталога */
         .catalog-widget {
             position: absolute;
             top: 0;
@@ -193,7 +250,6 @@
             visibility: visible;
         }
 
-        /* Широкие экраны — виджет по центру под кнопкой Каталог */
         @media (min-width: 600px) {
             .catalog-widget {
                 left: calc(25% - 47px + 18px);
@@ -279,9 +335,20 @@
         </div>
 
         <div class="content">
+            <!-- Главная страница со слайд-шоу -->
             <div class="page active" id="page-home">
-                <img src="sadtree.png" class="banner" alt="Banner">
+                <div class="slideshow" id="slideshow">
+                    <div class="slideshow-track" id="slideshow-track">
+                        <div class="slide"><img src="sadtree.png" alt="Slide 1"></div>
+                        <div class="slide"><img src="voda.png" alt="Slide 2"></div>
+                    </div>
+                    <div class="slideshow-indicators">
+                        <div class="indicator active" id="ind-0"></div>
+                        <div class="indicator inactive" id="ind-1"></div>
+                    </div>
+                </div>
             </div>
+
             <div class="page dev-page" id="page-korzina">
                 <h2>🛒 Корзина</h2>
                 <p>В разработке</p>
@@ -359,6 +426,84 @@
                 closeCatalog();
             });
         });
+
+        // ===== СЛАЙД-ШОУ =====
+        const track = document.getElementById('slideshow-track');
+        const indicators = [document.getElementById('ind-0'), document.getElementById('ind-1')];
+        const totalSlides = 2;
+        let currentSlide = 0;
+        let autoplayTimer;
+        let isDragging = false;
+        let startX = 0;
+        let currentTranslate = 0;
+
+        function goToSlide(index) {
+            currentSlide = index;
+            const offset = -index * 50; // 50% потому что track = 200%, каждый слайд = 50%
+            track.style.transform = `translateX(${offset}%)`;
+
+            // Обновляем индикаторы
+            indicators.forEach((ind, i) => {
+                if (i === index) {
+                    ind.className = 'indicator active';
+                } else {
+                    ind.className = 'indicator inactive';
+                }
+            });
+
+            resetAutoplay();
+        }
+
+        function nextSlide() {
+            goToSlide((currentSlide + 1) % totalSlides);
+        }
+
+        function prevSlide() {
+            goToSlide((currentSlide - 1 + totalSlides) % totalSlides);
+        }
+
+        function resetAutoplay() {
+            clearInterval(autoplayTimer);
+            autoplayTimer = setInterval(nextSlide, 5000);
+        }
+
+        // Свайп
+        const slideshow = document.getElementById('slideshow');
+
+        slideshow.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            track.classList.add('dragging');
+        }, { passive: true });
+
+        slideshow.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const diff = e.touches[0].clientX - startX;
+            const baseOffset = -currentSlide * 50;
+            // Конвертируем пиксели в проценты от ширины трека
+            const percentDiff = (diff / slideshow.offsetWidth) * 100;
+            track.style.transform = `translateX(${baseOffset + percentDiff / 2}%)`;
+        }, { passive: true });
+
+        slideshow.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            track.classList.remove('dragging');
+            const endX = e.changedTouches[0].clientX;
+            const diff = endX - startX;
+            const threshold = slideshow.offsetWidth * 0.2;
+
+            if (diff < -threshold) {
+                nextSlide();
+            } else if (diff > threshold) {
+                prevSlide();
+            } else {
+                goToSlide(currentSlide);
+            }
+        }, { passive: true });
+
+        // Запуск автоплея
+        resetAutoplay();
 
         window.addEventListener('load', () => {
             setTimeout(() => {
