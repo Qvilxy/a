@@ -49,23 +49,20 @@
             position: relative;
             flex-shrink: 0;
             z-index: 15;
-            /* Фон на весь header включая safe area */
             background: #7388A3;
             padding-top: var(--safe-top, 0px);
         }
 
         .header-top {
             height: 100px;
-            display: flex;
-            align-items: center;
             position: relative;
         }
 
-        /* Бургер по центру между левым краем и логотипом */
+        /* Бургер — центр по фиолетовой линии (по центру между левым краем и логотипом) */
         .menu-btn {
             position: absolute;
             left: calc(22% - 45px);
-            top: 55%;
+            top: 68%;
             transform: translate(-50%, -50%);
             background: none;
             border: none;
@@ -84,7 +81,7 @@
             display: block;
         }
 
-        /* Логотип опущен — низ на 1px выше края тёмной полоски */
+        /* Логотип */
         .logo-wrapper {
             position: absolute;
             top: 52%;
@@ -102,14 +99,14 @@
             filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
         }
 
-        /* Иконки */
+        /* Иконки — нижний край на красной линии, симметрично между логотипом и правым краем */
         .header-right {
             position: absolute;
-            right: 14px;
-            top: 55%;
-            transform: translateY(-50%);
+            left: calc(72% + 7px);
+            bottom: 0;
+            transform: translateX(-50%);
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             gap: 4px;
             z-index: 10;
         }
@@ -118,7 +115,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            padding: 4px;
+            padding: 0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -326,7 +323,7 @@
             </div>
 
             <div class="page dev-page" id="page-korzina">
-                <h2> Корзина</h2>
+                <h2>🛒 Корзина</h2>
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-profile">
@@ -512,3 +509,4 @@
     </script>
 </body>
 </html>
+
