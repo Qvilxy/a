@@ -49,12 +49,12 @@
             position: relative;
             flex-shrink: 0;
             z-index: 15;
+            /* Фон на весь header включая safe area */
+            background: #7388A3;
+            padding-top: var(--safe-top, 0px);
         }
 
         .header-top {
-            background: #7388A3;
-            /* Safe area применяется сюда, чтобы полоска была цвета шапки */
-            padding-top: var(--safe-top, 0px);
             height: 100px;
             display: flex;
             align-items: center;
@@ -84,12 +84,12 @@
             display: block;
         }
 
-        /* Логотип БОЛЬШЕ и смещён влево */
+        /* Логотип опущен — низ на 1px выше края тёмной полоски */
         .logo-wrapper {
             position: absolute;
-            top: 50%;
+            top: 52%;
             left: 44%;
-            transform: translate(-50%, -45%);
+            transform: translate(-50%, -40%);
             z-index: 20;
             width: 180px;
             height: 115px;
@@ -102,7 +102,7 @@
             filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
         }
 
-        /* Иконки чуть уменьшены */
+        /* Иконки */
         .header-right {
             position: absolute;
             right: 14px;
@@ -326,7 +326,7 @@
             </div>
 
             <div class="page dev-page" id="page-korzina">
-                <h2>🛒 Корзина</h2>
+                <h2> Корзина</h2>
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-profile">
@@ -334,7 +334,7 @@
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-faq">
-                <h2> F.A.Q.</h2>
+                <h2>❓ F.A.Q.</h2>
                 <p>В разработке</p>
             </div>
         </div>
