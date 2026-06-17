@@ -49,28 +49,28 @@
             position: relative;
             flex-shrink: 0;
             z-index: 15;
-            /* Отступ сверху под нативные кнопки Telegram */
-            padding-top: env(safe-area-inset-top, 20px);
         }
 
         .header-top {
             background: #7388A3;
-            height: 95px;
+            /* Safe area применяется сюда, чтобы полоска была цвета шапки */
+            padding-top: var(--safe-top, 0px);
+            height: 100px;
             display: flex;
             align-items: center;
             position: relative;
         }
 
-        /* Кнопка меню-бургер слева */
+        /* Бургер по центру между левым краем и логотипом */
         .menu-btn {
             position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-20%);
+            left: calc(22% - 45px);
+            top: 55%;
+            transform: translate(-50%, -50%);
             background: none;
             border: none;
             cursor: pointer;
-            padding: 8px;
+            padding: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -78,21 +78,21 @@
         }
 
         .menu-btn img {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             object-fit: contain;
             display: block;
         }
 
-        /* Логотип СМЕЩЁН ВЛЕВО от центра */
+        /* Логотип БОЛЬШЕ и смещён влево */
         .logo-wrapper {
             position: absolute;
             top: 50%;
             left: 44%;
-            transform: translate(-50%, -35%);
+            transform: translate(-50%, -45%);
             z-index: 20;
-            width: 150px;
-            height: 95px;
+            width: 180px;
+            height: 115px;
         }
 
         .logo-wrapper img {
@@ -102,15 +102,15 @@
             filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
         }
 
-        /* Иконки справа — БОЛЬШИЕ */
+        /* Иконки чуть уменьшены */
         .header-right {
             position: absolute;
             right: 14px;
-            top: 50%;
-            transform: translateY(-20%);
+            top: 55%;
+            transform: translateY(-50%);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             z-index: 10;
         }
 
@@ -118,20 +118,20 @@
             background: none;
             border: none;
             cursor: pointer;
-            padding: 6px;
+            padding: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .icon-btn img {
-            width: 42px;
-            height: 42px;
+            width: 36px;
+            height: 36px;
             object-fit: contain;
             display: block;
         }
 
-        /* Тёмная полоска — ТОЛЩЕ */
+        /* Тёмная полоска */
         .header-bottom {
             background: #15355B;
             height: 22px;
@@ -334,7 +334,7 @@
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-faq">
-                <h2>❓ F.A.Q.</h2>
+                <h2> F.A.Q.</h2>
                 <p>В разработке</p>
             </div>
         </div>
@@ -361,21 +361,19 @@
     <script>
         const tg = window.Telegram?.WebApp;
 
-        // Применяем safe area
         function applySafeArea() {
+            let top = 0;
             if (tg && tg.safeAreaInset && tg.safeAreaInset.top) {
-                document.documentElement.style.setProperty('--tg-safe-top', tg.safeAreaInset.top + 'px');
-                document.querySelector('.header').style.paddingTop = tg.safeAreaInset.top + 'px';
+                top = tg.safeAreaInset.top;
             } else {
-                // Fallback если safeAreaInset не доступен
-                document.querySelector('.header').style.paddingTop = '20px';
+                top = 20;
             }
+            document.documentElement.style.setProperty('--safe-top', top + 'px');
         }
 
         if (tg) {
             tg.ready();
             tg.expand();
-            // Применяем после ready
             setTimeout(applySafeArea, 100);
         } else {
             applySafeArea();
