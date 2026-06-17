@@ -58,7 +58,7 @@
             position: relative;
         }
 
-        /* Бургер — центр по фиолетовой линии (по центру между левым краем и логотипом) */
+        /* Бургер */
         .menu-btn {
             position: absolute;
             left: calc(22% - 45px);
@@ -99,14 +99,14 @@
             filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
         }
 
-        /* Иконки — нижний край на красной линии, симметрично между логотипом и правым краем */
+        /* Иконки — на одной высоте с бургером, правее */
         .header-right {
             position: absolute;
-            left: calc(72% + 7px);
-            bottom: 0;
-            transform: translateX(-50%);
+            right: 16px;
+            top: 68%;
+            transform: translateY(-50%);
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             gap: 4px;
             z-index: 10;
         }
