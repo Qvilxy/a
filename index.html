@@ -80,7 +80,6 @@
             display: block;
         }
 
-        /* Логотип кликабельный */
         .logo-wrapper {
             position: absolute;
             top: 52%;
@@ -148,7 +147,6 @@
             visibility: visible;
         }
 
-        /* Меню уже, опущено вниз */
         .side-menu {
             position: fixed;
             top: 0;
@@ -163,9 +161,7 @@
             padding: 100px 20px 24px;
             overflow-y: auto;
         }
-        .side-menu.show {
-            transform: translateX(0);
-        }
+        .side-menu.show { transform: translateX(0); }
 
         .side-menu h3 {
             font-size: 18px;
@@ -174,9 +170,7 @@
             margin-bottom: 6px;
             margin-top: 14px;
         }
-        .side-menu h3:first-child {
-            margin-top: 0;
-        }
+        .side-menu h3:first-child { margin-top: 0; }
 
         .side-menu ul {
             list-style: none;
@@ -211,11 +205,24 @@
         }
         .page.active { display: block; }
 
+        /* Главная страница со скроллом */
+        #page-home {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .home-scroll {
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+        }
+
         /* ===== СЛАЙД-ШОУ ===== */
         .slideshow {
             position: relative;
             width: 100%;
-            height: 100%;
+            height: 50vh;
+            flex-shrink: 0;
             overflow: hidden;
             touch-action: pan-y;
         }
@@ -265,6 +272,81 @@
         .indicator.active { width: 32px; background: #fff; }
         .indicator.inactive { width: 16px; background: rgba(255,255,255,0.5); }
 
+        /* ===== КАТЕГОРИИ ===== */
+        .categories-section {
+            padding: 24px 0 30px;
+            background: #f0f0f0;
+        }
+
+        .category-block {
+            margin-bottom: 28px;
+        }
+
+        .category-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111;
+            padding: 0 18px 12px;
+        }
+
+        /* ===== КАРУСЕЛЬ ===== */
+        .carousel {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            touch-action: pan-y;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .carousel-track {
+            display: flex;
+            gap: 12px;
+            padding: 0 18px;
+            will-change: transform;
+            transition: transform 0.3s ease-out;
+        }
+
+        .carousel-track.dragging {
+            transition: none;
+        }
+
+        .carousel-track.auto {
+            transition: none;
+        }
+
+        .carousel-item {
+            flex-shrink: 0;
+            width: 160px;
+            height: 200px;
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            -webkit-user-drag: none;
+        }
+
+        .carousel-item-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px 10px;
+            background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* ===== DEV PAGES ===== */
         .dev-page {
             background: #f0f0f0;
             display: none;
@@ -310,21 +392,46 @@
 
         <div class="content">
             <div class="page active" id="page-home">
-                <div class="slideshow" id="slideshow">
-                    <div class="slideshow-track" id="slideshow-track">
-                        <div class="slide"><img src="sadtree.png" alt="Slide 1"></div>
-                        <div class="slide"><img src="voda.png" alt="Slide 2"></div>
-                        <div class="slide"><img src="sadtree.png" alt="Slide 1 clone"></div>
+                <div class="home-scroll">
+                    <!-- Слайд-шоу -->
+                    <div class="slideshow" id="slideshow">
+                        <div class="slideshow-track" id="slideshow-track">
+                            <div class="slide"><img src="sadtree.png" alt="Slide 1"></div>
+                            <div class="slide"><img src="voda.png" alt="Slide 2"></div>
+                            <div class="slide"><img src="sadtree.png" alt="Slide 1 clone"></div>
+                        </div>
+                        <div class="slideshow-indicators">
+                            <div class="indicator active" id="ind-0"></div>
+                            <div class="indicator inactive" id="ind-1"></div>
+                        </div>
                     </div>
-                    <div class="slideshow-indicators">
-                        <div class="indicator active" id="ind-0"></div>
-                        <div class="indicator inactive" id="ind-1"></div>
+
+                    <!-- Категории с каруселями -->
+                    <div class="categories-section">
+                        <div class="category-block">
+                            <div class="category-title">Худи</div>
+                            <div class="carousel" data-image="hoodie.png" data-count="6">
+                                <div class="carousel-track"></div>
+                            </div>
+                        </div>
+                        <div class="category-block">
+                            <div class="category-title">Футболки</div>
+                            <div class="carousel" data-image="tshirt.png" data-count="6">
+                                <div class="carousel-track"></div>
+                            </div>
+                        </div>
+                        <div class="category-block">
+                            <div class="category-title">Штаны</div>
+                            <div class="carousel" data-image="pants.png" data-count="6">
+                                <div class="carousel-track"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="page dev-page" id="page-korzina">
-                <h2> Корзина</h2>
+                <h2>🛒 Корзина</h2>
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-profile">
@@ -416,6 +523,8 @@
             history = ['home'];
             showPage('home');
             if (tg?.BackButton) tg.BackButton.hide();
+            // Сбрасываем скролл главной
+            document.getElementById('page-home').scrollTop = 0;
         }
 
         // ===== СЛАЙД-ШОУ =====
@@ -501,6 +610,122 @@
         moveTo(0, false);
         resetAutoplay();
 
+        // ===== КАРУСЕЛИ С АВТО-ПРОКРУТКОЙ =====
+        document.querySelectorAll('.carousel').forEach(carousel => {
+            const imageSrc = carousel.dataset.image;
+            const count = parseInt(carousel.dataset.count) || 6;
+            const trackEl = carousel.querySelector('.carousel-track');
+
+            // Создаём элементы (двойной набор для бесконечной прокрутки)
+            const labels = ['New', 'Sale', 'Top', 'Hit', 'Limited', 'Best'];
+            const totalItems = count * 2;
+            for (let i = 0; i < totalItems; i++) {
+                const item = document.createElement('div');
+                item.className = 'carousel-item';
+                item.innerHTML = `
+                    <img src="${imageSrc}" alt="">
+                    <div class="carousel-item-label">${labels[i % count]}</div>
+                `;
+                trackEl.appendChild(item);
+            }
+
+            // Размеры
+            const itemWidth = 160;
+            const gap = 12;
+            const step = itemWidth + gap; // 172px
+
+            let offset = 0;
+            const singleSetWidth = count * step; // ширина одного набора
+            let autoInterval;
+            let isTouched = false;
+            let touchStartX = 0;
+            let touchStartOffset = 0;
+
+            function autoScroll() {
+                if (isTouched) return;
+                offset += 0.5; // скорость прокрутки
+                // При достижении конца первого набора — бесшовный прыжок в начало
+                if (offset >= singleSetWidth) {
+                    offset -= singleSetWidth;
+                }
+                trackEl.style.transition = 'none';
+                trackEl.style.transform = `translateX(${-offset}px)`;
+            }
+
+            function startAuto() {
+                if (autoInterval) clearInterval(autoInterval);
+                autoInterval = setInterval(autoScroll, 16); // ~60fps
+            }
+
+            function stopAuto() {
+                if (autoInterval) {
+                    clearInterval(autoInterval);
+                    autoInterval = null;
+                }
+            }
+
+            // Touch события
+            carousel.addEventListener('touchstart', (e) => {
+                isTouched = true;
+                stopAuto();
+                touchStartX = e.touches[0].clientX;
+                touchStartOffset = offset;
+                trackEl.classList.add('dragging');
+            }, { passive: true });
+
+            carousel.addEventListener('touchmove', (e) => {
+                if (!isTouched) return;
+                const diff = e.touches[0].clientX - touchStartX;
+                let newOffset = touchStartOffset - diff;
+                // Зацикливание
+                if (newOffset < 0) newOffset += singleSetWidth;
+                if (newOffset >= singleSetWidth) newOffset -= singleSetWidth;
+                offset = newOffset;
+                trackEl.style.transform = `translateX(${-offset}px)`;
+            }, { passive: true });
+
+            carousel.addEventListener('touchend', () => {
+                if (!isTouched) return;
+                isTouched = false;
+                trackEl.classList.remove('dragging');
+                // Возобновляем автопрокрутку после небольшой задержки
+                setTimeout(() => {
+                    if (!isTouched) startAuto();
+                }, 1500);
+            }, { passive: true });
+
+            // Mouse события (для десктопа)
+            carousel.addEventListener('mousedown', (e) => {
+                isTouched = true;
+                stopAuto();
+                touchStartX = e.clientX;
+                touchStartOffset = offset;
+                trackEl.classList.add('dragging');
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isTouched) return;
+                const diff = e.clientX - touchStartX;
+                let newOffset = touchStartOffset - diff;
+                if (newOffset < 0) newOffset += singleSetWidth;
+                if (newOffset >= singleSetWidth) newOffset -= singleSetWidth;
+                offset = newOffset;
+                trackEl.style.transform = `translateX(${-offset}px)`;
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (!isTouched) return;
+                isTouched = false;
+                trackEl.classList.remove('dragging');
+                setTimeout(() => {
+                    if (!isTouched) startAuto();
+                }, 1500);
+            });
+
+            startAuto();
+        });
+
         window.addEventListener('load', () => {
             setTimeout(() => {
                 document.getElementById('loading-screen').classList.add('hidden');
@@ -510,4 +735,3 @@
     </script>
 </body>
 </html>
-
