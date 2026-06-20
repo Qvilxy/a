@@ -409,7 +409,7 @@
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-profile">
-                <h2> Профиль</h2>
+                <h2>👤 Профиль</h2>
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-faq">
@@ -590,6 +590,9 @@
             const speed = 0.4;
             const trackEl = carousel.querySelector('.carousel-track');
 
+            // Направление: футболки (index 1) крутятся в обратную сторону
+            const direction = index === 1 ? -1 : 1;
+
             const totalItems = count * 2;
             for (let i = 0; i < totalItems; i++) {
                 const item = document.createElement('div');
@@ -612,9 +615,12 @@
 
             function autoScroll() {
                 if (isTouched) return;
-                offset += speed;
-                if (offset >= singleSetWidth) {
-                    offset -= singleSetWidth;
+                offset += speed * direction;
+                // Зацикливание в зависимости от направления
+                if (direction === 1) {
+                    if (offset >= singleSetWidth) offset -= singleSetWidth;
+                } else {
+                    if (offset < 0) offset += singleSetWidth;
                 }
                 trackEl.style.transform = `translateX(${-offset}px)`;
             }
@@ -653,8 +659,9 @@
                 if (!isTouched) return;
                 const diff = e.touches[0].clientX - touchStartX;
                 let newOffset = touchStartOffset - diff;
-                if (newOffset < 0) newOffset += singleSetWidth;
-                if (newOffset >= singleSetWidth) newOffset -= singleSetWidth;
+                // Зацикливание при ручном свайпе
+                while (newOffset < 0) newOffset += singleSetWidth;
+                while (newOffset >= singleSetWidth) newOffset -= singleSetWidth;
                 offset = newOffset;
                 trackEl.style.transform = `translateX(${-offset}px)`;
             }, { passive: true });
@@ -679,8 +686,8 @@
                 if (!isTouched) return;
                 const diff = e.clientX - touchStartX;
                 let newOffset = touchStartOffset - diff;
-                if (newOffset < 0) newOffset += singleSetWidth;
-                if (newOffset >= singleSetWidth) newOffset -= singleSetWidth;
+                while (newOffset < 0) newOffset += singleSetWidth;
+                while (newOffset >= singleSetWidth) newOffset -= singleSetWidth;
                 offset = newOffset;
                 trackEl.style.transform = `translateX(${-offset}px)`;
             });
