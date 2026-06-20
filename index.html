@@ -409,7 +409,7 @@
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-profile">
-                <h2> Профиль</h2>
+                <h2>👤 Профиль</h2>
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-faq">
@@ -583,11 +583,11 @@
         moveTo(0, false);
         resetAutoplay();
 
-        // ===== КАРУСЕЛИ — одинаковая скорость, разный старт =====
+        // ===== КАРУСЕЛИ =====
         document.querySelectorAll('.carousel').forEach((carousel, index) => {
             const imageSrc = carousel.dataset.image;
             const count = parseInt(carousel.dataset.count) || 6;
-            const speed = 0.4; // Одинаковая скорость для всех
+            const speed = 0.4;
             const trackEl = carousel.querySelector('.carousel-track');
 
             const totalItems = count * 2;
@@ -603,7 +603,6 @@
             const step = itemWidth + gap;
             const singleSetWidth = count * step;
 
-            // Разная стартовая позиция для эффекта рассинхронизации
             let offset = index * (singleSetWidth / 3);
             let autoInterval;
             let isTouched = false;
@@ -693,10 +692,10 @@
                 scheduleResume();
             });
 
-            // Задержка старта для каждой карусели (0ms, 200ms, 400ms)
+            // Задержка старта: Худи 0ms, Футболки 500ms, Штаны 1000ms
             setTimeout(() => {
                 startAuto();
-            }, index * 200);
+            }, index * 500);
         });
 
         window.addEventListener('load', () => {
