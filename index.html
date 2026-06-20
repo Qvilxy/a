@@ -44,7 +44,6 @@
         }
         #app-container.visible { display: flex; }
 
-        /* ===== ШАПКА ===== */
         .header {
             position: relative;
             flex-shrink: 0;
@@ -131,7 +130,6 @@
             height: 22px;
         }
 
-        /* ===== БОКОВОЕ МЕНЮ ===== */
         .side-menu-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -189,7 +187,6 @@
 
         .side-menu li:active { background: #f0f0f0; }
 
-        /* ===== КОНТЕНТ ===== */
         .content {
             flex: 1;
             position: relative;
@@ -205,7 +202,6 @@
         }
         .page.active { display: block; }
 
-        /* Главная страница со скроллом */
         #page-home {
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
@@ -217,7 +213,6 @@
             min-height: 100%;
         }
 
-        /* ===== СЛАЙД-ШОУ — занимает весь экран под шапкой ===== */
         .slideshow {
             position: relative;
             width: 100%;
@@ -272,7 +267,6 @@
         .indicator.active { width: 32px; background: #fff; }
         .indicator.inactive { width: 16px; background: rgba(255,255,255,0.5); }
 
-        /* ===== КАТЕГОРИИ ===== */
         .categories-section {
             padding: 24px 0 30px;
             background: #f0f0f0;
@@ -283,13 +277,14 @@
         }
 
         .category-title {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
+            font-style: italic;
             color: #111;
-            padding: 0 18px 12px;
+            text-align: center;
+            padding: 0 18px 14px;
         }
 
-        /* ===== КАРУСЕЛЬ ===== */
         .carousel {
             position: relative;
             width: 100%;
@@ -317,7 +312,6 @@
             background: #fff;
             border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             position: relative;
         }
 
@@ -329,19 +323,6 @@
             -webkit-user-drag: none;
         }
 
-        .carousel-item-label {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 8px 10px;
-            background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
-            color: #fff;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        /* ===== DEV PAGES ===== */
         .dev-page {
             background: #f0f0f0;
             display: none;
@@ -388,7 +369,6 @@
         <div class="content">
             <div class="page active" id="page-home">
                 <div class="home-scroll">
-                    <!-- Слайд-шоу -->
                     <div class="slideshow" id="slideshow">
                         <div class="slideshow-track" id="slideshow-track">
                             <div class="slide"><img src="sadtree.png" alt="Slide 1"></div>
@@ -401,23 +381,22 @@
                         </div>
                     </div>
 
-                    <!-- Категории с каруселями -->
                     <div class="categories-section">
                         <div class="category-block">
                             <div class="category-title">Худи</div>
-                            <div class="carousel" data-image="hoodie.png" data-count="6" data-speed="0.4">
+                            <div class="carousel" data-image="hoodie.png" data-count="6">
                                 <div class="carousel-track"></div>
                             </div>
                         </div>
                         <div class="category-block">
                             <div class="category-title">Футболки</div>
-                            <div class="carousel" data-image="tshirt.png" data-count="6" data-speed="0.6">
+                            <div class="carousel" data-image="tshirt.png" data-count="6">
                                 <div class="carousel-track"></div>
                             </div>
                         </div>
                         <div class="category-block">
                             <div class="category-title">Штаны</div>
-                            <div class="carousel" data-image="pants.png" data-count="6" data-speed="0.8">
+                            <div class="carousel" data-image="pants.png" data-count="6">
                                 <div class="carousel-track"></div>
                             </div>
                         </div>
@@ -430,7 +409,7 @@
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-profile">
-                <h2>👤 Профиль</h2>
+                <h2> Профиль</h2>
                 <p>В разработке</p>
             </div>
             <div class="page dev-page" id="page-faq">
@@ -604,22 +583,18 @@
         moveTo(0, false);
         resetAutoplay();
 
-        // ===== КАРУСЕЛИ — каждая крутится независимо =====
+        // ===== КАРУСЕЛИ — одинаковая скорость, разный старт =====
         document.querySelectorAll('.carousel').forEach((carousel, index) => {
             const imageSrc = carousel.dataset.image;
             const count = parseInt(carousel.dataset.count) || 6;
-            const speed = parseFloat(carousel.dataset.speed) || 0.5;
+            const speed = 0.4; // Одинаковая скорость для всех
             const trackEl = carousel.querySelector('.carousel-track');
 
-            const labels = ['New', 'Sale', 'Top', 'Hit', 'Limited', 'Best'];
             const totalItems = count * 2;
             for (let i = 0; i < totalItems; i++) {
                 const item = document.createElement('div');
                 item.className = 'carousel-item';
-                item.innerHTML = `
-                    <img src="${imageSrc}" alt="">
-                    <div class="carousel-item-label">${labels[i % count]}</div>
-                `;
+                item.innerHTML = `<img src="${imageSrc}" alt="">`;
                 trackEl.appendChild(item);
             }
 
@@ -628,8 +603,8 @@
             const step = itemWidth + gap;
             const singleSetWidth = count * step;
 
-            // Разная стартовая позиция для каждой карусели
-            let offset = index * 80;
+            // Разная стартовая позиция для эффекта рассинхронизации
+            let offset = index * (singleSetWidth / 3);
             let autoInterval;
             let isTouched = false;
             let touchStartX = 0;
@@ -664,7 +639,7 @@
             function scheduleResume() {
                 resumeTimeout = setTimeout(() => {
                     if (!isTouched) startAuto();
-                }, 15000); // 15 секунд
+                }, 15000);
             }
 
             carousel.addEventListener('touchstart', (e) => {
@@ -718,7 +693,10 @@
                 scheduleResume();
             });
 
-            startAuto();
+            // Задержка старта для каждой карусели (0ms, 200ms, 400ms)
+            setTimeout(() => {
+                startAuto();
+            }, index * 200);
         });
 
         window.addEventListener('load', () => {
