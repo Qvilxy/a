@@ -217,11 +217,11 @@
             min-height: 100%;
         }
 
-        /* ===== СЛАЙД-ШОУ ===== */
+        /* ===== СЛАЙД-ШОУ — занимает весь экран под шапкой ===== */
         .slideshow {
             position: relative;
             width: 100%;
-            height: 50vh;
+            height: calc(100vh - 122px - var(--safe-top, 0px));
             flex-shrink: 0;
             overflow: hidden;
             touch-action: pan-y;
@@ -304,14 +304,9 @@
             gap: 12px;
             padding: 0 18px;
             will-change: transform;
-            transition: transform 0.3s ease-out;
         }
 
         .carousel-track.dragging {
-            transition: none;
-        }
-
-        .carousel-track.auto {
             transition: none;
         }
 
@@ -410,19 +405,19 @@
                     <div class="categories-section">
                         <div class="category-block">
                             <div class="category-title">Худи</div>
-                            <div class="carousel" data-image="hoodie.png" data-count="6">
+                            <div class="carousel" data-image="hoodie.png" data-count="6" data-speed="0.4">
                                 <div class="carousel-track"></div>
                             </div>
                         </div>
                         <div class="category-block">
                             <div class="category-title">Футболки</div>
-                            <div class="carousel" data-image="tshirt.png" data-count="6">
+                            <div class="carousel" data-image="tshirt.png" data-count="6" data-speed="0.6">
                                 <div class="carousel-track"></div>
                             </div>
                         </div>
                         <div class="category-block">
                             <div class="category-title">Штаны</div>
-                            <div class="carousel" data-image="pants.png" data-count="6">
+                            <div class="carousel" data-image="pants.png" data-count="6" data-speed="0.8">
                                 <div class="carousel-track"></div>
                             </div>
                         </div>
@@ -523,7 +518,6 @@
             history = ['home'];
             showPage('home');
             if (tg?.BackButton) tg.BackButton.hide();
-            // Сбрасываем скролл главной
             document.getElementById('page-home').scrollTop = 0;
         }
 
@@ -610,13 +604,13 @@
         moveTo(0, false);
         resetAutoplay();
 
-        // ===== КАРУСЕЛИ С АВТО-ПРОКРУТКОЙ =====
-        document.querySelectorAll('.carousel').forEach(carousel => {
+        // ===== КАРУСЕЛИ — каждая крутится независимо =====
+        document.querySelectorAll('.carousel').forEach((carousel, index) => {
             const imageSrc = carousel.dataset.image;
             const count = parseInt(carousel.dataset.count) || 6;
+            const speed = parseFloat(carousel.dataset.speed) || 0.5;
             const trackEl = carousel.querySelector('.carousel-track');
 
-            // Создаём элементы (двойной набор для бесконечной прокрутки)
             const labels = ['New', 'Sale', 'Top', 'Hit', 'Limited', 'Best'];
             const totalItems = count * 2;
             for (let i = 0; i < totalItems; i++) {
@@ -629,32 +623,31 @@
                 trackEl.appendChild(item);
             }
 
-            // Размеры
             const itemWidth = 160;
             const gap = 12;
-            const step = itemWidth + gap; // 172px
+            const step = itemWidth + gap;
+            const singleSetWidth = count * step;
 
-            let offset = 0;
-            const singleSetWidth = count * step; // ширина одного набора
+            // Разная стартовая позиция для каждой карусели
+            let offset = index * 80;
             let autoInterval;
             let isTouched = false;
             let touchStartX = 0;
             let touchStartOffset = 0;
+            let resumeTimeout;
 
             function autoScroll() {
                 if (isTouched) return;
-                offset += 0.5; // скорость прокрутки
-                // При достижении конца первого набора — бесшовный прыжок в начало
+                offset += speed;
                 if (offset >= singleSetWidth) {
                     offset -= singleSetWidth;
                 }
-                trackEl.style.transition = 'none';
                 trackEl.style.transform = `translateX(${-offset}px)`;
             }
 
             function startAuto() {
                 if (autoInterval) clearInterval(autoInterval);
-                autoInterval = setInterval(autoScroll, 16); // ~60fps
+                autoInterval = setInterval(autoScroll, 16);
             }
 
             function stopAuto() {
@@ -662,9 +655,18 @@
                     clearInterval(autoInterval);
                     autoInterval = null;
                 }
+                if (resumeTimeout) {
+                    clearTimeout(resumeTimeout);
+                    resumeTimeout = null;
+                }
             }
 
-            // Touch события
+            function scheduleResume() {
+                resumeTimeout = setTimeout(() => {
+                    if (!isTouched) startAuto();
+                }, 15000); // 15 секунд
+            }
+
             carousel.addEventListener('touchstart', (e) => {
                 isTouched = true;
                 stopAuto();
@@ -677,7 +679,6 @@
                 if (!isTouched) return;
                 const diff = e.touches[0].clientX - touchStartX;
                 let newOffset = touchStartOffset - diff;
-                // Зацикливание
                 if (newOffset < 0) newOffset += singleSetWidth;
                 if (newOffset >= singleSetWidth) newOffset -= singleSetWidth;
                 offset = newOffset;
@@ -688,13 +689,9 @@
                 if (!isTouched) return;
                 isTouched = false;
                 trackEl.classList.remove('dragging');
-                // Возобновляем автопрокрутку после небольшой задержки
-                setTimeout(() => {
-                    if (!isTouched) startAuto();
-                }, 1500);
+                scheduleResume();
             }, { passive: true });
 
-            // Mouse события (для десктопа)
             carousel.addEventListener('mousedown', (e) => {
                 isTouched = true;
                 stopAuto();
@@ -718,9 +715,7 @@
                 if (!isTouched) return;
                 isTouched = false;
                 trackEl.classList.remove('dragging');
-                setTimeout(() => {
-                    if (!isTouched) startAuto();
-                }, 1500);
+                scheduleResume();
             });
 
             startAuto();
